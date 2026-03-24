@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Shelf It Right — Music Score Training</title>
+<title>Shelf It Right</title>
 <style>
-body { font-family: Arial; background:#f4f6f8; margin:0; padding:20px; }
-.card { background:white; padding:20px; border-radius:12px; max-width:800px; margin:auto; }
-button { padding:10px 15px; margin-top:10px; cursor:pointer; }
-.label { border:2px solid #000; padding:10px; margin:10px; background:#fff; cursor:grab; }
-.dropzone { border:2px dashed #aaa; padding:10px; min-height:60px; margin:10px; }
+body { font-family: Arial; background:#f4f6f8; padding:20px; }
+.card { background:white; padding:20px; border-radius:10px; max-width:700px; margin:auto; }
+button { padding:10px; margin-top:10px; cursor:pointer; }
+.choice { display:block; margin:10px 0; padding:10px; border:1px solid #ccc; cursor:pointer; }
 .correct { background:#e3f9e5; }
 .wrong { background:#fde8e8; }
 </style>
@@ -19,85 +18,115 @@ button { padding:10px 15px; margin-top:10px; cursor:pointer; }
 
 <script>
 
-let stage = 0;
+let round = 0;
+let score = 0;
 
-function start() {
-document.getElementById("app").innerHTML = `
-<h2>Shelf It Right</h2>
-<p><strong>A score</strong> is the written music of a piece showing multiple parts together.</p>
-<p>A <strong>mini-score</strong> is a smaller study version. A lowercase <strong>m</strong> (like m1998) tells you it's a mini-score.</p>
-<p>Cutters (like .B4 or T10) are read like decimals — even when there is no dot.</p>
-<button onclick="finalTest()">Start Final Test</button>
-`;
+const rounds = [
+
+{
+lesson: `
+<h3>What is a Score?</h3>
+<p>A <strong>score</strong> is the written music of a piece showing multiple parts together.</p>
+<p>A <strong>part</strong> is only one instrument or section.</p>
+`,
+question: "What is a score?",
+choices: [
+"Music for one instrument",
+"A written version showing multiple parts",
+"A recording"
+],
+answer: 1
+},
+
+{
+lesson: `
+<h3>Mini-Scores</h3>
+<p>A <strong>mini-score</strong> is a smaller study version.</p>
+<p>A lowercase <strong>m</strong> (like m1998) means mini-score.</p>
+`,
+question: "What does lowercase m mean?",
+choices: [
+"Mini-score",
+"Major key",
+"Missing page"
+],
+answer: 0
+},
+
+{
+lesson: `
+<h3>Whole Numbers</h3>
+<p>Compare the whole number first.</p>
+`,
+question: "Which comes first?",
+choices: ["M 100", "M 50", "M 75"],
+answer: 1
+},
+
+{
+lesson: `
+<h3>First Cutter</h3>
+<p>Read like a decimal.</p>
+<p>.B4 comes before .B45</p>
+`,
+question: "Which comes first?",
+choices: [".B45", ".B4", ".B5"],
+answer: 1
+},
+
+{
+lesson: `
+<h3>Second Cutter</h3>
+<p>The second Cutter is also read like a decimal — even without a dot.</p>
+<p>T10 behaves like .10</p>
+`,
+question: "Which comes first?",
+choices: ["T2", "T10", "T3"],
+answer: 1
+},
+
+{
+lesson: `
+<h3>Year</h3>
+<p>If everything else matches, earlier year comes first.</p>
+`,
+question: "Which comes first?",
+choices: ["2005", "1998", "2010"],
+answer: 1
 }
 
-function finalTest() {
-stage = 1;
-
-document.getElementById("app").innerHTML = `
-<h2>Final Test — Put in Order</h2>
-<p>Drag the call numbers into the correct order (top = first on shelf)</p>
-
-<div id="choices">
-<div class="label" draggable="true">M<br>300<br>.A2<br>T2<br>2005</div>
-<div class="label" draggable="true">M<br>300<br>.A2<br>T10<br>2005</div>
-<div class="label" draggable="true">M<br>300<br>.A2<br>T3<br>2005</div>
-<div class="label" draggable="true">M<br>300<br>.A2<br>T2<br>1998</div>
-</div>
-
-<h3>Drop here in order:</h3>
-
-<div class="dropzone"></div>
-<div class="dropzone"></div>
-<div class="dropzone"></div>
-<div class="dropzone"></div>
-
-<button onclick="checkOrder()">Check Order</button>
-<div id="result"></div>
-`;
-
-enableDrag();
-}
-
-let dragged;
-
-function enableDrag() {
-document.querySelectorAll(".label").forEach(el => {
-el.addEventListener("dragstart", e => dragged = el);
-});
-
-document.querySelectorAll(".dropzone").forEach(zone => {
-zone.addEventListener("dragover", e => e.preventDefault());
-zone.addEventListener("drop", function() {
-this.innerHTML = "";
-this.appendChild(dragged);
-});
-});
-}
-
-function checkOrder() {
-let zones = document.querySelectorAll(".dropzone");
-let order = Array.from(zones).map(z => z.textContent.trim());
-
-let correct = [
-"M300.A2T102005",
-"M300.A2T21998",
-"M300.A2T22005",
-"M300.A2T32005"
 ];
 
-let cleaned = order.map(o => o.replace(/\\s+/g,''));
+function render() {
+if (round >= rounds.length) return end();
 
-let result = document.getElementById("result");
+let r = rounds[round];
 
-if(JSON.stringify(cleaned) === JSON.stringify(correct)) {
-result.innerHTML = "<p class='correct'>Correct. You’ve got it.</p>";
-} else {
-result.innerHTML = "<p class='wrong'>Not quite. Remember: second Cutter is decimal logic (T10 comes before T2).</p>";
+document.getElementById("app").innerHTML = `
+${r.lesson}
+<p><strong>${r.question}</strong></p>
+${r.choices.map((c,i)=>`
+<div class="choice" onclick="answer(${i})">${c}</div>
+`).join("")}
+<p>Score: ${score}</p>
+`;
 }
+
+function answer(i) {
+if (i === rounds[round].answer) score++;
+round++;
+render();
 }
 
-start();
+function end() {
+document.getElementById("app").innerHTML = `
+<h2>Done</h2>
+<p>Score: ${score}/${rounds.length}</p>
+<button onclick="location.reload()">Restart</button>
+`;
+}
+
+render();
 
 </script>
 </body>
