@@ -3,266 +3,277 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shelf It Right</title>
+  <title>Shelf It Right — Music Score Training</title>
   <style>
-    :root{
-      --bg:#f5f7fb;
-      --card:#ffffff;
-      --ink:#1f2937;
-      --muted:#6b7280;
-      --line:#d6dde8;
-      --accent:#1d5f91;
-      --accent-2:#2b6ea3;
-      --good:#166534;
-      --good-bg:#dcfce7;
-      --bad:#991b1b;
-      --bad-bg:#fee2e2;
-      --warn:#92400e;
-      --warn-bg:#fef3c7;
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d7dee8;
+      --accent: #1d5f91;
+      --accent-2: #2d74ac;
+      --good: #166534;
+      --good-bg: #dcfce7;
+      --bad: #991b1b;
+      --bad-bg: #fee2e2;
+      --warn: #92400e;
+      --warn-bg: #fef3c7;
     }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-      line-height:1.5;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
     }
 
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:24px;
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px;
     }
 
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:24px;
-      box-shadow:0 6px 20px rgba(0,0,0,.05);
-      margin-bottom:18px;
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
     }
 
-    h1,h2,h3{margin-top:0}
-    h1{font-size:3rem; line-height:1.1; margin-bottom:18px;}
-    h2{font-size:1.7rem}
-    h3{font-size:1.15rem; margin-bottom:8px;}
-    p{font-size:1.05rem; margin:0 0 14px 0}
+    h1,h2,h3 { margin-top: 0; }
+    h1 { font-size: 2.7rem; line-height: 1.1; margin-bottom: 12px; }
+    h2 { font-size: 1.6rem; }
+    h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    p { margin: 0 0 14px 0; font-size: 1.02rem; }
 
-    .version{
-      color:var(--accent);
-      font-weight:700;
-      margin-bottom:8px;
-    }
-
-    .row{
-      display:flex;
-      gap:16px;
-      flex-wrap:wrap;
+    .version {
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
-    .col{
-      flex:1 1 320px;
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
     }
 
-    .info-box{
-      background:#f7fafc;
-      border:1px solid #c9d8e7;
-      border-radius:16px;
-      padding:16px 18px;
-      margin:14px 0;
+    .col {
+      flex: 1 1 320px;
     }
 
-    .info-box strong{
-      display:block;
-      color:var(--accent);
-      font-size:1.05rem;
-      margin-bottom:4px;
+    .info-box {
+      background: #f7fafc;
+      border: 1px solid #c8d9ea;
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin: 14px 0;
     }
 
-    button{
-      border:none;
-      border-radius:12px;
-      padding:12px 18px;
-      font-size:1rem;
-      font-weight:700;
-      cursor:pointer;
-      background:var(--accent);
-      color:#fff;
+    .info-box strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 5px;
+      font-size: 1.02rem;
     }
 
-    button:hover{background:var(--accent-2)}
-    button.secondary{
-      background:#fff;
-      color:var(--ink);
-      border:1px solid var(--line);
-    }
-    button.secondary:hover{background:#f8fafc}
-    button.choice{
-      display:block;
-      width:100%;
-      text-align:left;
-      margin:10px 0;
-      padding:14px 16px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--ink);
-      font-weight:600;
-    }
-    button.choice:hover{
-      border-color:var(--accent);
-      background:#f8fbff;
-    }
-    button:disabled{
-      opacity:.6;
-      cursor:not-allowed;
+    .lesson-note {
+      background: #f8fafc;
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin: 14px 0;
     }
 
-    .hidden{display:none}
-
-    .progress{
-      width:100%;
-      height:10px;
-      background:#e5e7eb;
-      border-radius:999px;
-      overflow:hidden;
-      margin:10px 0 20px;
-    }
-    .progress > div{
-      height:100%;
-      width:0%;
-      background:var(--accent);
-      transition:width .2s ease;
+    .small {
+      color: var(--muted);
+      font-size: .96rem;
     }
 
-    .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#e8eef5;
-      color:#37516b;
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.02em;
-      margin-bottom:10px;
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #e7eef6;
+      color: #34516c;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      margin-bottom: 10px;
     }
 
-    .feedback{
-      padding:12px 14px;
-      border-radius:12px;
-      margin-top:14px;
-      font-weight:600;
-    }
-    .good{background:var(--good-bg); color:var(--good)}
-    .bad{background:var(--bad-bg); color:var(--bad)}
-    .warn{background:var(--warn-bg); color:var(--warn)}
-
-    .small{
-      color:var(--muted);
-      font-size:.97rem;
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0 18px;
     }
 
-    code.call{
-      display:inline-block;
-      background:#f3f4f6;
-      padding:4px 8px;
-      border-radius:8px;
-      font-size:.96rem;
-      margin:2px 4px 2px 0;
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width .2s ease;
     }
 
-    ul.tight li{margin:7px 0}
-
-    .rules pre{
-      white-space:pre-wrap;
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:14px;
-      font-size:.98rem;
-      line-height:1.55;
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
     }
 
-    .sortbank, .sortslots{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      min-height:74px;
-      padding:14px;
-      border:2px dashed var(--line);
-      border-radius:16px;
-      background:#fafafa;
+    button:hover { background: var(--accent-2); }
+
+    button.secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
     }
 
-    .draggable{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px;
-      cursor:grab;
-      box-shadow:0 2px 8px rgba(0,0,0,.05);
-      min-width:190px;
+    button.secondary:hover {
+      background: #f8fafc;
     }
 
-    .slot{
-      min-height:68px;
-      min-width:190px;
-      border:2px dashed #cbd5e1;
-      border-radius:12px;
-      padding:8px;
-      background:#fff;
+    button.choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 10px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 600;
     }
 
-    .slotlabel{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:.04em;
+    button.choice:hover {
+      border-color: var(--accent);
+      background: #f8fbff;
     }
 
-    .lesson-note{
-      background:#f8fafc;
-      border-left:4px solid var(--accent);
-      padding:12px 14px;
-      border-radius:10px;
-      margin:14px 0;
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
     }
 
-    @media (max-width:700px){
-      h1{font-size:2.2rem}
-      .wrap{padding:14px}
-      .card{padding:18px}
+    .feedback {
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 14px;
+      font-weight: 600;
+    }
+
+    .good { background: var(--good-bg); color: var(--good); }
+    .bad  { background: var(--bad-bg); color: var(--bad); }
+    .warn { background: var(--warn-bg); color: var(--warn); }
+
+    .hidden { display: none; }
+
+    ul.tight li { margin: 7px 0; }
+
+    code.call {
+      display: inline-block;
+      background: #f3f4f6;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: .96rem;
+      margin: 3px 4px 3px 0;
+      vertical-align: middle;
+    }
+
+    .rules pre {
+      white-space: pre-wrap;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: .97rem;
+      line-height: 1.6;
+    }
+
+    .sortbank, .sortslots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 76px;
+      padding: 14px;
+      border: 2px dashed var(--line);
+      border-radius: 16px;
+      background: #fafafa;
+    }
+
+    .draggable {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: grab;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      min-width: 210px;
+    }
+
+    .slot {
+      min-height: 68px;
+      min-width: 210px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .slotlabel {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    @media (max-width: 700px) {
+      .wrap { padding: 14px; }
+      .card { padding: 18px; }
+      h1 { font-size: 2.1rem; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="version">Version 3.2</div>
+      <div class="version">Version 4.0</div>
       <h1>Shelf It Right</h1>
-      <p>This version puts score training front and center.</p>
+      <p>This version teaches music-score call numbers using the actual kinds of complicated labels you showed: decimals, cutters, Roman numerals, bands, fascicles, parts, sections, and work-style marks.</p>
 
       <div class="info-box">
-        <strong>What It Covers</strong>
+        <strong>What This Covers</strong>
         <div>
-          What a score is, fine sorting, whole numbers, first cutter, second cutter, added elements, and one final drag-and-drop ordering task.
+          Whole numbers, first cutters, possible second-cutter or work-mark elements, year, and later-line details such as <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code>, <code class="call">FASC.3</code>, <code class="call">ABT.5</code>, <code class="call">REIHE B</code>, <code class="call">T.2</code>, and <code class="call">H.III:E2</code>.
         </div>
       </div>
 
       <div class="info-box">
-        <strong>How It Works</strong>
+        <strong>How The Training Works</strong>
         <div>
-          Each round teaches first, then asks one question, then gives feedback right away.
+          Each section teaches one layer of sorting, then tests it right away. The final activity asks you to place realistic music-score call numbers in proper order.
         </div>
       </div>
 
       <div class="row">
         <div class="col">
-          <button id="startBtn">Start</button>
+          <button id="startBtn">Start Training</button>
         </div>
         <div class="col">
           <button class="secondary" id="showRulesBtn">Show Sorting Rules</button>
@@ -297,11 +308,11 @@
     function romanToInt(r) {
       if (!r) return null;
       const map = { I:1, V:5, X:10, L:50, C:100, D:500, M:1000 };
-      let total = 0;
-      let prev = 0;
       const s = String(r).toUpperCase().trim();
       if (/^\d+$/.test(s)) return parseInt(s, 10);
 
+      let total = 0;
+      let prev = 0;
       for (let i = s.length - 1; i >= 0; i--) {
         const v = map[s[i]] || 0;
         if (!v) return null;
@@ -340,10 +351,8 @@
     function parseCallNumber(raw) {
       const s = normalize(raw);
       const classMatch = s.match(/\b(MT|ML|M)\s*(\d+(?:\.\d+)?)/);
-
       const cutterMatches = [...s.matchAll(/\.([A-Z]{1,3})(\d+(?:\.\d+)?)([A-Z]?)/g)];
       const yearMatch = s.match(/\b(1[6-9]\d{2}|20\d{2})\b/);
-
       const serMatch = s.match(/\bSER\.([IVXLC]+|\d+)\b/);
       const bdMatch = s.match(/\bBD\.(\d+)/);
       const volMatch = s.match(/\bV\.(\d+)([A-Z]?)/);
@@ -353,8 +362,6 @@
       const abtMatch = s.match(/\bABT\.(\d+)/);
       const reiheMatch = s.match(/\bREIHE\s+([A-Z])/);
       const teilMatch = s.match(/\bT\.(\d+)/);
-      const opusMatch = s.match(/\bOP\.?\s*(\d+[A-Z]?(?:\/\d+)?)\b/);
-      const workNumMatch = s.match(/\b(K\.?|HOB\.?|BWV\.?|D\.?|RV\.?|WQ\.?|L\.?)(\s*\d+[A-Z]?(?::[A-Z0-9]+)?)/);
       const workMarkMatch = s.match(/\b([A-Z])\.([IVXLC]+):([A-Z0-9]+)\b/);
 
       const firstCutter = cutterMatches[0] ? {
@@ -363,11 +370,18 @@
         suffix: cutterMatches[0][3] || ''
       } : null;
 
-      const secondCutter = cutterMatches[1] ? {
-        letters: cutterMatches[1][1],
-        num: parseFloat(cutterMatches[1][2]),
-        suffix: cutterMatches[1][3] || ''
-      } : null;
+      // This catches things like R4 after .U6 in "M 2.3 .U6 R4 V.66"
+      const secondWorkMatch = s.match(/\b([A-Z]\d{1,4})\b(?!.*\b[A-Z]\d{1,4}\b)/);
+      let secondWork = null;
+      if (secondWorkMatch) {
+        const val = secondWorkMatch[1];
+        const isClassLike = /^M[T|L]?\d/.test(val);
+        const isYearLike = /^(1[6-9]\d{2}|20\d{2})$/.test(val);
+        const isTokenLike = /^(SER|BD|V|PT|PTS|FASC|ABT|T)\.?/.test(val);
+        if (!isClassLike && !isYearLike && !isTokenLike && !/^[A-Z]\.[IVXLC]+:/.test(s)) {
+          secondWork = val;
+        }
+      }
 
       return {
         raw,
@@ -375,21 +389,21 @@
         classLetters: classMatch ? classMatch[1] : '',
         whole: classMatch ? parseFloat(classMatch[2]) : Number.POSITIVE_INFINITY,
         firstCutter,
-        secondCutter,
+        secondWork,
         year: yearMatch ? parseInt(yearMatch[1], 10) : null,
         line4: {
-          opus: opusMatch ? opusMatch[1] : null,
-          workNumLabel: workNumMatch ? workNumMatch[1].replace('.', '').trim() : null,
-          workNumValue: workNumMatch ? workNumMatch[2].trim() : null,
+          abt: abtMatch ? parseInt(abtMatch[1], 10) : null,
+          reihe: reiheMatch ? reiheMatch[1] : null,
           series: serMatch ? romanToInt(serMatch[1]) : null,
           band: bdMatch ? parseInt(bdMatch[1], 10) : null,
           volume: volMatch ? { n: parseInt(volMatch[1], 10), suffix: volMatch[2] || '' } : null,
           part: ptMatch
             ? { start: parseInt(ptMatch[1], 10), end: null }
-            : (ptsMatch ? { start: parseInt(ptsMatch[1], 10), end: ptsMatch[2] ? parseInt(ptsMatch[2], 10) : null } : null),
+            : (ptsMatch ? {
+                start: parseInt(ptsMatch[1], 10),
+                end: ptsMatch[2] ? parseInt(ptsMatch[2], 10) : null
+              } : null),
           fasc: fascMatch ? parseInt(fascMatch[1], 10) : null,
-          abt: abtMatch ? parseInt(abtMatch[1], 10) : null,
-          reihe: reiheMatch ? reiheMatch[1] : null,
           teil: teilMatch ? parseInt(teilMatch[1], 10) : null,
           workMark: workMarkMatch ? {
             prefix: workMarkMatch[1],
@@ -410,6 +424,10 @@
         || compareStrings(a.suffix, b.suffix);
     }
 
+    function compareSecondWork(a, b) {
+      return compareStrings(a || '', b || '');
+    }
+
     function compareLine4(a, b) {
       const x = a.line4;
       const y = b.line4;
@@ -424,9 +442,6 @@
         || compareNums(x.part?.end, y.part?.end)
         || compareNums(x.fasc, y.fasc)
         || compareNums(x.teil, y.teil)
-        || compareStrings(x.workNumLabel, y.workNumLabel)
-        || compareStrings(x.workNumValue, y.workNumValue)
-        || compareStrings(x.opus, y.opus)
         || compareStrings(x.workMark?.prefix, y.workMark?.prefix)
         || compareNums(x.workMark?.roman, y.workMark?.roman)
         || compareStrings(x.workMark?.suffix, y.workMark?.suffix);
@@ -439,7 +454,7 @@
       return compareStrings(a.classLetters, b.classLetters)
         || compareNums(a.whole, b.whole)
         || compareCutter(a.firstCutter, b.firstCutter)
-        || compareCutter(a.secondCutter, b.secondCutter)
+        || compareSecondWork(a.secondWork, b.secondWork)
         || compareNums(a.year, b.year)
         || compareLine4(a, b);
     }
@@ -450,25 +465,59 @@
 
     const rulesText = `Local practice used in this prototype
 
-1. Start with the class and whole number.
-   Example: M 2 comes before M 2.3, which comes before M 3.
+1. Start with the class and the class number.
+   Read the class first, then the number after it.
+   Example:
+   M 2 comes before M 2.3
+   M 2.3 comes before M 3
+   M 3 comes before M 452
 
-2. Read the first cutter as a decimal.
-   Example: .B103 comes before .B1133, and .C4 comes after .B88R.
+2. After the class number, compare the first cutter.
+   Read the cutter letter first, then the cutter number.
+   Examples within M 3:
+   .B103 comes before .B1133
+   .B1133 comes before .B88R
+   .B88R comes before .C4
+   .C4 comes before .H26
+   .H26 comes before .O35
+   .O35 comes before .S36
 
-3. Compare the second cutter after the first cutter when a second cutter is present.
+3. If there is another work-like element after the first cutter, compare it next.
+   Example:
+   M 2.3 .U6 R4 V.66
+   In this prototype, R4 is treated as a later work element after .U6 and before the remaining volume-style detail.
 
-4. Compare the year after the main cutters when the earlier parts are the same.
+4. Compare the year after the base class number and cutter structure is settled.
+   Example:
+   M 3 .O35 1994 SER.II FASC.3
+   comes before
+   M 3 .O35 2001 SER.II FASC.3
 
-5. Compare line-four or trailing details after the earlier lines are settled.
-   In this prototype, those details are handled in this order:
-   ABT / REIHE / SER. / BD. / V. / PT. or PTS. / FASC. / T. / thematic or work-number style details / opus-style details / structured work marks like H.III:E2
+5. After the earlier parts are settled, compare later-line details that distinguish sets, series, bands, volumes, parts, fascicles, sections, and related music-score subdivisions.
+   In this prototype, those later details are compared in this order:
+   ABT.
+   REIHE
+   SER.
+   BD.
+   V.
+   PT. or PTS.
+   FASC.
+   T.
+   structured work marks such as H.III:E2
 
-6. Convert Roman numerals to numbers for sorting.
-   Example: SER.I comes before SER.II, which comes before SER.VI.
+6. Roman numerals are converted to numbers when they appear in sortable places.
+   Example:
+   SER.I comes before SER.II
+   SER.II comes before SER.VI
+   H.I:E2 comes before H.II:E2
+   H.II:E2 comes before H.III:E2
 
-7. This tool is meant to reflect local shelf logic for music scores.
-   If local practice changes, the rules here should be updated and re-tested.`;
+7. If a part is given as a range, the range is sorted by its starting number.
+   Example:
+   PTS.1-6 is treated as beginning with part 1.
+
+8. This tool is meant to reflect local shelf logic for music scores, using the kinds of labels shown in the training examples.
+   If local practice changes, the rule order here should be revised and tested again.`;
 
     document.getElementById('showRulesBtn').addEventListener('click', () => {
       rulesCard.classList.toggle('hidden');
@@ -479,33 +528,30 @@
       {
         type: 'teach',
         label: 'Lesson 1',
-        title: 'What a Score Is',
+        title: 'Start With The Big Shape Of The Call Number',
         html: `
-          <p>A score is a piece of music in written form. In the Music Library, scores are shelved in call number order, and small differences matter.</p>
+          <p>When you shelf-read music scores, do not try to read everything at once. Start with the largest structure first, then move downward into the details.</p>
           <div class="lesson-note">
-            Students often get tripped up because score call numbers can look similar at first glance. This training breaks the logic into smaller steps.
+            The safe rhythm is:
+            class and class number → first cutter → later work element if present → year → later-line details
           </div>
-          <ul class="tight">
-            <li>Read carefully.</li>
-            <li>Compare one layer at a time.</li>
-            <li>Do not jump ahead before the earlier line is settled.</li>
-          </ul>
+          <p>This matters because many music-score call numbers look scary, but the order becomes manageable when you compare only one layer at a time.</p>
         `
       },
       {
         type: 'teach',
         label: 'Lesson 2',
-        title: 'Whole Numbers Come First',
+        title: 'Class And Class Number Come First',
         html: `
-          <p>Start with the class and whole number. Do not compare cutters until the whole number is settled.</p>
-          <p>For example:</p>
+          <p>Read the class and class number before anything else.</p>
+          <p>Examples from this training:</p>
           <p>
-            <code class="call">M 2</code>
-            <code class="call">M 2.3</code>
-            <code class="call">M 3</code>
-            <code class="call">M 452</code>
+            <code class="call">M 2 .G39 1966 BD.23</code>
+            <code class="call">M 2.3 .U6 R4 V.66</code>
+            <code class="call">M 3 .B103 2005 SER.8 V.2</code>
+            <code class="call">M 452 .H42 H.III:E2</code>
           </p>
-          <p>That order goes from smallest to largest.</p>
+          <p>That order starts with 2, then 2.3, then 3, then 452. Do not jump ahead to <code class="call">.G39</code> or <code class="call">.B103</code> until the class number is settled.</p>
         `
       },
       {
@@ -513,27 +559,36 @@
         label: 'Quiz 1',
         question: 'Which call number should shelve first?',
         choices: [
-          'M 3 .B88R',
-          'M 2.3 .U6',
-          'M 452 .H42'
+          'M 3 .B103 2005 SER.8 V.2',
+          'M 2.3 .U6 R4 V.66',
+          'M 452 .H42 H.III:E2'
         ],
         answer: 1,
-        explain: 'M 2.3 comes before M 3, and both come before M 452.'
+        explain: 'Read the class number first. 2.3 comes before 3, and both come before 452.'
       },
       {
         type: 'teach',
         label: 'Lesson 3',
-        title: 'The First Cutter Is Read as a Decimal',
+        title: 'The First Cutter Comes Next',
         html: `
-          <p>After the whole number, compare the first cutter. Read the cutter number as a decimal-style sequence.</p>
-          <p>Within <code class="call">M 3</code>, this order is correct:</p>
+          <p>Once the class number matches, compare the first cutter.</p>
+          <p>Examples within <code class="call">M 3</code>:</p>
+          <p>
+            <code class="call">M 3 .B103 2005 SER.8 V.2</code><br>
+            <code class="call">M 3 .B1133 SER.I BD.32 PT.1</code><br>
+            <code class="call">M 3 .B88R BD.20 PTS.1-6</code><br>
+            <code class="call">M 3 .C4 1993 SER.VI V.69A</code><br>
+            <code class="call">M 3 .H26 SER.2 BD.8 2008</code><br>
+            <code class="call">M 3 .O35 1994 SER.II FASC.3</code><br>
+            <code class="call">M 3 .S36 ABT.5 REIHE B BD.26 T.2</code>
+          </p>
+          <p>Among these, the B cutters come before the C cutter, which comes before H, then O, then S.</p>
+          <p>Inside the B group, this prototype orders them as:</p>
           <p>
             <code class="call">.B103</code>
             <code class="call">.B1133</code>
             <code class="call">.B88R</code>
-            <code class="call">.C4</code>
           </p>
-          <p>Letter first. Then compare the number. Then compare any extra suffix letter.</p>
         `
       },
       {
@@ -541,54 +596,63 @@
         label: 'Quiz 2',
         question: 'Which call number comes first within M 3?',
         choices: [
-          'M 3 .C4',
-          'M 3 .B1133',
-          'M 3 .H26'
+          'M 3 .C4 1993 SER.VI V.69A',
+          'M 3 .B1133 SER.I BD.32 PT.1',
+          'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
         ],
         answer: 1,
-        explain: 'Within the same whole number, compare the first cutter. B comes before C and H.'
+        explain: 'All three are M 3, so compare the first cutter. B comes before C and S.'
       },
       {
         type: 'teach',
         label: 'Lesson 4',
-        title: 'Second Cutter and Year',
+        title: 'Later Work Elements And Year',
         html: `
-          <p>If the first cutter is the same, compare the second cutter. If the cutters are still the same, compare the year.</p>
-          <ul class="tight">
-            <li>Line 1: Class and whole number</li>
-            <li>Line 2: First cutter</li>
-            <li>Line 3: Second cutter, if present</li>
-            <li>Then: Year</li>
-          </ul>
-          <p>This keeps the comparison clean and predictable.</p>
+          <p>Some labels contain another work-like element after the first cutter, such as <code class="call">R4</code> in <code class="call">M 2.3 .U6 R4 V.66</code>. In this prototype, that kind of element is treated after the first cutter and before later-line details.</p>
+          <p>The year is compared after the main class number and cutter structure is settled.</p>
+          <p>Example:</p>
+          <p>
+            <code class="call">M 3 .O35 1994 SER.II FASC.3</code><br>
+            comes before<br>
+            <code class="call">M 3 .O35 2001 SER.II FASC.3</code>
+          </p>
+          <p>That is because the class number and first cutter match, so the year decides the order.</p>
         `
       },
       {
         type: 'quiz',
         label: 'Quiz 3',
-        question: 'Which one should shelve first under the local logic used here?',
+        question: 'Which one should shelve first?',
         choices: [
           'M 3 .O35 1994 SER.II FASC.3',
           'M 3 .O35 2001 SER.II FASC.3',
           'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
         ],
         answer: 0,
-        explain: 'The first two have the same whole number and first cutter, so compare the year. 1994 comes before 2001.'
+        explain: 'The first two have the same class number and first cutter. Compare the year. 1994 comes before 2001.'
       },
       {
         type: 'teach',
         label: 'Lesson 5',
-        title: 'Added Elements on Later Lines',
+        title: 'Later-Line Details: Series, Band, Volume, Part, Fascicle, Section',
         html: `
-          <p>After the earlier lines are settled, compare added elements such as series, band, volume, part, fascicle, section, and other music-specific numbering details.</p>
-          <p>Roman numerals are converted to numbers. So:</p>
+          <p>After the earlier parts are settled, compare the later-line details. These details help sort sets, collected works, volumes, parts, fascicles, sections, and related subdivisions.</p>
+          <p>Examples from the training set:</p>
           <p>
             <code class="call">SER.I</code>
             <code class="call">SER.II</code>
             <code class="call">SER.VI</code>
+            <code class="call">BD.20</code>
+            <code class="call">V.69A</code>
+            <code class="call">PTS.1-6</code>
+            <code class="call">FASC.3</code>
+            <code class="call">ABT.5</code>
+            <code class="call">REIHE B</code>
+            <code class="call">T.2</code>
           </p>
-          <p>That means I comes before II, and II comes before VI.</p>
-          <p>This prototype also recognizes details such as <code class="call">BD.20</code>, <code class="call">V.69A</code>, <code class="call">PTS.1-6</code>, and structured work marks such as <code class="call">H.III:E2</code>.</p>
+          <p>Roman numerals are converted to numbers. So <code class="call">SER.I</code> comes before <code class="call">SER.II</code>, and <code class="call">SER.II</code> comes before <code class="call">SER.VI</code>.</p>
+          <p>Ranges are sorted by their starting value. So <code class="call">PTS.1-6</code> is treated as beginning with part 1.</p>
+          <p>Structured work marks like <code class="call">H.III:E2</code> are also read in order. The Roman numeral part matters there too.</p>
         `
       },
       {
@@ -601,7 +665,7 @@
           'M 3 .B1133 SER.II BD.32 PT.1'
         ],
         answer: 0,
-        explain: 'Roman numerals are converted to numbers. SER.I comes before SER.II, which comes before SER.VI.'
+        explain: 'The class number and cutter match, so compare the later-line details. SER.I comes before SER.II, which comes before SER.VI.'
       },
       {
         type: 'quiz',
@@ -613,19 +677,23 @@
           'M 3 .B103 2005 SER.8 V.2'
         ],
         answer: 2,
-        explain: 'All three are M 3, so compare the first cutter. .B103 comes before .B88R and before .C4.'
+        explain: 'All three are M 3. Compare the first cutter first. .B103 comes before .B88R, and both come before .C4.'
       },
       {
         type: 'drag',
         label: 'Final Activity',
-        title: 'Place These Music Score Call Numbers in Correct Order',
+        title: 'Place These Realistic Music Score Call Numbers In Correct Order',
         instructions: 'Drag each call number into the slots from first to last according to the local shelf logic used in this prototype.',
         items: [
           'M 3 .C4 1993 SER.VI V.69A',
+          'M 2.3 .U6 R4 V.66',
           'M 3 .B103 2005 SER.8 V.2',
           'M 2 .G39 1966 BD.23',
+          'M 3 .B1133 SER.I BD.32 PT.1',
           'M 3 .B88R BD.20 PTS.1-6',
-          'M 452 .H42 H.III:E2'
+          'M 452 .H42 H.III:E2',
+          'M 3 .O35 1994 SER.II FASC.3',
+          'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
         ]
       },
       {
@@ -789,7 +857,7 @@
         <h2>Training Complete</h2>
         <p>You completed the prototype training sequence.</p>
         <div class="feedback good">Score: ${state.score} / ${state.totalQuestions}</div>
-        <p>This version is meant to be tested against local Music Library practice. Before finalizing it, the sorting rules, examples, and feedback language should be reviewed and adjusted as needed.</p>
+        <p>This version is built around the actual style of music-score call numbers discussed in this project. Before finalizing it, the exact sorting rules and examples should still be checked against your local practice and adjusted wherever needed.</p>
         <div class="row">
           <div class="col"><button id="restartBtn">Restart</button></div>
           <div class="col"><button class="secondary" id="rulesAgainBtn">Review Rules</button></div>
@@ -804,7 +872,7 @@
 
       document.getElementById('rulesAgainBtn').onclick = () => {
         rulesCard.classList.remove('hidden');
-        rulesCard.innerHTML = `<h2>Sorting Rules Used in This Prototype</h2><pre>${rulesText}</pre>`;
+        rulesCard.innerHTML = `<h2>Sorting Rules Used In This Prototype</h2><pre>${rulesText}</pre>`;
         window.scrollTo({ top: 0, behavior: 'smooth' });
       };
     }
