@@ -5,44 +5,63 @@
 <title>Shelf It Right</title>
 
 <style>
-body { font-family: Arial; background:#f4f6f8; padding:20px; }
-.card { background:white; padding:20px; border-radius:10px; max-width:800px; margin:auto; }
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f7fa;
+  padding: 30px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 800px;
+  margin: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+h3 { margin-top: 0; }
 
 .choice {
-  display:inline-block;
-  margin:10px;
-  padding:10px;
-  border:1px solid #ccc;
-  cursor:pointer;
-  border-radius:8px;
+  display: inline-block;
+  margin: 10px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.choice:hover {
+  background: #eef3f8;
 }
 
 .label {
-  border:2px solid #333;
-  padding:10px;
-  width:130px;
-  text-align:center;
-  margin:auto;
-  font-weight:bold;
-  line-height:1.6;
-  background:#fff;
+  border: 2px solid #222;
+  padding: 10px;
+  width: 120px;
+  text-align: center;
+  line-height: 1.6;
+  background: #fff;
+  border-radius: 6px;
+  font-weight: bold;
 }
 
 .dropzone {
-  border:2px dashed #aaa;
-  min-height:120px;
-  width:150px;
-  display:inline-block;
-  margin:10px;
-  vertical-align:top;
-  padding:5px;
+  border: 2px dashed #bbb;
+  min-height: 120px;
+  width: 140px;
+  display: inline-block;
+  margin: 10px;
+  padding: 5px;
 }
 
-.drag { cursor:grab; }
-.correct { background:#e3f9e5; }
-.wrong { background:#fde8e8; }
+.correct { background: #e6f7ec; }
+.wrong { background: #fdecea; }
 
-button { margin-top:15px; padding:10px; }
+button {
+  padding: 10px 14px;
+  margin-top: 20px;
+}
 </style>
 
 </head>
@@ -66,61 +85,18 @@ const rounds = [
 lesson: `
 <h3>What is a Score?</h3>
 
-<p>A <strong>score</strong> is written music that shows <strong>all parts together</strong>.</p>
+<p>A <strong>score</strong> shows all parts together.</p>
 
-<p>In an orchestra score, you can see violin, cello, flute, and more — all at the same time.</p>
+<p>A <strong>part</strong> shows only one instrument.</p>
 
-<p>A <strong>part</strong> shows <strong>only one instrument</strong>.</p>
-
-<p><strong>Key idea:</strong><br>
-Score = everything together<br>
-Part = one instrument</p>
+<p><strong>We are practicing fine sorting.</strong><br>
+All items are already in the correct section.</p>
 `,
-question: "Which best describes a score?",
+question: "Which describes a score?",
 choices: [
 "Music for one instrument",
-"A written version showing all parts together",
+"A written version showing all parts",
 "A recording"
-],
-answer: 1
-},
-
-{
-lesson: `
-<h3>Mini-Scores</h3>
-
-<p>A <strong>mini-score</strong> is a smaller study version of a full score.</p>
-
-<p>In this library, a lowercase <strong>m</strong> appears on its own line near the top.</p>
-
-<p><strong>The m is read first.</strong></p>
-
-<p>This tells you immediately: this is a mini-score.</p>
-`,
-question: "Which is a mini-score?",
-choices: [
-label(["Music","m","M","1010",".B585","op. 42"]),
-label(["Music","M","1010",".B585","1998"]),
-label(["Music","M","1010",".B585","violin"])
-],
-answer: 0
-},
-
-{
-lesson: `
-<h3>Reading Order</h3>
-
-<p>Always read call numbers <strong>top to bottom</strong>.</p>
-
-<p>If there is an <strong>m</strong>, it comes first.</p>
-
-<p>Then follow the rest of the lines in order.</p>
-`,
-question: "Which comes first?",
-choices: [
-label(["Music","M","1000",".B4"]),
-label(["Music","m","M","1000",".B4"]),
-label(["Music","M","500",".B4"])
 ],
 answer: 1
 },
@@ -129,24 +105,24 @@ answer: 1
 lesson: `
 <h3>Whole Numbers</h3>
 
-<p>After M, compare the whole number.</p>
+<p>Start with the number after M.</p>
 
 <p><strong>Smaller numbers come first.</strong></p>
 `,
 question: "Which comes first?",
 choices: [
-label(["M","100"]),
-label(["M","50"]),
-label(["M","75"])
+label(["M","1010"]),
+label(["M","500"]),
+label(["M","750"])
 ],
 answer: 1
 },
 
 {
 lesson: `
-<h3>Cutters</h3>
+<h3>First Cutter</h3>
 
-<p>Cutter numbers are read like decimals.</p>
+<p>Cutters are read like decimals.</p>
 
 <p><strong>.B4 comes before .B45</strong></p>
 `,
@@ -180,7 +156,9 @@ answer: 1
 lesson: `
 <h3>Line 4 Details</h3>
 
-<p>Opus numbers and details help sort when everything else matches.</p>
+<p>Opus numbers and other details are part of sorting.</p>
+
+<p><strong>Smaller numbers come first.</strong></p>
 `,
 question: "Which comes first?",
 choices: [
@@ -193,7 +171,7 @@ answer: 1
 
 ];
 
-// ---------- NORMAL ROUNDS ----------
+// ---------- NORMAL ----------
 
 function render(){
 if(round === rounds.length) return renderDrag();
@@ -217,13 +195,13 @@ round++;
 render();
 }
 
-// ---------- DRAG ROUND ----------
+// ---------- DRAG TEST ----------
 
 const correctOrder = [
-["Music","m","M","1010",".B585","op. 42"],
-["Music","M","500",".B585","op. 42"],
-["Music","M","1010",".B4","op. 42"],
-["Music","M","1010",".B585","op. 100"]
+["M","500",".B585","op. 42"],
+["M","1010",".B4","op. 42"],
+["M","1010",".B585","op. 42"],
+["M","1010",".B585","op. 100"]
 ];
 
 let placed = [];
@@ -236,12 +214,11 @@ let shuffled = [...correctOrder].sort(() => Math.random() - 0.5);
 
 document.getElementById("app").innerHTML = `
 <h3>Final Test</h3>
-<p>Drag the call numbers into the correct order.</p>
-<p>Feedback appears after each move.</p>
+<p>Put the call numbers in order.</p>
 
-<div id="pool">
+<div>
 ${shuffled.map((l,i)=>`
-<div class="choice drag" draggable="true" id="item${i}" data-index='${JSON.stringify(l)}'>
+<div class="choice" draggable="true" id="item${i}" data='${JSON.stringify(l)}'>
 ${label(l)}
 </div>
 `).join("")}
@@ -249,7 +226,7 @@ ${label(l)}
 
 <hr>
 
-<div id="zones">
+<div>
 ${[0,1,2,3].map(i=>`
 <div class="dropzone" data-pos="${i}"></div>
 `).join("")}
@@ -263,7 +240,7 @@ enableDrag();
 
 function enableDrag(){
 
-document.querySelectorAll(".drag").forEach(el=>{
+document.querySelectorAll(".choice").forEach(el=>{
 el.addEventListener("dragstart", e=>{
 e.dataTransfer.setData("text", el.id);
 });
@@ -281,39 +258,35 @@ let el = document.getElementById(id);
 if(zone.children.length > 0) return;
 
 zone.appendChild(el);
-checkPlacement(zone);
+check(zone);
 });
 });
 }
 
-function checkPlacement(zone){
+function check(zone){
 
-let pos = parseInt(zone.dataset.pos);
-let placedLabel = JSON.parse(zone.firstChild.dataset.index);
+let pos = zone.dataset.pos;
+let val = JSON.parse(zone.firstChild.dataset.data);
 
-placed[pos] = placedLabel;
+placed[pos] = val;
 
-let correct = true;
+let ok = true;
 
 for(let i=0;i<=pos;i++){
 if(JSON.stringify(placed[i]) !== JSON.stringify(correctOrder[i])){
-correct = false;
+ok = false;
 break;
 }
 }
 
-let feedback = document.getElementById("feedback");
+let f = document.getElementById("feedback");
 
-if(correct){
+if(ok){
 zone.classList.add("correct");
-feedback.innerText = "Correct so far.";
+f.innerText = "Correct so far.";
 }else{
 zone.classList.add("wrong");
-feedback.innerText = "Not quite — check order (m, numbers, cutters, details).";
-}
-
-if(placed.filter(x=>x).length === 4){
-end();
+f.innerText = "Not quite — check number, Cutter, and details.";
 }
 }
 
@@ -322,7 +295,7 @@ end();
 function end(){
 document.getElementById("app").innerHTML = `
 <h2>Done</h2>
-<p>Final Score: ${score}/${rounds.length}</p>
+<p>Score: ${score}/${rounds.length}</p>
 <button onclick="location.reload()">Restart</button>
 `;
 }
