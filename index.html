@@ -3,804 +3,601 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shelf It Right — V3.1</title>
+  <title>Music Score Call Number Trainer</title>
   <style>
     :root {
-      --bg: #f4f6f8;
+      --bg: #f6f7fb;
       --card: #ffffff;
-      --text: #1f2933;
-      --muted: #52606d;
-      --border: #d9e2ec;
-      --accent: #3f6b8c;
-      --accent-soft: #eef5fb;
-      --good: #e7f6ec;
-      --good-border: #7ab68a;
-      --bad: #fdecec;
-      --bad-border: #d46a6a;
-      --shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --accent: #2563eb;
+      --good: #166534;
+      --good-bg: #dcfce7;
+      --bad: #991b1b;
+      --bad-bg: #fee2e2;
+      --warn: #92400e;
+      --warn-bg: #fef3c7;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      padding: 28px;
-      background: var(--bg);
-      color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.45;
+      background: var(--bg);
+      color: var(--ink);
     }
-
     .wrap {
-      max-width: 980px;
+      max-width: 1100px;
       margin: 0 auto;
+      padding: 24px;
     }
-
+    h1, h2, h3 { margin-top: 0; }
     .card {
       background: var(--card);
-      border: 1px solid var(--border);
+      border: 1px solid var(--line);
       border-radius: 16px;
-      box-shadow: var(--shadow);
-      padding: 26px;
-    }
-
-    h1, h2, h3 {
-      margin-top: 0;
-      line-height: 1.2;
-    }
-
-    .eyebrow {
-      color: var(--accent);
-      font-size: 0.95rem;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .status {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-      color: var(--muted);
-      font-weight: bold;
-      font-size: 0.95rem;
-    }
-
-    .lesson-box {
-      background: #f8fbfd;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin: 14px 0;
-    }
-
-    .lesson-box strong {
-      color: var(--accent);
-    }
-
-    .prompt {
-      font-size: 1.08rem;
+      padding: 20px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.05);
       margin-bottom: 18px;
     }
-
-    .choices {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      background: #e5e7eb;
+      color: #374151;
+      margin-bottom: 10px;
     }
-
-    .choice-btn {
-      appearance: none;
-      border: 2px solid var(--border);
-      background: #fff;
-      color: var(--text);
-      border-radius: 14px;
-      padding: 14px;
-      cursor: pointer;
-      transition: transform 0.08s ease, border-color 0.08s ease, box-shadow 0.08s ease;
-      min-height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font: inherit;
-    }
-
-    .choice-btn:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
-      background: #fcfdff;
-    }
-
-    .choice-btn.text-only {
-      min-height: 110px;
-      justify-content: flex-start;
-      text-align: left;
-      line-height: 1.35;
-    }
-
-    .label {
-      width: 132px;
-      min-height: 170px;
-      margin: 0 auto;
-      border: 2px solid #222;
-      border-radius: 8px;
-      background: #fffefc;
-      color: #111;
-      padding: 10px 8px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      font-weight: bold;
-      letter-spacing: 0.02em;
-    }
-
-    .label-line {
-      width: 100%;
-      text-align: center;
-      margin: 3px 0;
-      word-break: break-word;
-    }
-
-    .feedback {
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 8px;
-    }
-
-    .feedback.good {
-      background: var(--good);
-      border: 1px solid var(--good-border);
-    }
-
-    .feedback.bad {
-      background: var(--bad);
-      border: 1px solid var(--bad-border);
-    }
-
-    .button-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
-    .primary-btn,
-    .secondary-btn {
-      appearance: none;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    .primary-btn {
-      border: 1px solid var(--accent);
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .col { flex: 1 1 320px; }
+    button {
       background: var(--accent);
       color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
     }
-
-    .secondary-btn {
-      border: 1px solid var(--border);
+    button.secondary {
       background: white;
-      color: var(--text);
+      color: var(--ink);
+      border: 1px solid var(--line);
     }
-
-    .drag-bank,
-    .drag-slots {
-      display: grid;
-      gap: 16px;
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .hidden { display: none; }
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 8px 0 18px;
     }
-
-    .drag-bank {
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      margin-bottom: 24px;
+    .progress > div {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width .2s ease;
     }
-
-    .draggable-card {
+    .choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 10px 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .choice:hover { border-color: var(--accent); }
+    .feedback {
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+    .good { background: var(--good-bg); color: var(--good); }
+    .bad { background: var(--bad-bg); color: var(--bad); }
+    .warn { background: var(--warn-bg); color: var(--warn); }
+    code.call {
+      display: inline-block;
+      background: #f3f4f6;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin: 4px 4px 0 0;
+    }
+    .sortbank, .sortslots {
       display: flex;
-      justify-content: center;
-      cursor: grab;
-    }
-
-    .draggable-card.dragging {
-      opacity: 0.45;
-    }
-
-    .drop-slot {
-      border: 2px dashed #b9c7d4;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 70px;
+      padding: 12px;
+      border: 2px dashed var(--line);
       border-radius: 14px;
-      min-height: 190px;
-      padding: 10px;
-      background: #fafcfe;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #fafafa;
     }
-
-    .drop-slot.drag-over {
-      border-color: var(--accent);
-      background: var(--accent-soft);
+    .draggable {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: grab;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      min-width: 180px;
     }
-
-    .drop-slot.correct-slot {
-      background: var(--good);
-      border-color: var(--good-border);
+    .slot {
+      min-height: 62px;
+      min-width: 180px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 8px;
+      background: white;
     }
-
-    .drop-slot.wrong-slot {
-      background: var(--bad);
-      border-color: var(--bad-border);
-    }
-
-    .slot-name {
+    .slotlabel {
+      font-size: 12px;
       color: var(--muted);
-      font-weight: bold;
-      text-align: center;
+      margin-bottom: 6px;
+      font-weight: 700;
     }
-
-    .final-score {
-      font-size: 2rem;
-      font-weight: bold;
-      color: var(--accent);
-      margin: 14px 0;
-    }
-
-    ul {
-      margin-top: 8px;
+    ul.tight li { margin: 6px 0; }
+    .small { color: var(--muted); font-size: 14px; }
+    .rules pre {
+      white-space: pre-wrap;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div id="app"></div>
+    <h1>Music Score Call Number Trainer</h1>
+    <div class="card">
+      <div class="pill">Prototype</div>
+      <p>This training tool teaches and tests local Music Library shelf logic for music scores. It starts simple, then moves to realistic score-style call numbers, and ends with a drag-and-drop ordering activity.</p>
+      <div class="row">
+        <div class="col"><button id="startBtn">Start Training</button></div>
+        <div class="col"><button class="secondary" id="showRulesBtn">Show Sorting Rules Used Here</button></div>
+      </div>
+    </div>
+
+    <div id="rulesCard" class="card hidden rules"></div>
+
+    <div id="app" class="hidden">
+      <div class="card">
+        <div id="stageLabel" class="pill">Lesson 1</div>
+        <div class="progress"><div id="bar"></div></div>
+        <div id="screen"></div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const app = document.getElementById("app");
+    const app = document.getElementById('app');
+    const screen = document.getElementById('screen');
+    const stageLabel = document.getElementById('stageLabel');
+    const bar = document.getElementById('bar');
+    const rulesCard = document.getElementById('rulesCard');
 
-    const rounds = [
+    const state = {
+      step: 0,
+      score: 0,
+      totalQuestions: 0
+    };
+
+    function romanToInt(r) {
+      if (!r) return null;
+      const map = {I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
+      let total = 0, prev = 0;
+      const s = String(r).toUpperCase().trim();
+      if (/^\d+$/.test(s)) return parseInt(s,10);
+      for (let i = s.length - 1; i >= 0; i--) {
+        const v = map[s[i]] || 0;
+        if (!v) return null;
+        if (v < prev) total -= v; else total += v;
+        prev = v;
+      }
+      return total || null;
+    }
+
+    function normalize(raw) {
+      return raw
+        .replace(/\bMusic\b/gi, '')
+        .replace(/\s+/g, ' ')
+        .replace(/\bSER\.?\s*/gi, 'SER.')
+        .replace(/\bBD\.?\s*/gi, 'BD.')
+        .replace(/\bV\.?\s*/gi, 'V.')
+        .replace(/\bPTS?\.?\s*/gi, m => m.toUpperCase().startsWith('PTS') ? 'PTS.' : 'PT.')
+        .replace(/\bFASC\.?\s*/gi, 'FASC.')
+        .replace(/\bABT\.?\s*/gi, 'ABT.')
+        .replace(/\bT\.?\s*/gi, 'T.')
+        .trim()
+        .toUpperCase();
+    }
+
+    function parseCutter(str) {
+      const m = str.match(/\.([A-Z]{1,3})(\d+(?:\.\d+)?)([A-Z]?)/);
+      if (!m) return null;
+      return { letters: m[1], num: parseFloat(m[2]), suffix: m[3] || '' };
+    }
+
+    function parseCallNumber(raw) {
+      const s = normalize(raw);
+      const classMatch = s.match(/\b(MT|ML|M)\s*(\d+(?:\.\d+)?)/);
+      const cutterMatches = [...s.matchAll(/\.([A-Z]{1,3})(\d+(?:\.\d+)?)([A-Z]?)/g)];
+      const yearMatch = s.match(/\b(1[6-9]\d{2}|20\d{2})\b/);
+      const serMatch = s.match(/\bSER\.([IVXLC]+|\d+)\b/);
+      const bdMatch = s.match(/\bBD\.(\d+)/);
+      const volMatch = s.match(/\bV\.(\d+)([A-Z]?)/);
+      const ptMatch = s.match(/\bPT\.(\d+)/);
+      const ptsMatch = s.match(/\bPTS\.(\d+)(?:-(\d+))?/);
+      const fascMatch = s.match(/\bFASC\.(\d+)/);
+      const abtMatch = s.match(/\bABT\.(\d+)/);
+      const reiheMatch = s.match(/\bREIHE\s+([A-Z])/);
+      const teilMatch = s.match(/\bT\.(\d+)/);
+      const opusMatch = s.match(/\bOP\.?\s*(\d+[A-Z]?(?:\/\d+)?)\b/);
+      const workNumMatch = s.match(/\b(K\.?|HOB\.?|BWV\.?|D\.?|RV\.?|WQ\.?|L\.?)(\s*\d+[A-Z]?(?::[A-Z0-9]+)?)/);
+      const workMarkMatch = s.match(/\b([A-Z])\.([IVXLC]+):([A-Z0-9]+)\b/);
+
+      const firstCutter = cutterMatches[0] ? { letters: cutterMatches[0][1], num: parseFloat(cutterMatches[0][2]), suffix: cutterMatches[0][3] || '' } : null;
+      const secondCutter = cutterMatches[1] ? { letters: cutterMatches[1][1], num: parseFloat(cutterMatches[1][2]), suffix: cutterMatches[1][3] || '' } : null;
+
+      return {
+        raw,
+        normalized: s,
+        classLetters: classMatch ? classMatch[1] : '',
+        whole: classMatch ? parseFloat(classMatch[2]) : Number.POSITIVE_INFINITY,
+        firstCutter,
+        secondCutter,
+        year: yearMatch ? parseInt(yearMatch[1], 10) : null,
+        line4: {
+          opus: opusMatch ? opusMatch[1] : null,
+          workNumLabel: workNumMatch ? workNumMatch[1].replace('.', '').trim() : null,
+          workNumValue: workNumMatch ? workNumMatch[2].trim() : null,
+          series: serMatch ? romanToInt(serMatch[1]) : null,
+          band: bdMatch ? parseInt(bdMatch[1], 10) : null,
+          volume: volMatch ? { n: parseInt(volMatch[1],10), suffix: volMatch[2] || '' } : null,
+          part: ptMatch ? { start: parseInt(ptMatch[1],10), end: null } : (ptsMatch ? { start: parseInt(ptsMatch[1],10), end: ptsMatch[2] ? parseInt(ptsMatch[2],10) : null } : null),
+          fasc: fascMatch ? parseInt(fascMatch[1],10) : null,
+          abt: abtMatch ? parseInt(abtMatch[1],10) : null,
+          reihe: reiheMatch ? reiheMatch[1] : null,
+          teil: teilMatch ? parseInt(teilMatch[1],10) : null,
+          workMark: workMarkMatch ? { prefix: workMarkMatch[1], roman: romanToInt(workMarkMatch[2]), suffix: workMarkMatch[3] } : null,
+        }
+      };
+    }
+
+    function compareStrings(a,b){ return String(a||'').localeCompare(String(b||'')); }
+    function compareNums(a,b){
+      const av = (a === null || a === undefined) ? -Infinity : a;
+      const bv = (b === null || b === undefined) ? -Infinity : b;
+      return av < bv ? -1 : av > bv ? 1 : 0;
+    }
+    function compareCutter(a,b){
+      if (!a && !b) return 0;
+      if (!a) return -1;
+      if (!b) return 1;
+      return compareStrings(a.letters,b.letters) || compareNums(a.num,b.num) || compareStrings(a.suffix,b.suffix);
+    }
+    function compareLine4(a,b){
+      const x = a.line4, y = b.line4;
+      return compareNums(x.abt, y.abt)
+        || compareStrings(x.reihe, y.reihe)
+        || compareNums(x.series, y.series)
+        || compareNums(x.band, y.band)
+        || compareNums(x.volume?.n, y.volume?.n)
+        || compareStrings(x.volume?.suffix, y.volume?.suffix)
+        || compareNums(x.part?.start, y.part?.start)
+        || compareNums(x.part?.end, y.part?.end)
+        || compareNums(x.fasc, y.fasc)
+        || compareNums(x.teil, y.teil)
+        || compareStrings(x.workNumLabel, y.workNumLabel)
+        || compareStrings(x.workNumValue, y.workNumValue)
+        || compareStrings(x.opus, y.opus)
+        || compareStrings(x.workMark?.prefix, y.workMark?.prefix)
+        || compareNums(x.workMark?.roman, y.workMark?.roman)
+        || compareStrings(x.workMark?.suffix, y.workMark?.suffix);
+    }
+    function compareCallNumbers(rawA, rawB){
+      const a = typeof rawA === 'string' ? parseCallNumber(rawA) : rawA;
+      const b = typeof rawB === 'string' ? parseCallNumber(rawB) : rawB;
+      return compareStrings(a.classLetters, b.classLetters)
+        || compareNums(a.whole, b.whole)
+        || compareCutter(a.firstCutter, b.firstCutter)
+        || compareCutter(a.secondCutter, b.secondCutter)
+        || compareNums(a.year, b.year)
+        || compareLine4(a,b);
+    }
+    function sortCalls(arr){ return [...arr].sort(compareCallNumbers); }
+
+    const rulesText = `Local practice used in this prototype\n\n1. Read the class and whole number first.\n   Example: M 2 comes before M 2.3, which comes before M 3.\n\n2. First cutter is read as a decimal.\n   Example: .B103 comes before .B1133, and .C4 comes after .B88R.\n\n3. Second cutter, if present, is compared after the first cutter.\n\n4. Year is compared after the main cutters.\n\n5. Line-four or trailing details are compared after the earlier lines. In this prototype, those details are handled in this order:\n   ABT / REIHE / SER. / BD. / V. / PT. or PTS. / FASC. / T. / thematic or work-number style details / opus-style details / structured work marks like H.III:E2.\n\n6. Roman numerals are converted to numbers for sorting.\n   Example: SER.I before SER.II before SER.VI.\n\n7. The purpose here is training for local shelf logic, not generic LC theory in the abstract. If local practice changes, the rule order here should be updated and re-tested.`;
+
+    document.getElementById('showRulesBtn').addEventListener('click', () => {
+      rulesCard.classList.toggle('hidden');
+      rulesCard.innerHTML = `<h2>Sorting Rules Used in This Prototype</h2><pre>${rulesText}</pre>`;
+    });
+
+    const lessons = [
       {
-        title: "What Is a Score?",
-        lesson: [
-          "A score is written music that shows the whole piece together.",
-          "A part is written music for one instrument or section only.",
-          "This tool practices fine sorting of scores that are already in the correct section."
-        ],
-        example: ["Score = whole piece", "Part = one instrument"],
-        watch: "This is not rough sorting. Assume the items are already together and you are putting them in correct order.",
-        prompt: "Which best describes a score?",
-        choices: [
-          { type: "text", text: "Music for one instrument only" },
-          { type: "text", text: "A written version showing the whole piece together" },
-          { type: "text", text: "A recording of a performance" }
-        ],
-        answer: 1,
-        correctText: "Correct. A score shows the whole piece together.",
-        teachText: "A score brings the music together on the page. A part is only one instrument or section."
+        type: 'teach',
+        label: 'Lesson 1',
+        title: 'Whole numbers come first',
+        html: `
+          <h2>Whole numbers first</h2>
+          <p>Start with the class and whole number. In this tool, <code class="call">M 2</code> comes before <code class="call">M 2.3</code>, and both come before <code class="call">M 3</code>.</p>
+          <ul class="tight">
+            <li>Read the number carefully.</li>
+            <li>Do not jump ahead to cutters until the whole number is settled.</li>
+            <li>Decimals matter.</li>
+          </ul>
+        `
       },
       {
-        title: "Fine Sorting Only",
-        lesson: [
-          "Read top to bottom.",
-          "Compare one line at a time.",
-          "Use the first difference you see."
-        ],
-        example: ["M", "500"],
-        watch: "Do not jump ahead. Compare in order.",
-        prompt: "Which call number comes first?",
-        choices: [
-          { type: "label", lines: ["M", "500"] },
-          { type: "label", lines: ["M", "1010"] },
-          { type: "label", lines: ["M", "750"] }
-        ],
+        type: 'quiz',
+        label: 'Quiz 1',
+        question: 'Which call number comes first?',
+        choices: ['M 3 .B88R', 'M 2.3 .U6', 'M 452 .H42'],
+        answer: 1,
+        explain: 'M 2.3 comes before M 3, and both come before M 452.'
+      },
+      {
+        type: 'teach',
+        label: 'Lesson 2',
+        title: 'First cutter is read as a decimal',
+        html: `
+          <h2>First cutter</h2>
+          <p>The first cutter is compared after the whole number, and it is read as a decimal. Think letter first, then the number after it as a decimal-style sequence.</p>
+          <p>Example order within <code class="call">M 3</code>:</p>
+          <p><code class="call">.B103</code> before <code class="call">.B1133</code> before <code class="call">.C4</code></p>
+        `
+      },
+      {
+        type: 'quiz',
+        label: 'Quiz 2',
+        question: 'Put these in order by choosing the earliest one.',
+        choices: ['M 3 .C4', 'M 3 .B1133', 'M 3 .H26'],
+        answer: 1,
+        explain: 'Within the same whole number, compare the first cutter. B comes before C and H.'
+      },
+      {
+        type: 'teach',
+        label: 'Lesson 3',
+        title: 'Second cutter and year',
+        html: `
+          <h2>Second cutter and year</h2>
+          <p>If the first cutter is the same, compare the second cutter. If the cutters are the same, compare the year.</p>
+          <ul class="tight">
+            <li>Line 1: class and whole number</li>
+            <li>Line 2: first cutter</li>
+            <li>Line 3: second cutter when present</li>
+            <li>Then year</li>
+          </ul>
+        `
+      },
+      {
+        type: 'quiz',
+        label: 'Quiz 3',
+        question: 'Which comes first under the local logic used here?',
+        choices: ['M 3 .O35 1994 SER.II FASC.3', 'M 3 .O35 2001 SER.II FASC.3', 'M 3 .S36 ABT.5 REIHE B BD.26 T.2'],
         answer: 0,
-        correctText: "Correct. M 500 comes first.",
-        teachText: "Start with the number after M. The smaller whole number comes first."
+        explain: 'Same whole number and first cutter for the first two, so compare year: 1994 comes before 2001.'
       },
       {
-        title: "Whole Number Again",
-        lesson: [
-          "Use the same rule again.",
-          "Compare the whole number before you look at later lines."
-        ],
-        example: ["M", "1000"],
-        watch: "Do not let the Cutter distract you too early.",
-        prompt: "Which call number comes first?",
-        choices: [
-          { type: "label", lines: ["M", "1000", ".B4"] },
-          { type: "label", lines: ["M", "250", ".Z9"] },
-          { type: "label", lines: ["M", "900", ".A2"] }
-        ],
-        answer: 1,
-        correctText: "Correct. M 250 comes first.",
-        teachText: "The whole number decides this one. 250 comes before 900 and 1000."
+        type: 'teach',
+        label: 'Lesson 4',
+        title: 'Line-four details matter',
+        html: `
+          <h2>Line-four details</h2>
+          <p>After the earlier lines are settled, compare line-four details such as series, band, volume, part, fascicle, section, and other music-specific numbering details.</p>
+          <p>Roman numerals are treated as numbers. So <code class="call">SER.I</code> comes before <code class="call">SER.II</code> and both come before <code class="call">SER.VI</code>.</p>
+          <p>This prototype also recognizes details such as <code class="call">BD.20</code>, <code class="call">V.69A</code>, <code class="call">PTS.1-6</code>, and work-mark style elements like <code class="call">H.III:E2</code>.</p>
+        `
       },
       {
-        title: "First Cutter",
-        lesson: [
-          "After the whole number, compare the first Cutter.",
-          "Read Cutters like decimals."
-        ],
-        example: [".B4", ".B45", ".B5"],
-        watch: "Length does not decide it. Decimal value decides it.",
-        prompt: "Which call number comes first?",
-        choices: [
-          { type: "label", lines: ["M", "1010", ".B45"] },
-          { type: "label", lines: ["M", "1010", ".B4"] },
-          { type: "label", lines: ["M", "1010", ".B5"] }
-        ],
-        answer: 1,
-        correctText: "Correct. .B4 comes first.",
-        teachText: "The first Cutter is read like a decimal: .4 comes before .45 and .5."
-      },
-      {
-        title: "First Cutter Again",
-        lesson: [
-          "Keep using decimal logic.",
-          ".C25 comes before .C3."
-        ],
-        example: [".C25", ".C3", ".C4"],
-        watch: "Do not treat .25 as bigger just because it has more digits.",
-        prompt: "Which call number comes first?",
-        choices: [
-          { type: "label", lines: ["M", "1010", ".C3"] },
-          { type: "label", lines: ["M", "1010", ".C25"] },
-          { type: "label", lines: ["M", "1010", ".C4"] }
-        ],
-        answer: 1,
-        correctText: "Correct. .C25 comes first.",
-        teachText: "Read the Cutter as a decimal. .25 comes before .3 and .4."
-      },
-      {
-        title: "Second Cutter",
-        lesson: [
-          "If the earlier lines match, move to the next line.",
-          "The second Cutter is also read like a decimal, even without a printed decimal point."
-        ],
-        example: ["T10", "T2", "T3"],
-        watch: "T10 behaves like .10, not like the whole number 10.",
-        prompt: "Which call number comes first?",
-        choices: [
-          { type: "label", lines: ["M", "300", ".A2", "T2"] },
-          { type: "label", lines: ["M", "300", ".A2", "T10"] },
-          { type: "label", lines: ["M", "300", ".A2", "T3"] }
-        ],
-        answer: 1,
-        correctText: "Correct. T10 comes first.",
-        teachText: "The second Cutter still uses decimal logic. T10 behaves like .10, so it comes before T2 and T3."
-      },
-      {
-        title: "Second Cutter Again",
-        lesson: [
-          "Use the same rule again.",
-          "When the earlier lines match, the next Cutter decides the order."
-        ],
-        example: ["S5", "S6", "S7"],
-        watch: "Do not stop after the first Cutter if another line is there.",
-        prompt: "Which call number comes first?",
-        choices: [
-          { type: "label", lines: ["M", "100", ".B4", "S6"] },
-          { type: "label", lines: ["M", "100", ".B4", "S5"] },
-          { type: "label", lines: ["M", "100", ".B4", "S7"] }
-        ],
-        answer: 1,
-        correctText: "Correct. S5 comes first.",
-        teachText: "Once the earlier lines match, the second Cutter decides it. S5 comes before S6 and S7."
-      },
-      {
-        title: "Added Elements",
-        lesson: [
-          "Extra elements are used to make call numbers unique.",
-          "Compare what you see, left to right."
-        ],
-        example: ["op. 42", "no. 2"],
-        watch: "Do not invent categories. Compare the actual printed elements in order.",
-        prompt: "Which call number comes first?",
-        choices: [
-          { type: "label", lines: ["M", "1010", ".B585", "op. 42", "no. 2"] },
-          { type: "label", lines: ["M", "1010", ".B585", "op. 42", "no. 10"] },
-          { type: "label", lines: ["M", "1010", ".B585", "op. 50"] }
-        ],
+        type: 'quiz',
+        label: 'Quiz 4',
+        question: 'Which comes first?',
+        choices: ['M 3 .B1133 SER.I BD.32 PT.1', 'M 3 .B1133 SER.VI BD.32 PT.1', 'M 3 .B1133 SER.II BD.32 PT.1'],
         answer: 0,
-        correctText: "Correct. op. 42 no. 2 comes first.",
-        teachText: "Compare the added elements in order. op. 42 comes before op. 50, and within op. 42, no. 2 comes before no. 10."
+        explain: 'Roman numerals are converted to numbers. SER.I comes before SER.II, which comes before SER.VI.'
       },
       {
-        title: "Added Elements Again",
-        lesson: [
-          "Keep comparing the printed sequence, piece by piece.",
-          "Use the first difference that appears."
-        ],
-        example: ["op. 42", "no. 2", "violin"],
-        watch: "Stay with the printed order. Do not jump around the label.",
-        prompt: "Which call number comes first?",
-        choices: [
-          { type: "label", lines: ["M", "1010", ".B585", "op. 42", "no. 2"] },
-          { type: "label", lines: ["M", "1010", ".B585", "op. 42", "no. 10"] },
-          { type: "label", lines: ["M", "1010", ".B585", "op. 50"] }
-        ],
-        answer: 0,
-        correctText: "Correct. op. 42 no. 2 comes first.",
-        teachText: "Use the first difference in the printed sequence. The lower opus comes first, and within the same opus, the lower number comes first."
+        type: 'quiz',
+        label: 'Quiz 5',
+        question: 'Which call number should shelve first?',
+        choices: ['M 3 .B88R BD.20 PTS.1-6', 'M 3 .C4 1993 SER.VI V.69A', 'M 3 .B103 2005 SER.8 V.2'],
+        answer: 2,
+        explain: 'All are M 3, so compare the first cutter. .B103 comes before .B88R and before .C4.'
+      },
+      {
+        type: 'drag',
+        label: 'Final Activity',
+        title: 'Place these realistic music score call numbers in correct order',
+        items: [
+          'M 3 .C4 1993 SER.VI V.69A',
+          'M 3 .B103 2005 SER.8 V.2',
+          'M 2 .G39 1966 BD.23',
+          'M 3 .B88R BD.20 PTS.1-6',
+          'M 452 .H42 H.III:E2'
+        ]
+      },
+      {
+        type: 'done',
+        label: 'Complete'
       }
     ];
 
-    const finalCards = [
-      { id: "a", lines: ["M", "500", ".B4", "op. 42"] },
-      { id: "b", lines: ["M", "1010", ".B4", "op. 42"] },
-      { id: "c", lines: ["M", "1010", ".B585", "op. 42"] },
-      { id: "d", lines: ["M", "1010", ".B585", "op. 100"] }
-    ];
+    state.totalQuestions = lessons.filter(x => x.type === 'quiz').length + 1;
 
-    const finalOrder = ["a", "b", "c", "d"];
-
-    let roundIndex = 0;
-    let score = 0;
-    let dragCorrect = false;
-
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    function setProgress(){
+      bar.style.width = `${(state.step)/(lessons.length-1)*100}%`;
     }
 
-    function renderLabel(lines) {
-      return `
-        <div class="label">
-          ${lines.map(line => `<div class="label-line">${escapeHtml(line)}</div>`).join("")}
-        </div>
+    function nextStep(){
+      state.step++;
+      render();
+    }
+
+    function renderTeach(lesson){
+      screen.innerHTML = `
+        <h2>${lesson.title}</h2>
+        ${lesson.html}
+        <button id="next">Continue</button>
       `;
+      document.getElementById('next').onclick = nextStep;
     }
 
-    function renderChoice(choice, index) {
-      if (choice.type === "label") {
-        return `
-          <button type="button" class="choice-btn" onclick="answerRound(${index})">
-            ${renderLabel(choice.lines)}
-          </button>
-        `;
-      }
-      return `
-        <button type="button" class="choice-btn text-only" onclick="answerRound(${index})">
-          ${escapeHtml(choice.text)}
-        </button>
+    function renderQuiz(lesson){
+      screen.innerHTML = `
+        <h2>${lesson.question}</h2>
+        <div id="choices"></div>
+        <div id="feedback"></div>
       `;
-    }
-
-    function renderStart() {
-      app.innerHTML = `
-        <div class="card">
-          <div class="eyebrow">Version 3.1</div>
-          <h1>Shelf It Right</h1>
-          <p>This version puts score teaching back at the front.</p>
-          <div class="lesson-box">
-            <strong>What it covers:</strong><br>
-            what a score is, fine sorting, whole numbers, first Cutter, second Cutter, added elements, and one final drag-and-drop ordering task.
-          </div>
-          <div class="lesson-box">
-            <strong>How it works:</strong><br>
-            Each round teaches first, then asks one question, then gives feedback.
-          </div>
-          <div class="button-row">
-            <button type="button" class="primary-btn" onclick="renderLesson()">Start</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderLesson() {
-      const r = rounds[roundIndex];
-      app.innerHTML = `
-        <div class="card">
-          <div class="status">
-            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
-            <div>Score: ${score}</div>
-          </div>
-          <div class="eyebrow">Lesson</div>
-          <h2>${escapeHtml(r.title)}</h2>
-          ${r.lesson.map(p => `<p>${escapeHtml(p)}</p>`).join("")}
-          <div class="lesson-box">
-            <strong>Example:</strong><br>
-            ${r.example.map(x => escapeHtml(x)).join(" → ")}
-          </div>
-          <div class="lesson-box">
-            <strong>Watch out:</strong><br>
-            ${escapeHtml(r.watch)}
-          </div>
-          <div class="button-row">
-            <button type="button" class="primary-btn" onclick="renderQuestion()">Next</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderQuestion() {
-      const r = rounds[roundIndex];
-      app.innerHTML = `
-        <div class="card">
-          <div class="status">
-            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
-            <div>Score: ${score}</div>
-          </div>
-          <div class="eyebrow">Question</div>
-          <div class="prompt">${escapeHtml(r.prompt)}</div>
-          <div class="choices">
-            ${r.choices.map((choice, index) => renderChoice(choice, index)).join("")}
-          </div>
-        </div>
-      `;
-    }
-
-    function answerRound(selectedIndex) {
-      const r = rounds[roundIndex];
-      const isCorrect = selectedIndex === r.answer;
-      if (isCorrect) score++;
-
-      app.innerHTML = `
-        <div class="card">
-          <div class="status">
-            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
-            <div>Score: ${score}</div>
-          </div>
-          <div class="eyebrow">Feedback</div>
-          <div class="feedback ${isCorrect ? "good" : "bad"}">
-            <h2>${isCorrect ? "Correct" : "Not Quite"}</h2>
-            <p><strong>${escapeHtml(isCorrect ? r.correctText : "Review the comparison order and try the next one.")}</strong></p>
-            <p>${escapeHtml(r.teachText)}</p>
-          </div>
-          <div class="button-row">
-            <button type="button" class="primary-btn" onclick="nextRound()">Next</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function nextRound() {
-      roundIndex++;
-      if (roundIndex >= rounds.length) {
-        renderFinalDrag();
-      } else {
-        renderLesson();
-      }
-    }
-
-    function renderFinalDrag() {
-      dragCorrect = false;
-      const shuffled = [...finalCards].sort(() => Math.random() - 0.5);
-
-      app.innerHTML = `
-        <div class="card">
-          <div class="status">
-            <div>Round ${rounds.length + 1} of ${rounds.length + 1}</div>
-            <div>Score: ${score}</div>
-          </div>
-          <div class="eyebrow">Final Task</div>
-          <h2>Put the Call Numbers in Order</h2>
-          <p>Drag the cards into shelf order. Feedback appears after each move.</p>
-          <div class="lesson-box">
-            <strong>Reminder:</strong><br>
-            Compare top to bottom. Use the first difference you see.
-          </div>
-
-          <h3>Cards</h3>
-          <div class="drag-bank" id="drag-bank"></div>
-
-          <h3>Order from first to last</h3>
-          <div class="drag-slots">
-            <div class="drop-slot" data-pos="0"><div class="slot-name">1st</div></div>
-            <div class="drop-slot" data-pos="1"><div class="slot-name">2nd</div></div>
-            <div class="drop-slot" data-pos="2"><div class="slot-name">3rd</div></div>
-            <div class="drop-slot" data-pos="3"><div class="slot-name">4th</div></div>
-          </div>
-
-          <div id="drag-feedback"></div>
-
-          <div class="button-row">
-            <button type="button" class="secondary-btn" onclick="resetDrag()">Reset</button>
-            <button type="button" class="primary-btn" onclick="finishIfReady()">Finish</button>
-          </div>
-        </div>
-      `;
-
-      const bank = document.getElementById("drag-bank");
-      shuffled.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "draggable-card";
-        card.draggable = true;
-        card.dataset.id = item.id;
-        card.innerHTML = renderLabel(item.lines);
-        bank.appendChild(card);
+      const choices = document.getElementById('choices');
+      const feedback = document.getElementById('feedback');
+      lesson.choices.forEach((choice, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = choice;
+        btn.onclick = () => {
+          const correct = i === lesson.answer;
+          if (correct) state.score++;
+          feedback.className = `feedback ${correct ? 'good' : 'bad'}`;
+          feedback.innerHTML = `${correct ? 'Correct.' : 'Not quite.'} ${lesson.explain}<br><br><button id="nextQ">Continue</button>`;
+          [...choices.querySelectorAll('button')].forEach(b => b.disabled = true);
+          document.getElementById('nextQ').onclick = nextStep;
+        };
+        choices.appendChild(btn);
       });
-
-      wireDrag();
     }
 
-    function wireDrag() {
-      let dragged = null;
+    function shuffle(arr){ return [...arr].sort(() => Math.random() - 0.5); }
 
-      document.querySelectorAll(".draggable-card").forEach(card => {
-        card.addEventListener("dragstart", () => {
-          dragged = card;
-          card.classList.add("dragging");
-        });
+    function renderDrag(lesson){
+      const shuffled = shuffle(lesson.items);
+      const correct = sortCalls(lesson.items);
+      screen.innerHTML = `
+        <h2>${lesson.title}</h2>
+        <p class="small">Drag each call number into the slots from first to last according to the local shelf logic used in this prototype.</p>
+        <h3>Call number bank</h3>
+        <div class="sortbank" id="bank"></div>
+        <h3>Order slots</h3>
+        <div class="sortslots" id="slots"></div>
+        <div id="dragFeedback"></div>
+        <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="checkDrag">Check Order</button>
+          <button id="resetDrag" class="secondary">Reset</button>
+        </div>
+      `;
+      const bank = document.getElementById('bank');
+      const slots = document.getElementById('slots');
+      const dragFeedback = document.getElementById('dragFeedback');
 
-        card.addEventListener("dragend", () => {
-          card.classList.remove("dragging");
-        });
+      shuffled.forEach((item, idx) => bank.appendChild(makeDraggable(item, `item-${idx}`)));
+      lesson.items.forEach((_, i) => slots.appendChild(makeSlot(i+1)));
+      enableDnD();
+
+      document.getElementById('resetDrag').onclick = () => renderDrag(lesson);
+      document.getElementById('checkDrag').onclick = () => {
+        const chosen = [...slots.querySelectorAll('.slot')].map(slot => slot.querySelector('.draggable')?.dataset.value).filter(Boolean);
+        if (chosen.length !== lesson.items.length) {
+          dragFeedback.className = 'feedback warn';
+          dragFeedback.textContent = 'Please place every call number into a slot before checking.';
+          return;
+        }
+        const ok = chosen.every((x,i) => x === correct[i]);
+        if (ok) state.score++;
+        dragFeedback.className = `feedback ${ok ? 'good' : 'bad'}`;
+        dragFeedback.innerHTML = ok
+          ? `Correct. You placed the scores in the right order.<br><br><button id="finishBtn">Finish</button>`
+          : `Not quite. Correct order:<br>${correct.map(x => `<code class="call">${x}</code>`).join(' ')}<br><br><button id="finishBtn">Continue</button>`;
+        document.getElementById('finishBtn').onclick = nextStep;
+      };
+    }
+
+    function makeDraggable(text, id){
+      const div = document.createElement('div');
+      div.className = 'draggable';
+      div.draggable = true;
+      div.id = id;
+      div.dataset.value = text;
+      div.textContent = text;
+      return div;
+    }
+
+    function makeSlot(n){
+      const div = document.createElement('div');
+      div.className = 'slot';
+      div.innerHTML = `<div class="slotlabel">Position ${n}</div>`;
+      return div;
+    }
+
+    function enableDnD(){
+      document.querySelectorAll('.draggable').forEach(el => {
+        el.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', el.id));
       });
-
-      const bank = document.getElementById("drag-bank");
-      bank.addEventListener("dragover", e => e.preventDefault());
-      bank.addEventListener("drop", e => {
-        e.preventDefault();
-        if (!dragged) return;
-        bank.appendChild(dragged);
-        updateDragFeedback();
-      });
-
-      document.querySelectorAll(".drop-slot").forEach(slot => {
-        slot.addEventListener("dragover", e => {
+      document.querySelectorAll('.slot, .sortbank').forEach(target => {
+        target.addEventListener('dragover', e => e.preventDefault());
+        target.addEventListener('drop', e => {
           e.preventDefault();
-          slot.classList.add("drag-over");
-        });
-
-        slot.addEventListener("dragleave", () => {
-          slot.classList.remove("drag-over");
-        });
-
-        slot.addEventListener("drop", e => {
-          e.preventDefault();
-          slot.classList.remove("drag-over");
-          if (!dragged) return;
-
-          const existing = slot.querySelector(".draggable-card");
-          if (existing) {
-            document.getElementById("drag-bank").appendChild(existing);
+          const id = e.dataTransfer.getData('text/plain');
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (target.classList.contains('slot')) {
+            const existing = target.querySelector('.draggable');
+            if (existing) document.getElementById('bank').appendChild(existing);
+            target.appendChild(el);
+          } else {
+            target.appendChild(el);
           }
-
-          const label = slot.querySelector(".slot-name");
-          if (label) label.remove();
-
-          slot.innerHTML = "";
-          slot.appendChild(dragged);
-          updateDragFeedback();
         });
       });
     }
 
-    function slotState() {
-      return Array.from(document.querySelectorAll(".drop-slot")).map(slot => {
-        const card = slot.querySelector(".draggable-card");
-        return card ? card.dataset.id : null;
-      });
-    }
-
-    function updateDragFeedback() {
-      const state = slotState();
-      const feedback = document.getElementById("drag-feedback");
-
-      document.querySelectorAll(".drop-slot").forEach((slot, idx) => {
-        slot.classList.remove("correct-slot", "wrong-slot");
-        const id = state[idx];
-        if (!id) return;
-        if (id === finalOrder[idx]) {
-          slot.classList.add("correct-slot");
-        } else {
-          slot.classList.add("wrong-slot");
-        }
-      });
-
-      let filled = 0;
-      let stillCorrect = true;
-
-      for (let i = 0; i < state.length; i++) {
-        if (state[i] !== null) filled++;
-        if (state[i] !== null && state[i] !== finalOrder[i]) {
-          stillCorrect = false;
-        }
-      }
-
-      if (filled === 0) {
-        feedback.innerHTML = "";
-        dragCorrect = false;
-        return;
-      }
-
-      if (stillCorrect) {
-        feedback.innerHTML = `
-          <div class="feedback good">
-            <strong>Correct so far.</strong><br>
-            Keep going.
-          </div>
-        `;
-      } else {
-        feedback.innerHTML = `
-          <div class="feedback bad">
-            <strong>Not quite.</strong><br>
-            Check the first place where the labels differ.
-          </div>
-        `;
-      }
-
-      dragCorrect = JSON.stringify(state) === JSON.stringify(finalOrder);
-    }
-
-    function resetDrag() {
-      renderFinalDrag();
-    }
-
-    function finishIfReady() {
-      const state = slotState();
-      const filledAll = state.every(x => x !== null);
-
-      if (!filledAll) {
-        document.getElementById("drag-feedback").innerHTML = `
-          <div class="feedback bad">
-            <strong>Not ready yet.</strong><br>
-            Place all four call numbers before finishing.
-          </div>
-        `;
-        return;
-      }
-
-      if (dragCorrect) {
-        score++;
-      }
-
-      renderEnd();
-    }
-
-    function renderEnd() {
-      const total = rounds.length + 1;
-      let message = "";
-
-      if (score >= total - 1) {
-        message = "This version at least teaches the basics before asking.";
-      } else if (score >= Math.ceil(total * 0.6)) {
-        message = "The structure is there. It still needs more real examples.";
-      } else {
-        message = "It works as a start, but it still needs repetition.";
-      }
-
-      app.innerHTML = `
-        <div class="card">
-          <div class="eyebrow">V3.1 Complete</div>
-          <h2>Done</h2>
-          <div class="final-score">${score} / ${total}</div>
-          <p>${escapeHtml(message)}</p>
-          <div class="lesson-box">
-            <strong>What this version teaches:</strong>
-            <ul>
-              <li>What a score is</li>
-              <li>Fine sorting only</li>
-              <li>Whole number first</li>
-              <li>First Cutter as decimal</li>
-              <li>Second Cutter as decimal</li>
-              <li>Added elements compared in sequence</li>
-              <li>One drag-and-drop ordering task</li>
-            </ul>
-          </div>
-          <div class="button-row">
-            <button type="button" class="primary-btn" onclick="restart()">Restart</button>
-          </div>
+    function renderDone(){
+      screen.innerHTML = `
+        <h2>Training complete</h2>
+        <p>You completed the prototype training sequence.</p>
+        <div class="feedback good">Score: ${state.score} / ${state.totalQuestions}</div>
+        <p>This version is testable and meant to be checked against local Music Library practice. Before finalizing, the sorting rules, examples, and feedback language should be reviewed with you and adjusted where needed.</p>
+        <div class="row">
+          <div class="col"><button id="restartBtn">Restart</button></div>
+          <div class="col"><button class="secondary" id="rulesAgainBtn">Review Rules</button></div>
         </div>
       `;
+      document.getElementById('restartBtn').onclick = () => { state.step = 0; state.score = 0; render(); };
+      document.getElementById('rulesAgainBtn').onclick = () => {
+        rulesCard.classList.remove('hidden');
+        rulesCard.innerHTML = `<h2>Sorting Rules Used in This Prototype</h2><pre>${rulesText}</pre>`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
     }
 
-    function restart() {
-      roundIndex = 0;
-      score = 0;
-      dragCorrect = false;
-      renderStart();
+    function render(){
+      app.classList.remove('hidden');
+      const lesson = lessons[state.step];
+      stageLabel.textContent = lesson.label;
+      setProgress();
+      if (lesson.type === 'teach') return renderTeach(lesson);
+      if (lesson.type === 'quiz') return renderQuiz(lesson);
+      if (lesson.type === 'drag') return renderDrag(lesson);
+      if (lesson.type === 'done') return renderDone();
     }
 
-    renderStart();
+    document.getElementById('startBtn').addEventListener('click', () => {
+      state.step = 0;
+      state.score = 0;
+      render();
+    });
   </script>
 </body>
 </html>
