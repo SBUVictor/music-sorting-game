@@ -38,10 +38,7 @@ body { font-family: Arial; background:#f4f6f8; padding:20px; }
   padding:5px;
 }
 
-.drag {
-  cursor:grab;
-}
-
+.drag { cursor:grab; }
 .correct { background:#e3f9e5; }
 .wrong { background:#fde8e8; }
 
@@ -68,13 +65,21 @@ const rounds = [
 {
 lesson: `
 <h3>What is a Score?</h3>
-<p>A <strong>score</strong> shows all parts together.</p>
-<p>A <strong>part</strong> shows only one instrument.</p>
+
+<p>A <strong>score</strong> is written music that shows <strong>all parts together</strong>.</p>
+
+<p>In an orchestra score, you can see violin, cello, flute, and more — all at the same time.</p>
+
+<p>A <strong>part</strong> shows <strong>only one instrument</strong>.</p>
+
+<p><strong>Key idea:</strong><br>
+Score = everything together<br>
+Part = one instrument</p>
 `,
-question: "What is a score?",
+question: "Which best describes a score?",
 choices: [
 "Music for one instrument",
-"A written version showing all parts",
+"A written version showing all parts together",
 "A recording"
 ],
 answer: 1
@@ -83,9 +88,14 @@ answer: 1
 {
 lesson: `
 <h3>Mini-Scores</h3>
-<p>A <strong>mini-score</strong> is a smaller study version.</p>
-<p>A lowercase <strong>m</strong> appears on its own line near the top.</p>
-<p><strong>It is read first.</strong></p>
+
+<p>A <strong>mini-score</strong> is a smaller study version of a full score.</p>
+
+<p>In this library, a lowercase <strong>m</strong> appears on its own line near the top.</p>
+
+<p><strong>The m is read first.</strong></p>
+
+<p>This tells you immediately: this is a mini-score.</p>
 `,
 question: "Which is a mini-score?",
 choices: [
@@ -99,8 +109,12 @@ answer: 0
 {
 lesson: `
 <h3>Reading Order</h3>
-<p>Always read from top to bottom.</p>
+
+<p>Always read call numbers <strong>top to bottom</strong>.</p>
+
 <p>If there is an <strong>m</strong>, it comes first.</p>
+
+<p>Then follow the rest of the lines in order.</p>
 `,
 question: "Which comes first?",
 choices: [
@@ -114,7 +128,10 @@ answer: 1
 {
 lesson: `
 <h3>Whole Numbers</h3>
-<p>Compare the whole number after M.</p>
+
+<p>After M, compare the whole number.</p>
+
+<p><strong>Smaller numbers come first.</strong></p>
 `,
 question: "Which comes first?",
 choices: [
@@ -128,8 +145,10 @@ answer: 1
 {
 lesson: `
 <h3>Cutters</h3>
+
 <p>Cutter numbers are read like decimals.</p>
-<p>.B4 comes before .B45</p>
+
+<p><strong>.B4 comes before .B45</strong></p>
 `,
 question: "Which comes first?",
 choices: [
@@ -143,7 +162,10 @@ answer: 1
 {
 lesson: `
 <h3>Second Cutter</h3>
-<p>The second Cutter is also read like a decimal, even without a dot.</p>
+
+<p>The second Cutter is also read like a decimal — even without a dot.</p>
+
+<p><strong>T10 behaves like .10</strong></p>
 `,
 question: "Which comes first?",
 choices: [
@@ -156,8 +178,9 @@ answer: 1
 
 {
 lesson: `
-<h3>Line 4</h3>
-<p>Opus numbers and details are part of sorting.</p>
+<h3>Line 4 Details</h3>
+
+<p>Opus numbers and details help sort when everything else matches.</p>
 `,
 question: "Which comes first?",
 choices: [
@@ -174,7 +197,6 @@ answer: 1
 
 function render(){
 if(round === rounds.length) return renderDrag();
-
 if(round > rounds.length) return end();
 
 let r = rounds[round];
@@ -214,11 +236,12 @@ let shuffled = [...correctOrder].sort(() => Math.random() - 0.5);
 
 document.getElementById("app").innerHTML = `
 <h3>Final Test</h3>
-<p>Drag the call numbers into the correct order. Feedback appears after each move.</p>
+<p>Drag the call numbers into the correct order.</p>
+<p>Feedback appears after each move.</p>
 
 <div id="pool">
 ${shuffled.map((l,i)=>`
-<div class="choice drag" draggable="true" id="item${i}" data-index="${JSON.stringify(l)}">
+<div class="choice drag" draggable="true" id="item${i}" data-index='${JSON.stringify(l)}'>
 ${label(l)}
 </div>
 `).join("")}
@@ -258,7 +281,6 @@ let el = document.getElementById(id);
 if(zone.children.length > 0) return;
 
 zone.appendChild(el);
-
 checkPlacement(zone);
 });
 });
