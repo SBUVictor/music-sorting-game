@@ -7,63 +7,52 @@
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #f5f7fa;
-  padding: 30px;
+  background:#f4f6f8;
+  margin:0;
+  padding:40px;
 }
 
 .card {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  max-width: 800px;
-  margin: auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  max-width:800px;
+  margin:auto;
+  box-shadow:0 4px 20px rgba(0,0,0,0.08);
 }
 
-h3 { margin-top: 0; }
+h2 { margin-top:0; }
 
 .choice {
-  display: inline-block;
-  margin: 10px;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
+  display:inline-block;
+  margin:10px;
+  padding:15px 20px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  cursor:pointer;
+  background:white;
 }
 
 .choice:hover {
-  background: #eef3f8;
+  background:#eef4ff;
 }
 
-.label {
-  border: 2px solid #222;
-  padding: 10px;
-  width: 120px;
-  text-align: center;
-  line-height: 1.6;
-  background: #fff;
-  border-radius: 6px;
-  font-weight: bold;
+.correct { background:#e3f9e5 !important; }
+.wrong { background:#fde8e8 !important; }
+
+.callbox {
+  border:2px solid #333;
+  padding:10px;
+  width:120px;
+  margin:auto;
+  text-align:center;
+  font-weight:bold;
 }
 
-.dropzone {
-  border: 2px dashed #bbb;
-  min-height: 120px;
-  width: 140px;
-  display: inline-block;
-  margin: 10px;
-  padding: 5px;
-}
-
-.correct { background: #e6f7ec; }
-.wrong { background: #fdecea; }
-
-button {
-  padding: 10px 14px;
-  margin-top: 20px;
+.score {
+  margin-top:20px;
 }
 </style>
-
 </head>
 
 <body>
@@ -72,235 +61,89 @@ button {
 
 <script>
 
-let round = 0;
 let score = 0;
 
-function label(lines){
-  return `<div class="label">${lines.join("<br>")}</div>`;
+function renderLesson() {
+  document.getElementById("app").innerHTML = `
+    <h2>Reading Order</h2>
+
+    <p>Always read from <strong>top to bottom</strong>.</p>
+
+    <p>If there is a lowercase <strong>m</strong>, it appears as its own line 
+    and is read in that position — not as part of the year.</p>
+
+    <p>You are comparing what is physically printed on the label.</p>
+
+    <button onclick="renderQuestion()">Continue</button>
+  `;
 }
 
-const rounds = [
+function renderQuestion() {
+  document.getElementById("app").innerHTML = `
+    <h2>Which Comes First?</h2>
 
-{
-lesson: `
-<h3>What is a Score?</h3>
+    <div style="display:flex; justify-content:space-around;">
 
-<p>A <strong>score</strong> shows all parts together.</p>
+      <div class="choice" onclick="answer(0)">
+        <div class="callbox">
+          Music<br>
+          m<br>
+          M<br>
+          1010<br>
+          .B585
+        </div>
+      </div>
 
-<p>A <strong>part</strong> shows only one instrument.</p>
+      <div class="choice" onclick="answer(1)">
+        <div class="callbox">
+          Music<br>
+          M<br>
+          1010<br>
+          .B585
+        </div>
+      </div>
 
-<p><strong>We are practicing fine sorting.</strong><br>
-All items are already in the correct section.</p>
-`,
-question: "Which describes a score?",
-choices: [
-"Music for one instrument",
-"A written version showing all parts",
-"A recording"
-],
-answer: 1
-},
+      <div class="choice" onclick="answer(2)">
+        <div class="callbox">
+          Music<br>
+          M<br>
+          500<br>
+          .B4
+        </div>
+      </div>
 
-{
-lesson: `
-<h3>Whole Numbers</h3>
+    </div>
 
-<p>Start with the number after M.</p>
-
-<p><strong>Smaller numbers come first.</strong></p>
-`,
-question: "Which comes first?",
-choices: [
-label(["M","1010"]),
-label(["M","500"]),
-label(["M","750"])
-],
-answer: 1
-},
-
-{
-lesson: `
-<h3>First Cutter</h3>
-
-<p>Cutters are read like decimals.</p>
-
-<p><strong>.B4 comes before .B45</strong></p>
-`,
-question: "Which comes first?",
-choices: [
-label([".B45"]),
-label([".B4"]),
-label([".B5"])
-],
-answer: 1
-},
-
-{
-lesson: `
-<h3>Second Cutter</h3>
-
-<p>The second Cutter is also read like a decimal — even without a dot.</p>
-
-<p><strong>T10 behaves like .10</strong></p>
-`,
-question: "Which comes first?",
-choices: [
-label(["T2"]),
-label(["T10"]),
-label(["T3"])
-],
-answer: 1
-},
-
-{
-lesson: `
-<h3>Line 4 Details</h3>
-
-<p>Opus numbers and other details are part of sorting.</p>
-
-<p><strong>Smaller numbers come first.</strong></p>
-`,
-question: "Which comes first?",
-choices: [
-label(["op. 42"]),
-label(["op. 5"]),
-label(["op. 100"])
-],
-answer: 1
+    <div class="score">Score: ${score}</div>
+  `;
 }
 
-];
+function answer(i) {
+  let correct = 0;
 
-// ---------- NORMAL ----------
+  const choices = document.querySelectorAll(".choice");
 
-function render(){
-if(round === rounds.length) return renderDrag();
-if(round > rounds.length) return end();
+  choices.forEach((c, index) => {
+    if (index === correct) c.classList.add("correct");
+    if (index === i && i !== correct) c.classList.add("wrong");
+  });
 
-let r = rounds[round];
+  if (i === correct) score++;
 
-document.getElementById("app").innerHTML = `
-${r.lesson}
-<p><strong>${r.question}</strong></p>
-${r.choices.map((c,i)=>`
-<div class="choice" onclick="answer(${i})">${c}</div>
-`).join("")}
-<p>Score: ${score}</p>
-`;
+  setTimeout(() => {
+    renderEnd();
+  }, 1200);
 }
 
-function answer(i){
-if(i === rounds[round].answer) score++;
-round++;
-render();
+function renderEnd() {
+  document.getElementById("app").innerHTML = `
+    <h2>Done</h2>
+    <p>Score: ${score}/1</p>
+    <button onclick="location.reload()">Restart</button>
+  `;
 }
 
-// ---------- DRAG TEST ----------
-
-const correctOrder = [
-["M","500",".B585","op. 42"],
-["M","1010",".B4","op. 42"],
-["M","1010",".B585","op. 42"],
-["M","1010",".B585","op. 100"]
-];
-
-let placed = [];
-
-function renderDrag(){
-
-placed = [];
-
-let shuffled = [...correctOrder].sort(() => Math.random() - 0.5);
-
-document.getElementById("app").innerHTML = `
-<h3>Final Test</h3>
-<p>Put the call numbers in order.</p>
-
-<div>
-${shuffled.map((l,i)=>`
-<div class="choice" draggable="true" id="item${i}" data='${JSON.stringify(l)}'>
-${label(l)}
-</div>
-`).join("")}
-</div>
-
-<hr>
-
-<div>
-${[0,1,2,3].map(i=>`
-<div class="dropzone" data-pos="${i}"></div>
-`).join("")}
-</div>
-
-<p id="feedback"></p>
-`;
-
-enableDrag();
-}
-
-function enableDrag(){
-
-document.querySelectorAll(".choice").forEach(el=>{
-el.addEventListener("dragstart", e=>{
-e.dataTransfer.setData("text", el.id);
-});
-});
-
-document.querySelectorAll(".dropzone").forEach(zone=>{
-zone.addEventListener("dragover", e=> e.preventDefault());
-
-zone.addEventListener("drop", e=>{
-e.preventDefault();
-
-let id = e.dataTransfer.getData("text");
-let el = document.getElementById(id);
-
-if(zone.children.length > 0) return;
-
-zone.appendChild(el);
-check(zone);
-});
-});
-}
-
-function check(zone){
-
-let pos = zone.dataset.pos;
-let val = JSON.parse(zone.firstChild.dataset.data);
-
-placed[pos] = val;
-
-let ok = true;
-
-for(let i=0;i<=pos;i++){
-if(JSON.stringify(placed[i]) !== JSON.stringify(correctOrder[i])){
-ok = false;
-break;
-}
-}
-
-let f = document.getElementById("feedback");
-
-if(ok){
-zone.classList.add("correct");
-f.innerText = "Correct so far.";
-}else{
-zone.classList.add("wrong");
-f.innerText = "Not quite — check number, Cutter, and details.";
-}
-}
-
-// ---------- END ----------
-
-function end(){
-document.getElementById("app").innerHTML = `
-<h2>Done</h2>
-<p>Score: ${score}/${rounds.length}</p>
-<button onclick="location.reload()">Restart</button>
-`;
-}
-
-render();
+renderLesson();
 
 </script>
 
