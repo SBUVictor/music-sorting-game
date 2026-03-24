@@ -2,13 +2,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Shelf It Right</title>
+<title>Shelf It Right V2</title>
 
 <style>
 body {
   font-family: Arial, sans-serif;
-  background:#f4f6f8;
-  margin:0;
+  background:#f5f7fa;
   padding:40px;
 }
 
@@ -21,38 +20,39 @@ body {
   box-shadow:0 4px 20px rgba(0,0,0,0.08);
 }
 
-h2 { margin-top:0; }
+h3 { margin-top:0; }
 
 .choice {
   display:inline-block;
   margin:10px;
-  padding:15px 20px;
+  padding:12px;
   border:1px solid #ccc;
   border-radius:8px;
   cursor:pointer;
-  background:white;
 }
 
 .choice:hover {
-  background:#eef4ff;
+  background:#eef3f8;
 }
 
-.correct { background:#e3f9e5 !important; }
-.wrong { background:#fde8e8 !important; }
-
-.callbox {
+.label {
   border:2px solid #333;
   padding:10px;
   width:120px;
-  margin:auto;
   text-align:center;
+  line-height:1.6;
   font-weight:bold;
 }
 
-.score {
+.correct { background:#e6f7ec; }
+.wrong { background:#fdecea; }
+
+button {
+  padding:10px 14px;
   margin-top:20px;
 }
 </style>
+
 </head>
 
 <body>
@@ -61,89 +61,133 @@ h2 { margin-top:0; }
 
 <script>
 
+let round = 0;
 let score = 0;
 
-function renderLesson() {
-  document.getElementById("app").innerHTML = `
-    <h2>Reading Order</h2>
-
-    <p>Always read from <strong>top to bottom</strong>.</p>
-
-    <p>If there is a lowercase <strong>m</strong>, it appears as its own line 
-    and is read in that position — not as part of the year.</p>
-
-    <p>You are comparing what is physically printed on the label.</p>
-
-    <button onclick="renderQuestion()">Continue</button>
-  `;
+function label(lines){
+  return `<div class="label">${lines.join("<br>")}</div>`;
 }
 
-function renderQuestion() {
-  document.getElementById("app").innerHTML = `
-    <h2>Which Comes First?</h2>
+const rounds = [
 
-    <div style="display:flex; justify-content:space-around;">
+{
+lesson: `
+<h3>Fine Sorting</h3>
 
-      <div class="choice" onclick="answer(0)">
-        <div class="callbox">
-          Music<br>
-          m<br>
-          M<br>
-          1010<br>
-          .B585
-        </div>
-      </div>
+<p>You are sorting items that are already in the correct section.</p>
 
-      <div class="choice" onclick="answer(1)">
-        <div class="callbox">
-          Music<br>
-          M<br>
-          1010<br>
-          .B585
-        </div>
-      </div>
+<p>Read call numbers <strong>top to bottom</strong> and compare each line in order.</p>
+`,
+question: "Which comes first?",
+choices: [
+label(["M","500"]),
+label(["M","1010"]),
+label(["M","750"])
+],
+answer: 0
+},
 
-      <div class="choice" onclick="answer(2)">
-        <div class="callbox">
-          Music<br>
-          M<br>
-          500<br>
-          .B4
-        </div>
-      </div>
+{
+lesson: `
+<h3>First Cutter</h3>
 
-    </div>
+<p>Cutter numbers are read like decimals.</p>
 
-    <div class="score">Score: ${score}</div>
-  `;
+<p>.B4 comes before .B45</p>
+`,
+question: "Which comes first?",
+choices: [
+label([".B45"]),
+label([".B4"]),
+label([".B5"])
+],
+answer: 1
+},
+
+{
+lesson: `
+<h3>Second Cutter</h3>
+
+<p>The second Cutter is also read like a decimal, even without a dot.</p>
+
+<p>T10 behaves like .10</p>
+`,
+question: "Which comes first?",
+choices: [
+label(["T2"]),
+label(["T10"]),
+label(["T3"])
+],
+answer: 1
+},
+
+{
+lesson: `
+<h3>Line 4 — Added Elements</h3>
+
+<p>Extra elements are added to make items unique.</p>
+
+<p>Examples include:</p>
+<ul>
+<li>Opus numbers</li>
+<li>Numbers within a work</li>
+</ul>
+
+<p><strong>Compare left to right.</strong></p>
+`,
+question: "Which comes first?",
+choices: [
+label(["op. 42","no. 2"]),
+label(["op. 42","no. 10"]),
+label(["op. 50"])
+],
+answer: 0
 }
 
-function answer(i) {
-  let correct = 0;
+];
 
-  const choices = document.querySelectorAll(".choice");
+function render(){
+if(round >= rounds.length) return end();
 
-  choices.forEach((c, index) => {
-    if (index === correct) c.classList.add("correct");
-    if (index === i && i !== correct) c.classList.add("wrong");
-  });
+let r = rounds[round];
 
-  if (i === correct) score++;
-
-  setTimeout(() => {
-    renderEnd();
-  }, 1200);
+document.getElementById("app").innerHTML = `
+${r.lesson}
+<p><strong>${r.question}</strong></p>
+${r.choices.map((c,i)=>`
+<div class="choice" onclick="answer(${i})">${c}</div>
+`).join("")}
+<p>Score: ${score}</p>
+`;
 }
 
-function renderEnd() {
-  document.getElementById("app").innerHTML = `
-    <h2>Done</h2>
-    <p>Score: ${score}/1</p>
-    <button onclick="location.reload()">Restart</button>
-  `;
+function answer(i){
+let correct = rounds[round].answer;
+
+let choices = document.querySelectorAll(".choice");
+
+choices.forEach((c, idx)=>{
+if(idx === correct) c.classList.add("correct");
+if(idx === i && i !== correct) c.classList.add("wrong");
+});
+
+if(i === correct) score++;
+
+setTimeout(()=>{
+round++;
+render();
+}, 800);
 }
 
-renderLesson();
+function end(){
+document.getElementById("app").innerHTML = `
+<h2>V2 Stable</h2>
+<p>Score: ${score}/${rounds.length}</p>
+<button onclick="location.reload()">Restart</button>
+`;
+}
+
+render();
 
 </script>
 
