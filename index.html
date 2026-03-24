@@ -1,286 +1,806 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Shelf It Right</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shelf It Right — V3.1</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #52606d;
+      --border: #d9e2ec;
+      --accent: #3f6b8c;
+      --accent-soft: #eef5fb;
+      --good: #e7f6ec;
+      --good-border: #7ab68a;
+      --bad: #fdecec;
+      --bad-border: #d46a6a;
+      --shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    }
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background:#f5f7fa;
-  padding:30px;
-}
+    * { box-sizing: border-box; }
 
-.card {
-  background:white;
-  padding:25px;
-  border-radius:10px;
-  max-width:800px;
-  margin:auto;
-  box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
+    body {
+      margin: 0;
+      padding: 28px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.45;
+    }
 
-h3 { margin-top:0; }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+    }
 
-.choice {
-  display:inline-block;
-  margin:10px;
-  padding:12px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  cursor:pointer;
-}
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
 
-.choice:hover { background:#eef3f8; }
+    h1, h2, h3 {
+      margin-top: 0;
+      line-height: 1.2;
+    }
 
-.label {
-  border:2px solid #222;
-  padding:10px;
-  width:120px;
-  text-align:center;
-  font-weight:bold;
-  line-height:1.6;
-  background:white;
-}
+    .eyebrow {
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
 
-.correct { background:#e6f7ec; }
-.wrong { background:#fdecea; }
+    .status {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
 
-.dropzone {
-  border:2px dashed #bbb;
-  width:140px;
-  min-height:120px;
-  display:inline-block;
-  margin:10px;
-  padding:5px;
-}
+    .lesson-box {
+      background: #f8fbfd;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 14px 0;
+    }
 
-button { margin-top:20px; padding:10px; }
-</style>
+    .lesson-box strong {
+      color: var(--accent);
+    }
 
+    .prompt {
+      font-size: 1.08rem;
+      margin-bottom: 18px;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .choice-btn {
+      appearance: none;
+      border: 2px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      transition: transform 0.08s ease, border-color 0.08s ease, box-shadow 0.08s ease;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: inherit;
+    }
+
+    .choice-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+      background: #fcfdff;
+    }
+
+    .choice-btn.text-only {
+      min-height: 110px;
+      justify-content: flex-start;
+      text-align: left;
+      line-height: 1.35;
+    }
+
+    .label {
+      width: 132px;
+      min-height: 170px;
+      margin: 0 auto;
+      border: 2px solid #222;
+      border-radius: 8px;
+      background: #fffefc;
+      color: #111;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      font-weight: bold;
+      letter-spacing: 0.02em;
+    }
+
+    .label-line {
+      width: 100%;
+      text-align: center;
+      margin: 3px 0;
+      word-break: break-word;
+    }
+
+    .feedback {
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+
+    .feedback.good {
+      background: var(--good);
+      border: 1px solid var(--good-border);
+    }
+
+    .feedback.bad {
+      background: var(--bad);
+      border: 1px solid var(--bad-border);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      appearance: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .primary-btn {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary-btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+    }
+
+    .drag-bank,
+    .drag-slots {
+      display: grid;
+      gap: 16px;
+    }
+
+    .drag-bank {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      margin-bottom: 24px;
+    }
+
+    .draggable-card {
+      display: flex;
+      justify-content: center;
+      cursor: grab;
+    }
+
+    .draggable-card.dragging {
+      opacity: 0.45;
+    }
+
+    .drop-slot {
+      border: 2px dashed #b9c7d4;
+      border-radius: 14px;
+      min-height: 190px;
+      padding: 10px;
+      background: #fafcfe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drop-slot.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .drop-slot.correct-slot {
+      background: var(--good);
+      border-color: var(--good-border);
+    }
+
+    .drop-slot.wrong-slot {
+      background: var(--bad);
+      border-color: var(--bad-border);
+    }
+
+    .slot-name {
+      color: var(--muted);
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .final-score {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 14px 0;
+    }
+
+    ul {
+      margin-top: 8px;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <div id="app"></div>
+  </div>
 
-<div class="card" id="app"></div>
+  <script>
+    const app = document.getElementById("app");
 
-<script>
+    const rounds = [
+      {
+        title: "What Is a Score?",
+        lesson: [
+          "A score is written music that shows the whole piece together.",
+          "A part is written music for one instrument or section only.",
+          "This tool practices fine sorting of scores that are already in the correct section."
+        ],
+        example: ["Score = whole piece", "Part = one instrument"],
+        watch: "This is not rough sorting. Assume the items are already together and you are putting them in correct order.",
+        prompt: "Which best describes a score?",
+        choices: [
+          { type: "text", text: "Music for one instrument only" },
+          { type: "text", text: "A written version showing the whole piece together" },
+          { type: "text", text: "A recording of a performance" }
+        ],
+        answer: 1,
+        correctText: "Correct. A score shows the whole piece together.",
+        teachText: "A score brings the music together on the page. A part is only one instrument or section."
+      },
+      {
+        title: "Fine Sorting Only",
+        lesson: [
+          "Read top to bottom.",
+          "Compare one line at a time.",
+          "Use the first difference you see."
+        ],
+        example: ["M", "500"],
+        watch: "Do not jump ahead. Compare in order.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "500"] },
+          { type: "label", lines: ["M", "1010"] },
+          { type: "label", lines: ["M", "750"] }
+        ],
+        answer: 0,
+        correctText: "Correct. M 500 comes first.",
+        teachText: "Start with the number after M. The smaller whole number comes first."
+      },
+      {
+        title: "Whole Number Again",
+        lesson: [
+          "Use the same rule again.",
+          "Compare the whole number before you look at later lines."
+        ],
+        example: ["M", "1000"],
+        watch: "Do not let the Cutter distract you too early.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1000", ".B4"] },
+          { type: "label", lines: ["M", "250", ".Z9"] },
+          { type: "label", lines: ["M", "900", ".A2"] }
+        ],
+        answer: 1,
+        correctText: "Correct. M 250 comes first.",
+        teachText: "The whole number decides this one. 250 comes before 900 and 1000."
+      },
+      {
+        title: "First Cutter",
+        lesson: [
+          "After the whole number, compare the first Cutter.",
+          "Read Cutters like decimals."
+        ],
+        example: [".B4", ".B45", ".B5"],
+        watch: "Length does not decide it. Decimal value decides it.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1010", ".B45"] },
+          { type: "label", lines: ["M", "1010", ".B4"] },
+          { type: "label", lines: ["M", "1010", ".B5"] }
+        ],
+        answer: 1,
+        correctText: "Correct. .B4 comes first.",
+        teachText: "The first Cutter is read like a decimal: .4 comes before .45 and .5."
+      },
+      {
+        title: "First Cutter Again",
+        lesson: [
+          "Keep using decimal logic.",
+          ".C25 comes before .C3."
+        ],
+        example: [".C25", ".C3", ".C4"],
+        watch: "Do not treat .25 as bigger just because it has more digits.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1010", ".C3"] },
+          { type: "label", lines: ["M", "1010", ".C25"] },
+          { type: "label", lines: ["M", "1010", ".C4"] }
+        ],
+        answer: 1,
+        correctText: "Correct. .C25 comes first.",
+        teachText: "Read the Cutter as a decimal. .25 comes before .3 and .4."
+      },
+      {
+        title: "Second Cutter",
+        lesson: [
+          "If the earlier lines match, move to the next line.",
+          "The second Cutter is also read like a decimal, even without a printed decimal point."
+        ],
+        example: ["T10", "T2", "T3"],
+        watch: "T10 behaves like .10, not like the whole number 10.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "300", ".A2", "T2"] },
+          { type: "label", lines: ["M", "300", ".A2", "T10"] },
+          { type: "label", lines: ["M", "300", ".A2", "T3"] }
+        ],
+        answer: 1,
+        correctText: "Correct. T10 comes first.",
+        teachText: "The second Cutter still uses decimal logic. T10 behaves like .10, so it comes before T2 and T3."
+      },
+      {
+        title: "Second Cutter Again",
+        lesson: [
+          "Use the same rule again.",
+          "When the earlier lines match, the next Cutter decides the order."
+        ],
+        example: ["S5", "S6", "S7"],
+        watch: "Do not stop after the first Cutter if another line is there.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "100", ".B4", "S6"] },
+          { type: "label", lines: ["M", "100", ".B4", "S5"] },
+          { type: "label", lines: ["M", "100", ".B4", "S7"] }
+        ],
+        answer: 1,
+        correctText: "Correct. S5 comes first.",
+        teachText: "Once the earlier lines match, the second Cutter decides it. S5 comes before S6 and S7."
+      },
+      {
+        title: "Added Elements",
+        lesson: [
+          "Extra elements are used to make call numbers unique.",
+          "Compare what you see, left to right."
+        ],
+        example: ["op. 42", "no. 2"],
+        watch: "Do not invent categories. Compare the actual printed elements in order.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1010", ".B585", "op. 42", "no. 2"] },
+          { type: "label", lines: ["M", "1010", ".B585", "op. 42", "no. 10"] },
+          { type: "label", lines: ["M", "1010", ".B585", "op. 50"] }
+        ],
+        answer: 0,
+        correctText: "Correct. op. 42 no. 2 comes first.",
+        teachText: "Compare the added elements in order. op. 42 comes before op. 50, and within op. 42, no. 2 comes before no. 10."
+      },
+      {
+        title: "Added Elements Again",
+        lesson: [
+          "Keep comparing the printed sequence, piece by piece.",
+          "Use the first difference that appears."
+        ],
+        example: ["op. 42", "no. 2", "violin"],
+        watch: "Stay with the printed order. Do not jump around the label.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1010", ".B585", "op. 42", "no. 2"] },
+          { type: "label", lines: ["M", "1010", ".B585", "op. 42", "no. 10"] },
+          { type: "label", lines: ["M", "1010", ".B585", "op. 50"] }
+        ],
+        answer: 0,
+        correctText: "Correct. op. 42 no. 2 comes first.",
+        teachText: "Use the first difference in the printed sequence. The lower opus comes first, and within the same opus, the lower number comes first."
+      }
+    ];
 
-let round = 0;
-let score = 0;
+    const finalCards = [
+      { id: "a", lines: ["M", "500", ".B4", "op. 42"] },
+      { id: "b", lines: ["M", "1010", ".B4", "op. 42"] },
+      { id: "c", lines: ["M", "1010", ".B585", "op. 42"] },
+      { id: "d", lines: ["M", "1010", ".B585", "op. 100"] }
+    ];
 
-function label(lines){
-  return `<div class="label">${lines.join("<br>")}</div>`;
-}
+    const finalOrder = ["a", "b", "c", "d"];
 
-const rounds = [
+    let roundIndex = 0;
+    let score = 0;
+    let dragCorrect = false;
 
-{
-lesson: `
-<h3>How to Compare</h3>
-<p>Read top to bottom.</p>
-<p>Compare one line at a time.</p>
-`,
-question: "Which comes first?",
-choices: [
-label(["M","500"]),
-label(["M","1010"]),
-label(["M","750"])
-],
-answer: 0
-},
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-{
-lesson: `
-<h3>First Cutter</h3>
-<p>Read like decimals.</p>
-<p>.B4 comes before .B45</p>
-`,
-question: "Which comes first?",
-choices: [
-label([".B45"]),
-label([".B4"]),
-label([".B5"])
-],
-answer: 1
-},
+    function renderLabel(lines) {
+      return `
+        <div class="label">
+          ${lines.map(line => `<div class="label-line">${escapeHtml(line)}</div>`).join("")}
+        </div>
+      `;
+    }
 
-{
-lesson: `
-<h3>Second Cutter</h3>
-<p>Still decimal logic.</p>
-<p>T10 comes before T2</p>
-`,
-question: "Which comes first?",
-choices: [
-label(["T2"]),
-label(["T10"]),
-label(["T3"])
-],
-answer: 1
-},
+    function renderChoice(choice, index) {
+      if (choice.type === "label") {
+        return `
+          <button type="button" class="choice-btn" onclick="answerRound(${index})">
+            ${renderLabel(choice.lines)}
+          </button>
+        `;
+      }
+      return `
+        <button type="button" class="choice-btn text-only" onclick="answerRound(${index})">
+          ${escapeHtml(choice.text)}
+        </button>
+      `;
+    }
 
-{
-lesson: `
-<h3>Line 4</h3>
-<p>Compare what you see.</p>
-<p>Left to right.</p>
-`,
-question: "Which comes first?",
-choices: [
-label(["op. 42","no. 2"]),
-label(["op. 42","no. 10"]),
-label(["op. 50"])
-],
-answer: 0
-}
+    function renderStart() {
+      app.innerHTML = `
+        <div class="card">
+          <div class="eyebrow">Version 3.1</div>
+          <h1>Shelf It Right</h1>
+          <p>This version puts score teaching back at the front.</p>
+          <div class="lesson-box">
+            <strong>What it covers:</strong><br>
+            what a score is, fine sorting, whole numbers, first Cutter, second Cutter, added elements, and one final drag-and-drop ordering task.
+          </div>
+          <div class="lesson-box">
+            <strong>How it works:</strong><br>
+            Each round teaches first, then asks one question, then gives feedback.
+          </div>
+          <div class="button-row">
+            <button type="button" class="primary-btn" onclick="renderLesson()">Start</button>
+          </div>
+        </div>
+      `;
+    }
 
-];
+    function renderLesson() {
+      const r = rounds[roundIndex];
+      app.innerHTML = `
+        <div class="card">
+          <div class="status">
+            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
+            <div>Score: ${score}</div>
+          </div>
+          <div class="eyebrow">Lesson</div>
+          <h2>${escapeHtml(r.title)}</h2>
+          ${r.lesson.map(p => `<p>${escapeHtml(p)}</p>`).join("")}
+          <div class="lesson-box">
+            <strong>Example:</strong><br>
+            ${r.example.map(x => escapeHtml(x)).join(" → ")}
+          </div>
+          <div class="lesson-box">
+            <strong>Watch out:</strong><br>
+            ${escapeHtml(r.watch)}
+          </div>
+          <div class="button-row">
+            <button type="button" class="primary-btn" onclick="renderQuestion()">Next</button>
+          </div>
+        </div>
+      `;
+    }
 
-// ---------- NORMAL ----------
+    function renderQuestion() {
+      const r = rounds[roundIndex];
+      app.innerHTML = `
+        <div class="card">
+          <div class="status">
+            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
+            <div>Score: ${score}</div>
+          </div>
+          <div class="eyebrow">Question</div>
+          <div class="prompt">${escapeHtml(r.prompt)}</div>
+          <div class="choices">
+            ${r.choices.map((choice, index) => renderChoice(choice, index)).join("")}
+          </div>
+        </div>
+      `;
+    }
 
-function render(){
-if(round === rounds.length) return dragRound();
-if(round > rounds.length) return end();
+    function answerRound(selectedIndex) {
+      const r = rounds[roundIndex];
+      const isCorrect = selectedIndex === r.answer;
+      if (isCorrect) score++;
 
-let r = rounds[round];
+      app.innerHTML = `
+        <div class="card">
+          <div class="status">
+            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
+            <div>Score: ${score}</div>
+          </div>
+          <div class="eyebrow">Feedback</div>
+          <div class="feedback ${isCorrect ? "good" : "bad"}">
+            <h2>${isCorrect ? "Correct" : "Not Quite"}</h2>
+            <p><strong>${escapeHtml(isCorrect ? r.correctText : "Review the comparison order and try the next one.")}</strong></p>
+            <p>${escapeHtml(r.teachText)}</p>
+          </div>
+          <div class="button-row">
+            <button type="button" class="primary-btn" onclick="nextRound()">Next</button>
+          </div>
+        </div>
+      `;
+    }
 
-document.getElementById("app").innerHTML = `
-${r.lesson}
-<p><strong>${r.question}</strong></p>
-${r.choices.map((c,i)=>`
-<div class="choice" onclick="answer(${i})">${c}</div>
-`).join("")}
-<p>Score: ${score}</p>
-`;
-}
+    function nextRound() {
+      roundIndex++;
+      if (roundIndex >= rounds.length) {
+        renderFinalDrag();
+      } else {
+        renderLesson();
+      }
+    }
 
-function answer(i){
-let correct = rounds[round].answer;
+    function renderFinalDrag() {
+      dragCorrect = false;
+      const shuffled = [...finalCards].sort(() => Math.random() - 0.5);
 
-let choices = document.querySelectorAll(".choice");
+      app.innerHTML = `
+        <div class="card">
+          <div class="status">
+            <div>Round ${rounds.length + 1} of ${rounds.length + 1}</div>
+            <div>Score: ${score}</div>
+          </div>
+          <div class="eyebrow">Final Task</div>
+          <h2>Put the Call Numbers in Order</h2>
+          <p>Drag the cards into shelf order. Feedback appears after each move.</p>
+          <div class="lesson-box">
+            <strong>Reminder:</strong><br>
+            Compare top to bottom. Use the first difference you see.
+          </div>
 
-choices.forEach((c, idx)=>{
-if(idx === correct) c.classList.add("correct");
-if(idx === i && i !== correct) c.classList.add("wrong");
-});
+          <h3>Cards</h3>
+          <div class="drag-bank" id="drag-bank"></div>
 
-if(i === correct) score++;
+          <h3>Order from first to last</h3>
+          <div class="drag-slots">
+            <div class="drop-slot" data-pos="0"><div class="slot-name">1st</div></div>
+            <div class="drop-slot" data-pos="1"><div class="slot-name">2nd</div></div>
+            <div class="drop-slot" data-pos="2"><div class="slot-name">3rd</div></div>
+            <div class="drop-slot" data-pos="3"><div class="slot-name">4th</div></div>
+          </div>
 
-setTimeout(()=>{
-round++;
-render();
-}, 800);
-}
+          <div id="drag-feedback"></div>
 
-// ---------- DRAG ----------
+          <div class="button-row">
+            <button type="button" class="secondary-btn" onclick="resetDrag()">Reset</button>
+            <button type="button" class="primary-btn" onclick="finishIfReady()">Finish</button>
+          </div>
+        </div>
+      `;
 
-const correctOrder = [
-["M","500",".B4","op. 42"],
-["M","1010",".B4","op. 42"],
-["M","1010",".B585","op. 42"],
-["M","1010",".B585","op. 100"]
-];
+      const bank = document.getElementById("drag-bank");
+      shuffled.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "draggable-card";
+        card.draggable = true;
+        card.dataset.id = item.id;
+        card.innerHTML = renderLabel(item.lines);
+        bank.appendChild(card);
+      });
 
-let placed = [];
+      wireDrag();
+    }
 
-function dragRound(){
+    function wireDrag() {
+      let dragged = null;
 
-placed = [];
+      document.querySelectorAll(".draggable-card").forEach(card => {
+        card.addEventListener("dragstart", () => {
+          dragged = card;
+          card.classList.add("dragging");
+        });
 
-let shuffled = [...correctOrder].sort(()=>Math.random()-0.5);
+        card.addEventListener("dragend", () => {
+          card.classList.remove("dragging");
+        });
+      });
 
-document.getElementById("app").innerHTML = `
-<h3>Final Task</h3>
-<p>Put in order. Feedback appears after each move.</p>
+      const bank = document.getElementById("drag-bank");
+      bank.addEventListener("dragover", e => e.preventDefault());
+      bank.addEventListener("drop", e => {
+        e.preventDefault();
+        if (!dragged) return;
+        bank.appendChild(dragged);
+        updateDragFeedback();
+      });
 
-<div>
-${shuffled.map((l,i)=>`
-<div class="choice" draggable="true" id="item${i}" data='${JSON.stringify(l)}'>
-${label(l)}
-</div>
-`).join("")}
-</div>
+      document.querySelectorAll(".drop-slot").forEach(slot => {
+        slot.addEventListener("dragover", e => {
+          e.preventDefault();
+          slot.classList.add("drag-over");
+        });
 
-<hr>
+        slot.addEventListener("dragleave", () => {
+          slot.classList.remove("drag-over");
+        });
 
-<div>
-${[0,1,2,3].map(i=>`
-<div class="dropzone" data-pos="${i}"></div>
-`).join("")}
-</div>
+        slot.addEventListener("drop", e => {
+          e.preventDefault();
+          slot.classList.remove("drag-over");
+          if (!dragged) return;
 
-<p id="feedback"></p>
-`;
+          const existing = slot.querySelector(".draggable-card");
+          if (existing) {
+            document.getElementById("drag-bank").appendChild(existing);
+          }
 
-enableDrag();
-}
+          const label = slot.querySelector(".slot-name");
+          if (label) label.remove();
 
-function enableDrag(){
+          slot.innerHTML = "";
+          slot.appendChild(dragged);
+          updateDragFeedback();
+        });
+      });
+    }
 
-document.querySelectorAll(".choice").forEach(el=>{
-el.addEventListener("dragstart", e=>{
-e.dataTransfer.setData("text", el.id);
-});
-});
+    function slotState() {
+      return Array.from(document.querySelectorAll(".drop-slot")).map(slot => {
+        const card = slot.querySelector(".draggable-card");
+        return card ? card.dataset.id : null;
+      });
+    }
 
-document.querySelectorAll(".dropzone").forEach(zone=>{
-zone.addEventListener("dragover", e=> e.preventDefault());
+    function updateDragFeedback() {
+      const state = slotState();
+      const feedback = document.getElementById("drag-feedback");
 
-zone.addEventListener("drop", e=>{
-e.preventDefault();
+      document.querySelectorAll(".drop-slot").forEach((slot, idx) => {
+        slot.classList.remove("correct-slot", "wrong-slot");
+        const id = state[idx];
+        if (!id) return;
+        if (id === finalOrder[idx]) {
+          slot.classList.add("correct-slot");
+        } else {
+          slot.classList.add("wrong-slot");
+        }
+      });
 
-let id = e.dataTransfer.getData("text");
-let el = document.getElementById(id);
+      let filled = 0;
+      let stillCorrect = true;
 
-if(zone.children.length > 0) return;
+      for (let i = 0; i < state.length; i++) {
+        if (state[i] !== null) filled++;
+        if (state[i] !== null && state[i] !== finalOrder[i]) {
+          stillCorrect = false;
+        }
+      }
 
-zone.appendChild(el);
-check(zone);
-});
-});
-}
+      if (filled === 0) {
+        feedback.innerHTML = "";
+        dragCorrect = false;
+        return;
+      }
 
-function check(zone){
+      if (stillCorrect) {
+        feedback.innerHTML = `
+          <div class="feedback good">
+            <strong>Correct so far.</strong><br>
+            Keep going.
+          </div>
+        `;
+      } else {
+        feedback.innerHTML = `
+          <div class="feedback bad">
+            <strong>Not quite.</strong><br>
+            Check the first place where the labels differ.
+          </div>
+        `;
+      }
 
-let pos = zone.dataset.pos;
-let val = JSON.parse(zone.firstChild.dataset.data);
+      dragCorrect = JSON.stringify(state) === JSON.stringify(finalOrder);
+    }
 
-placed[pos] = val;
+    function resetDrag() {
+      renderFinalDrag();
+    }
 
-let ok = true;
+    function finishIfReady() {
+      const state = slotState();
+      const filledAll = state.every(x => x !== null);
 
-for(let i=0;i<=pos;i++){
-if(JSON.stringify(placed[i]) !== JSON.stringify(correctOrder[i])){
-ok = false;
-break;
-}
-}
+      if (!filledAll) {
+        document.getElementById("drag-feedback").innerHTML = `
+          <div class="feedback bad">
+            <strong>Not ready yet.</strong><br>
+            Place all four call numbers before finishing.
+          </div>
+        `;
+        return;
+      }
 
-let f = document.getElementById("feedback");
+      if (dragCorrect) {
+        score++;
+      }
 
-if(ok){
-zone.classList.add("correct");
-f.innerText = "Correct so far.";
-}else{
-zone.classList.add("wrong");
-f.innerText = "Not quite.";
-}
-}
+      renderEnd();
+    }
 
-// ---------- END ----------
+    function renderEnd() {
+      const total = rounds.length + 1;
+      let message = "";
 
-function end(){
-document.getElementById("app").innerHTML = `
-<h2>Done</h2>
-<p>Score: ${score}/${rounds.length}</p>
-<button onclick="location.reload()">Restart</button>
-`;
-}
+      if (score >= total - 1) {
+        message = "This version at least teaches the basics before asking.";
+      } else if (score >= Math.ceil(total * 0.6)) {
+        message = "The structure is there. It still needs more real examples.";
+      } else {
+        message = "It works as a start, but it still needs repetition.";
+      }
 
-render();
+      app.innerHTML = `
+        <div class="card">
+          <div class="eyebrow">V3.1 Complete</div>
+          <h2>Done</h2>
+          <div class="final-score">${score} / ${total}</div>
+          <p>${escapeHtml(message)}</p>
+          <div class="lesson-box">
+            <strong>What this version teaches:</strong>
+            <ul>
+              <li>What a score is</li>
+              <li>Fine sorting only</li>
+              <li>Whole number first</li>
+              <li>First Cutter as decimal</li>
+              <li>Second Cutter as decimal</li>
+              <li>Added elements compared in sequence</li>
+              <li>One drag-and-drop ordering task</li>
+            </ul>
+          </div>
+          <div class="button-row">
+            <button type="button" class="primary-btn" onclick="restart()">Restart</button>
+          </div>
+        </div>
+      `;
+    }
 
-</script>
+    function restart() {
+      roundIndex = 0;
+      score = 0;
+      dragCorrect = false;
+      renderStart();
+    }
 
+    renderStart();
+  </script>
 </body>
 </html>
