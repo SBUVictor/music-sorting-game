@@ -1,133 +1,991 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Shelf It Right</title>
-<style>
-body { font-family: Arial; background:#f4f6f8; padding:20px; }
-.card { background:white; padding:20px; border-radius:10px; max-width:700px; margin:auto; }
-button { padding:10px; margin-top:10px; cursor:pointer; }
-.choice { display:block; margin:10px 0; padding:10px; border:1px solid #ccc; cursor:pointer; }
-.correct { background:#e3f9e5; }
-.wrong { background:#fde8e8; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shelf It Right — Music Score Training</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #52606d;
+      --border: #d9e2ec;
+      --accent: #486581;
+      --good: #e3f9e5;
+      --good-border: #7bc47f;
+      --bad: #fde8e8;
+      --bad-border: #d64545;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding: 24px 16px 48px;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      line-height: 1.2;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .lesson-block {
+      background: #f8fbfd;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      text-align: left;
+    }
+
+    .lesson-block strong {
+      color: var(--accent);
+    }
+
+    .button-row {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .action-button {
+      appearance: none;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: white;
+      padding: 12px 18px;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .action-button:hover {
+      filter: brightness(0.98);
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-weight: bold;
+    }
+
+    .prompt {
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .choice {
+      appearance: none;
+      border: 2px solid var(--border);
+      background: white;
+      color: var(--text);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
+      min-height: 210px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: inherit;
+    }
+
+    .choice:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+      border-color: var(--accent);
+      background: #fcfdff;
+    }
+
+    .choice.text-choice {
+      min-height: 120px;
+      text-align: left;
+      justify-content: flex-start;
+      padding: 18px;
+      font-size: 1rem;
+      line-height: 1.35;
+    }
+
+    .label {
+      width: 132px;
+      min-height: 170px;
+      margin: 0 auto;
+      border: 2px solid #222;
+      border-radius: 8px;
+      background: #fffefc;
+      color: #111;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      font-weight: bold;
+      letter-spacing: 0.02em;
+    }
+
+    .label-line {
+      width: 100%;
+      text-align: center;
+      margin: 3px 0;
+      word-break: break-word;
+    }
+
+    .line-1 { font-size: 1.3rem; }
+    .line-2 { font-size: 1.25rem; }
+    .line-3, .line-4, .line-5, .line-6, .line-7 {
+      font-size: 1rem;
+    }
+
+    .feedback.good {
+      background: var(--good);
+      border: 1px solid var(--good-border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .feedback.bad {
+      background: var(--bad);
+      border: 1px solid var(--bad-border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .score-big {
+      font-size: 2.1rem;
+      font-weight: bold;
+      margin: 12px 0;
+      color: var(--accent);
+    }
+
+    .small-list {
+      margin: 10px 0 0 20px;
+      text-align: left;
+    }
+
+    .small-list li {
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .drag-intro {
+      margin-bottom: 18px;
+    }
+
+    .bank,
+    .order-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .bank {
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      margin-bottom: 24px;
+    }
+
+    .drop-slot {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      min-height: 190px;
+      padding: 12px;
+      background: #fafcfe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drop-slot.filled {
+      border-style: solid;
+      background: white;
+    }
+
+    .drop-slot.drag-over {
+      border-color: var(--accent);
+      background: #eef5fb;
+    }
+
+    .slot-label {
+      color: var(--muted);
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .draggable-card {
+      cursor: grab;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .draggable-card.dragging {
+      opacity: 0.45;
+    }
+
+    .drag-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .secondary-button {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      padding: 12px 18px;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .secondary-button:hover {
+      background: #f8fbfd;
+    }
+
+    .drag-feedback {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    .drag-feedback.good {
+      background: var(--good);
+      border: 1px solid var(--good-border);
+    }
+
+    .drag-feedback.bad {
+      background: var(--bad);
+      border: 1px solid var(--bad-border);
+    }
+  </style>
 </head>
-
 <body>
-<div class="card" id="app"></div>
+  <div class="wrap">
+    <div id="app"></div>
+  </div>
 
-<script>
+  <script>
+    const rounds = [
+      {
+        lessonTitle: "What is a Score?",
+        lessonText: [
+          "In the Music Library, a score is the written music of a piece.",
+          "A score shows multiple parts together so the whole piece can be read and understood.",
+          "A part is different. A part gives music for just one performer or section."
+        ],
+        example: "A full score lets you see the whole piece on the page.",
+        watchOut: "Do not confuse a score with a part. A score shows the whole piece. A part does not.",
+        prompt: "What is a score in this training?",
+        choices: [
+          { type: "text", text: "Music for one instrument only" },
+          { type: "text", text: "A written version of a piece showing multiple parts together" },
+          { type: "text", text: "A recording of a performance" }
+        ],
+        answer: 1,
+        feedbackCorrect: "Correct. A score shows multiple parts together.",
+        feedbackTeach: "A score is the full written representation of a piece. A part is only one instrument or section."
+      },
+      {
+        lessonTitle: "Mini-Scores and the Lowercase m",
+        lessonText: [
+          "A mini-score is a smaller, study-sized version of a score.",
+          "It is different from the larger full performance size used for conducting or performance work.",
+          "In this collection, a lowercase m at the top of the extra detail means mini-score."
+        ],
+        example: "M / 1000 / .B4 / m1998 = a mini-score from 1998.",
+        watchOut: "The lowercase m matters. It is part of the call number and affects sorting.",
+        prompt: "What does the lowercase m mean in this call number?",
+        choices: [
+          { type: "label", lines: ["M", "1000", ".B4", "m1998"] },
+          { type: "label", lines: ["M", "1000", ".B4", "1998"] },
+          { type: "label", lines: ["M", "1000", ".B4", "violin"] }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. The lowercase m indicates a mini-score.",
+        feedbackTeach: "A lowercase m in the call number tells you the item is a mini-score, a smaller study-sized score."
+      },
+      {
+        lessonTitle: "Sorting with Mini-Scores",
+        lessonText: [
+          "When the main call number matches, extra details help decide order.",
+          "A call number with nothing extra comes first.",
+          "After that, added details like m or a year help distinguish versions."
+        ],
+        example: "Plain call number first, then the version with m1998.",
+        watchOut: "Do not ignore the m. It is not decoration. It helps distinguish the item.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1000", ".B4"] },
+          { type: "label", lines: ["M", "1000", ".B4", "m1998"] },
+          { type: "label", lines: ["M", "1000", ".B4", "1998"] }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. The plain call number comes first.",
+        feedbackTeach: "When the main lines match, the simpler call number with nothing extra comes before versions with added details like m or a year."
+      },
+      {
+        lessonTitle: "Whole Number First",
+        lessonText: [
+          "After the initial M, compare the whole number.",
+          "Smaller whole numbers come first on the shelf."
+        ],
+        example: "M / 50 comes before M / 75 and M / 100.",
+        watchOut: "Do not jump to the Cutter line too soon. First compare the whole number.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "50", ".A1"] },
+          { type: "label", lines: ["M", "100", ".A1"] },
+          { type: "label", lines: ["M", "75", ".A1"] }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. M 50 comes first.",
+        feedbackTeach: "The whole number is compared before the Cutter. 50 is smaller than 75 and 100."
+      },
+      {
+        lessonTitle: "Keep Comparing the Whole Number",
+        lessonText: [
+          "If the first line is the same, keep going in order.",
+          "With M score call numbers, the whole number is one of the first major sorting points."
+        ],
+        example: "M / 500 comes before M / 750 and M / 1000.",
+        watchOut: "A bigger-looking label is not first just because it catches your eye. Compare the numbers carefully.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1000", ".B2"] },
+          { type: "label", lines: ["M", "500", ".B2"] },
+          { type: "label", lines: ["M", "750", ".B2"] }
+        ],
+        answer: 1,
+        feedbackCorrect: "Correct. M 500 comes first.",
+        feedbackTeach: "The whole number decides this round. 500 is smaller than 750 and 1000."
+      },
+      {
+        lessonTitle: "First Cutter = Decimal Thinking",
+        lessonText: [
+          "After the whole number, compare the first Cutter.",
+          "The first Cutter is read like a decimal.",
+          "That means .B4 comes before .B45, and .B45 comes before .B5."
+        ],
+        example: ".4 < .45 < .5",
+        watchOut: "Do not treat .B10 as bigger than .B2 just because 10 looks bigger than 2. In decimal thinking, .10 comes before .2.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "100", ".B4"] },
+          { type: "label", lines: ["M", "100", ".B45"] },
+          { type: "label", lines: ["M", "100", ".B5"] }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. .B4 comes first.",
+        feedbackTeach: "The first Cutter is read like a decimal. .4 comes before .45 and .5."
+      },
+      {
+        lessonTitle: "Another First Cutter Example",
+        lessonText: [
+          "When the M and the whole number match, the first Cutter decides the order.",
+          "Keep using decimal thinking."
+        ],
+        example: ".C25 comes before .C3 and .C4.",
+        watchOut: "Length does not decide it. Value decides it.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "200", ".C3"] },
+          { type: "label", lines: ["M", "200", ".C25"] },
+          { type: "label", lines: ["M", "200", ".C4"] }
+        ],
+        answer: 1,
+        feedbackCorrect: "Correct. .C25 comes first.",
+        feedbackTeach: "Read the first Cutter as a decimal. .25 comes before .3 and .4."
+      },
+      {
+        lessonTitle: "Second Cutter = Decimal Thinking Too",
+        lessonText: [
+          "The second Cutter is also read like a decimal.",
+          "This is true even though there is no decimal point shown.",
+          "So T10 is read like .10, T2 is read like .2, and T3 is read like .3."
+        ],
+        example: "T10 comes before T2 because .10 comes before .2.",
+        watchOut: "This is a very common confusing point. Even without a dot, the second Cutter still behaves like a decimal.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "300", ".A2", "T10"] },
+          { type: "label", lines: ["M", "300", ".A2", "T2"] },
+          { type: "label", lines: ["M", "300", ".A2", "T3"] }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. The one with T10 comes first.",
+        feedbackTeach: "The second Cutter is still read like a decimal even though no decimal point is printed. T10 behaves like .10, which comes before .2 and .3."
+      },
+      {
+        lessonTitle: "Second Cutter with the Same Rule Again",
+        lessonText: [
+          "When the earlier lines match, move to the second Cutter.",
+          "Use the same decimal logic again, even without a printed decimal point."
+        ],
+        example: "S5 comes before S6 and S7.",
+        watchOut: "Do not stop after the first Cutter if there is another line to compare.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "100", ".B4", "S6"] },
+          { type: "label", lines: ["M", "100", ".B4", "S5"] },
+          { type: "label", lines: ["M", "100", ".B4", "S7"] }
+        ],
+        answer: 1,
+        feedbackCorrect: "Correct. The one with S5 comes first.",
+        feedbackTeach: "Once M, the whole number, and the first Cutter match, the second Cutter decides it. It is still read like a decimal sequence, so S5 comes before S6 and S7."
+      },
+      {
+        lessonTitle: "Year on the Call Number",
+        lessonText: [
+          "Sometimes you will see a year after the main call number lines.",
+          "That year usually helps distinguish editions or printings."
+        ],
+        example: "A later year often means a later publication or edition.",
+        watchOut: "Do not compare the year until the earlier lines match.",
+        prompt: "What does a year like 1998 usually tell you here?",
+        choices: [
+          { type: "text", text: "It is usually a publication year or edition clue" },
+          { type: "text", text: "It is the volume number" },
+          { type: "text", text: "It is the instrument name" }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. The year usually helps distinguish publication date or edition.",
+        feedbackTeach: "In score call numbers, a year is often used to separate editions, printings, or publication dates."
+      },
+      {
+        lessonTitle: "Compare the Year Last",
+        lessonText: [
+          "If everything else is the same, compare the year.",
+          "Earlier year comes first."
+        ],
+        example: "1987 comes before 1998 and 2005.",
+        watchOut: "Year is a later sorting point, not an early one.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "100", ".B4", "S6", "1998"] },
+          { type: "label", lines: ["M", "100", ".B4", "S6", "2005"] },
+          { type: "label", lines: ["M", "100", ".B4", "S6", "1987"] }
+        ],
+        answer: 2,
+        feedbackCorrect: "Correct. The 1987 item comes first.",
+        feedbackTeach: "When the earlier lines match, compare the year. Earlier year comes first."
+      },
+      {
+        lessonTitle: "Line Four and Extra Details",
+        lessonText: [
+          "After the main call number, you may see extra information.",
+          "This can include year, volume, copy number, part name, score type, opus number, number within an opus, or a thematic catalog number."
+        ],
+        example: "These details help distinguish one version of a work from another.",
+        watchOut: "Do not jump to line four until the main call number lines match.",
+        prompt: "Which of these is an example of extra line-four information?",
+        choices: [
+          { type: "text", text: "op. 27" },
+          { type: "text", text: "M" },
+          { type: "text", text: "100 as the main class number" }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. op. 27 is an example of extra line-four information.",
+        feedbackTeach: "Line-four details often identify a specific work, edition, part, or version after the main call number has already matched."
+      },
+      {
+        lessonTitle: "Score Types and Part Names",
+        lessonText: [
+          "Words like score, vocal score, mini-score, conductor score, violin, cello, or trumpet tell you what kind of item you are holding.",
+          "A score shows the whole work. A part is the music for one performer or section."
+        ],
+        example: "violin usually means a part name. mini-score means a smaller study score format.",
+        watchOut: "These words are not random decoration. They help identify format and use.",
+        prompt: "If a call number includes 'violin,' what does that most likely mean?",
+        choices: [
+          { type: "text", text: "It is probably a part name" },
+          { type: "text", text: "It is probably the publication year" },
+          { type: "text", text: "It is probably the copy number" }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. 'violin' is most likely a part name.",
+        feedbackTeach: "Part names tell you which performer or section the item belongs to. A score is different from an individual part."
+      },
+      {
+        lessonTitle: "Opus and Number Within Opus",
+        lessonText: [
+          "You may see op. for opus and no. for number within that opus or set.",
+          "These help identify a particular work."
+        ],
+        example: "op. 27 no. 2 means opus 27, number 2 within that set or group.",
+        watchOut: "op. and no. are not the same thing. Opus is the larger work grouping; number is the specific item within it.",
+        prompt: "What does 'op. 27' mean?",
+        choices: [
+          { type: "text", text: "Publication year 1927" },
+          { type: "text", text: "Opus number 27" },
+          { type: "text", text: "Copy number 27" }
+        ],
+        answer: 1,
+        feedbackCorrect: "Correct. op. 27 means opus number 27.",
+        feedbackTeach: "Opus numbers are work identifiers. They help distinguish one work from another."
+      },
+      {
+        lessonTitle: "Thematic Catalog Numbers",
+        lessonText: [
+          "Some composers are identified by thematic catalog numbers instead of opus numbers.",
+          "Examples include K. for Mozart, BWV for Bach, and Hob. for Haydn."
+        ],
+        example: "K. 525 is a thematic catalog number.",
+        watchOut: "Students do not need full musicology here. The practical point is that these are work identifiers.",
+        prompt: "What kind of information is 'K. 525'?",
+        choices: [
+          { type: "text", text: "A thematic catalog number" },
+          { type: "text", text: "A volume number" },
+          { type: "text", text: "A part name" }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. K. 525 is a thematic catalog number.",
+        feedbackTeach: "Thematic catalog numbers identify specific works for certain composers, much like opus numbers do for others."
+      },
+      {
+        lessonTitle: "When One Has Nothing Extra",
+        lessonText: [
+          "If the main call number matches and one item has no extra line-four detail while another one does, the simpler one comes first.",
+          "In other words, nothing extra comes before something extra."
+        ],
+        example: "Plain call number first, then the version with added detail.",
+        watchOut: "Do not assume the one with more information should come first. Usually it comes after the simpler one.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1001", ".B4", "S6"] },
+          { type: "label", lines: ["M", "1001", ".B4", "S6", "1998"] },
+          { type: "label", lines: ["M", "1001", ".B4", "S6", "violin"] }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. The plain call number comes first.",
+        feedbackTeach: "When the main call number matches, the one with nothing extra comes before versions with added details like a year or part name."
+      },
+      {
+        lessonTitle: "Numbers Before Letters in Extra Details",
+        lessonText: [
+          "In the extra-detail area, standalone numbers come before letters or words.",
+          "That means a year or volume number comes before a word like violin or score."
+        ],
+        example: "1998 comes before violin.",
+        watchOut: "Only use this after the earlier lines already match.",
+        prompt: "Which call number comes first?",
+        choices: [
+          { type: "label", lines: ["M", "1001", ".B4", "S6", "1998"] },
+          { type: "label", lines: ["M", "1001", ".B4", "S6", "violin"] },
+          { type: "label", lines: ["M", "1001", ".B4", "S6", "v.2"] }
+        ],
+        answer: 0,
+        feedbackCorrect: "Correct. The one with 1998 comes first.",
+        feedbackTeach: "In the extra-detail zone, a standalone number comes before a lettered word detail. Here, 1998 comes before violin."
+      }
+    ];
 
-let round = 0;
-let score = 0;
+    const finalDragItems = [
+      { id: "a", lines: ["M", "300", ".A2", "T10", "2005"] },
+      { id: "b", lines: ["M", "300", ".A2", "T2", "1998"] },
+      { id: "c", lines: ["M", "300", ".A2", "T2", "2005"] },
+      { id: "d", lines: ["M", "300", ".A2", "T3", "2005"] }
+    ];
 
-const rounds = [
+    const finalCorrectOrder = ["a", "b", "c", "d"];
 
-{
-lesson: `
-<h3>What is a Score?</h3>
-<p>A <strong>score</strong> is the written music of a piece showing multiple parts together.</p>
-<p>A <strong>part</strong> is only one instrument or section.</p>
-`,
-question: "What is a score?",
-choices: [
-"Music for one instrument",
-"A written version showing multiple parts",
-"A recording"
-],
-answer: 1
-},
+    let roundIndex = 0;
+    let score = 0;
+    let dragFeedbackShown = false;
 
-{
-lesson: `
-<h3>Mini-Scores</h3>
-<p>A <strong>mini-score</strong> is a smaller study version.</p>
-<p>A lowercase <strong>m</strong> (like m1998) means mini-score.</p>
-`,
-question: "What does lowercase m mean?",
-choices: [
-"Mini-score",
-"Major key",
-"Missing page"
-],
-answer: 0
-},
+    const app = document.getElementById("app");
 
-{
-lesson: `
-<h3>Whole Numbers</h3>
-<p>Compare the whole number first.</p>
-`,
-question: "Which comes first?",
-choices: ["M 100", "M 50", "M 75"],
-answer: 1
-},
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-{
-lesson: `
-<h3>First Cutter</h3>
-<p>Read like a decimal.</p>
-<p>.B4 comes before .B45</p>
-`,
-question: "Which comes first?",
-choices: [".B45", ".B4", ".B5"],
-answer: 1
-},
+    function renderLabel(lines) {
+      return `
+        <div class="label">
+          ${lines.map((line, idx) => `<div class="label-line line-${idx + 1}">${escapeHtml(line)}</div>`).join("")}
+        </div>
+      `;
+    }
 
-{
-lesson: `
-<h3>Second Cutter</h3>
-<p>The second Cutter is also read like a decimal — even without a dot.</p>
-<p>T10 behaves like .10</p>
-`,
-question: "Which comes first?",
-choices: ["T2", "T10", "T3"],
-answer: 1
-},
+    function renderChoice(choice, index) {
+      if (choice.type === "label") {
+        return `
+          <button type="button" class="choice" onclick="answerRound(${index})" aria-label="Choose call number option ${index + 1}">
+            ${renderLabel(choice.lines)}
+          </button>
+        `;
+      }
+      return `
+        <button type="button" class="choice text-choice" onclick="answerRound(${index})" aria-label="Choose answer option ${index + 1}">
+          ${escapeHtml(choice.text)}
+        </button>
+      `;
+    }
 
-{
-lesson: `
-<h3>Year</h3>
-<p>If everything else matches, earlier year comes first.</p>
-`,
-question: "Which comes first?",
-choices: ["2005", "1998", "2010"],
-answer: 1
-}
+    function renderStart() {
+      app.innerHTML = `
+        <div class="card">
+          <div class="eyebrow">Music Library Student Training</div>
+          <h1>🎼 Shelf It Right</h1>
+          <p>This practice tool teaches students how to read and compare music score call numbers.</p>
+          <div class="lesson-block">
+            <strong>What this version teaches:</strong><br>
+            score definition, mini-scores, whole numbers, first Cutters, second Cutters, year, line-four details, and a final ordering test.
+          </div>
+          <div class="lesson-block">
+            <strong>How it works:</strong><br>
+            each round has a short teaching screen, one question, and feedback before moving on. The last round asks you to place four call numbers in order.
+          </div>
+          <div class="button-row">
+            <button type="button" class="action-button" onclick="renderLesson()">Start Training</button>
+          </div>
+        </div>
+      `;
+    }
 
-];
+    function renderLesson() {
+      const r = rounds[roundIndex];
+      app.innerHTML = `
+        <div class="card">
+          <div class="status">
+            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
+            <div>Score: ${score}</div>
+          </div>
+          <div class="eyebrow">Lesson</div>
+          <h2>${escapeHtml(r.lessonTitle)}</h2>
+          ${r.lessonText.map(p => `<p>${escapeHtml(p)}</p>`).join("")}
+          <div class="lesson-block">
+            <strong>Example:</strong><br>
+            ${escapeHtml(r.example)}
+          </div>
+          <div class="lesson-block">
+            <strong>Watch out:</strong><br>
+            ${escapeHtml(r.watchOut)}
+          </div>
+          <div class="button-row">
+            <button type="button" class="action-button" onclick="renderQuestion()">Next</button>
+          </div>
+        </div>
+      `;
+    }
 
-function render() {
-if (round >= rounds.length) return end();
+    function renderQuestion() {
+      const r = rounds[roundIndex];
+      app.innerHTML = `
+        <div class="card">
+          <div class="status">
+            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
+            <div>Score: ${score}</div>
+          </div>
+          <div class="eyebrow">Question</div>
+          <div class="prompt">${escapeHtml(r.prompt)}</div>
+          <div class="choices">
+            ${r.choices.map((choice, index) => renderChoice(choice, index)).join("")}
+          </div>
+        </div>
+      `;
+    }
 
-let r = rounds[round];
+    function answerRound(selectedIndex) {
+      const r = rounds[roundIndex];
+      const isCorrect = selectedIndex === r.answer;
+      if (isCorrect) score++;
 
-document.getElementById("app").innerHTML = `
-${r.lesson}
-<p><strong>${r.question}</strong></p>
-${r.choices.map((c,i)=>`
-<div class="choice" onclick="answer(${i})">${c}</div>
-`).join("")}
-<p>Score: ${score}</p>
-`;
-}
+      app.innerHTML = `
+        <div class="card">
+          <div class="status">
+            <div>Round ${roundIndex + 1} of ${rounds.length + 1}</div>
+            <div>Score: ${score}</div>
+          </div>
+          <div class="eyebrow">Feedback</div>
+          <div class="feedback ${isCorrect ? "good" : "bad"}">
+            <h2>${isCorrect ? "✅ Correct" : "❌ Not quite"}</h2>
+            <p><strong>${escapeHtml(isCorrect ? r.feedbackCorrect : "Let's fix it.")}</strong></p>
+            <p>${escapeHtml(r.feedbackTeach)}</p>
+          </div>
+          <div class="button-row">
+            <button type="button" class="action-button" onclick="nextRound()">Next</button>
+          </div>
+        </div>
+      `;
+    }
 
-function answer(i) {
-if (i === rounds[round].answer) score++;
-round++;
-render();
-}
+    function nextRound() {
+      roundIndex++;
+      if (roundIndex >= rounds.length) {
+        renderFinalDragRound();
+      } else {
+        renderLesson();
+      }
+    }
 
-function end() {
-document.getElementById("app").innerHTML = `
-<h2>Done</h2>
-<p>Score: ${score}/${rounds.length}</p>
-<button onclick="location.reload()">Restart</button>
-`;
-}
+    function renderFinalDragRound() {
+      dragFeedbackShown = false;
 
-render();
+      app.innerHTML = `
+        <div class="card">
+          <div class="status">
+            <div>Round ${rounds.length + 1} of ${rounds.length + 1}</div>
+            <div>Score: ${score}</div>
+          </div>
+          <div class="eyebrow">Final Ordering Test</div>
+          <h2>Put the Call Numbers in Order</h2>
+          <p class="drag-intro">Drag the four call numbers into shelf order. Put the item that comes first at the top.</p>
 
-</script>
+          <div class="lesson-block">
+            <strong>Reminder:</strong><br>
+            Compare the main lines first. Then compare the second Cutter like a decimal, even without a printed decimal point. If needed, use the year last.
+          </div>
+
+          <h3>Cards to place</h3>
+          <div class="bank" id="bank"></div>
+
+          <h3>Order from first to last</h3>
+          <div class="order-grid">
+            <div class="drop-slot" data-slot="0"><div class="slot-label">1st</div></div>
+            <div class="drop-slot" data-slot="1"><div class="slot-label">2nd</div></div>
+            <div class="drop-slot" data-slot="2"><div class="slot-label">3rd</div></div>
+            <div class="drop-slot" data-slot="3"><div class="slot-label">4th</div></div>
+          </div>
+
+          <div class="drag-actions">
+            <button type="button" class="action-button" onclick="checkFinalOrder()">Check Order</button>
+            <button type="button" class="secondary-button" onclick="resetDragRound()">Reset Cards</button>
+          </div>
+
+          <div id="drag-feedback"></div>
+        </div>
+      `;
+
+      const bank = document.getElementById("bank");
+      finalDragItems.forEach(item => {
+        bank.appendChild(createDragCard(item));
+      });
+
+      enableDragAndDrop();
+    }
+
+    function createDragCard(item) {
+      const card = document.createElement("div");
+      card.className = "draggable-card";
+      card.draggable = true;
+      card.dataset.id = item.id;
+      card.innerHTML = renderLabel(item.lines);
+      return card;
+    }
+
+    function enableDragAndDrop() {
+      let dragged = null;
+
+      document.querySelectorAll(".draggable-card").forEach(card => {
+        card.addEventListener("dragstart", () => {
+          dragged = card;
+          card.classList.add("dragging");
+        });
+
+        card.addEventListener("dragend", () => {
+          card.classList.remove("dragging");
+        });
+      });
+
+      const bank = document.getElementById("bank");
+      bank.addEventListener("dragover", e => e.preventDefault());
+      bank.addEventListener("drop", e => {
+        e.preventDefault();
+        if (dragged) {
+          bank.appendChild(dragged);
+        }
+      });
+
+      document.querySelectorAll(".drop-slot").forEach(slot => {
+        slot.addEventListener("dragover", e => {
+          e.preventDefault();
+          slot.classList.add("drag-over");
+        });
+
+        slot.addEventListener("dragleave", () => {
+          slot.classList.remove("drag-over");
+        });
+
+        slot.addEventListener("drop", e => {
+          e.preventDefault();
+          slot.classList.remove("drag-over");
+
+          if (!dragged) return;
+
+          const existingCard = slot.querySelector(".draggable-card");
+          const bank = document.getElementById("bank");
+
+          if (existingCard) {
+            bank.appendChild(existingCard);
+          }
+
+          const slotLabel = slot.querySelector(".slot-label");
+          if (slotLabel) slotLabel.remove();
+
+          slot.appendChild(dragged);
+          slot.classList.add("filled");
+        });
+      });
+    }
+
+    function resetDragRound() {
+      const bank = document.getElementById("bank");
+      if (!bank) return;
+
+      document.querySelectorAll(".drop-slot").forEach(slot => {
+        const card = slot.querySelector(".draggable-card");
+        if (card) bank.appendChild(card);
+        slot.classList.remove("filled");
+        slot.innerHTML = `<div class="slot-label">${getSlotName(slot.dataset.slot)}</div>`;
+      });
+
+      document.getElementById("drag-feedback").innerHTML = "";
+      enableDragAndDrop();
+    }
+
+    function getSlotName(slotIndex) {
+      const labels = ["1st", "2nd", "3rd", "4th"];
+      return labels[Number(slotIndex)] || "";
+    }
+
+    function checkFinalOrder() {
+      const slotIds = Array.from(document.querySelectorAll(".drop-slot")).map(slot => {
+        const card = slot.querySelector(".draggable-card");
+        return card ? card.dataset.id : null;
+      });
+
+      const feedback = document.getElementById("drag-feedback");
+
+      if (slotIds.some(id => id === null)) {
+        feedback.innerHTML = `
+          <div class="drag-feedback bad">
+            <strong>Not yet.</strong><br>
+            Place all four call numbers before checking the order.
+          </div>
+        `;
+        return;
+      }
+
+      const correct = JSON.stringify(slotIds) === JSON.stringify(finalCorrectOrder);
+
+      if (correct) {
+        score++;
+        dragFeedbackShown = true;
+        feedback.innerHTML = `
+          <div class="drag-feedback good">
+            <strong>✅ Correct.</strong><br>
+            T10 comes first because the second Cutter is still read like a decimal: .10 comes before .2 and .3. Between the two T2 items, 1998 comes before 2005.
+          </div>
+        `;
+
+        feedback.innerHTML += `
+          <div class="button-row">
+            <button type="button" class="action-button" onclick="renderEnd()">Finish</button>
+          </div>
+        `;
+      } else {
+        feedback.innerHTML = `
+          <div class="drag-feedback bad">
+            <strong>❌ Not quite.</strong><br>
+            Compare the second Cutter like a decimal, even without a printed decimal point. T10 behaves like .10, so it comes before T2 and T3. Then use the year to sort the two T2 items.
+          </div>
+        `;
+      }
+    }
+
+    function restart() {
+      roundIndex = 0;
+      score = 0;
+      dragFeedbackShown = false;
+      renderStart();
+    }
+
+    function renderEnd() {
+      let message = "";
+      const totalPossible = rounds.length + 1;
+
+      if (score >= totalPossible - 2) {
+        message = "Strong work. You are reading these with real control.";
+      } else if (score >= Math.ceil(totalPossible * 0.6)) {
+        message = "Solid progress. You have the structure; another run will sharpen it.";
+      } else {
+        message = "Good start. Run it again and take the labels one line at a time.";
+      }
+
+      app.innerHTML = `
+        <div class="card">
+          <div class="eyebrow">Finished</div>
+          <h2>🎉 Training Complete</h2>
+          <div class="score-big">${score} / ${totalPossible}</div>
+          <p>${escapeHtml(message)}</p>
+          <div class="lesson-block">
+            <strong>Core reminder:</strong>
+            <ul class="small-list">
+              <li>Know what kind of item you are holding: score, mini-score, or part.</li>
+              <li>Compare the main call number before the extra details.</li>
+              <li>Read first and second Cutter numbers like decimals.</li>
+              <li>Use line-four details to distinguish versions, parts, and work identifiers.</li>
+              <li>Take it step by step. Do not guess.</li>
+            </ul>
+          </div>
+          <div class="button-row">
+            <button type="button" class="action-button" onclick="restart()">Play Again</button>
+          </div>
+          <div class="footer-note">Built through iterative collaboration, testing, and revision for Music Library student training.</div>
+        </div>
+      `;
+    }
+
+    renderStart();
+  </script>
 </body>
 </html>
