@@ -2,22 +2,22 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Shelf It Right V2</title>
+<title>Shelf It Right</title>
 
 <style>
 body {
   font-family: Arial, sans-serif;
   background:#f5f7fa;
-  padding:40px;
+  padding:30px;
 }
 
 .card {
   background:white;
-  padding:30px;
-  border-radius:12px;
+  padding:25px;
+  border-radius:10px;
   max-width:800px;
   margin:auto;
-  box-shadow:0 4px 20px rgba(0,0,0,0.08);
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
 
 h3 { margin-top:0; }
@@ -31,26 +31,31 @@ h3 { margin-top:0; }
   cursor:pointer;
 }
 
-.choice:hover {
-  background:#eef3f8;
-}
+.choice:hover { background:#eef3f8; }
 
 .label {
-  border:2px solid #333;
+  border:2px solid #222;
   padding:10px;
   width:120px;
   text-align:center;
-  line-height:1.6;
   font-weight:bold;
+  line-height:1.6;
+  background:white;
 }
 
 .correct { background:#e6f7ec; }
 .wrong { background:#fdecea; }
 
-button {
-  padding:10px 14px;
-  margin-top:20px;
+.dropzone {
+  border:2px dashed #bbb;
+  width:140px;
+  min-height:120px;
+  display:inline-block;
+  margin:10px;
+  padding:5px;
 }
+
+button { margin-top:20px; padding:10px; }
 </style>
 
 </head>
@@ -72,11 +77,9 @@ const rounds = [
 
 {
 lesson: `
-<h3>Fine Sorting</h3>
-
-<p>You are sorting items that are already in the correct section.</p>
-
-<p>Read call numbers <strong>top to bottom</strong> and compare each line in order.</p>
+<h3>How to Compare</h3>
+<p>Read top to bottom.</p>
+<p>Compare one line at a time.</p>
 `,
 question: "Which comes first?",
 choices: [
@@ -90,9 +93,7 @@ answer: 0
 {
 lesson: `
 <h3>First Cutter</h3>
-
-<p>Cutter numbers are read like decimals.</p>
-
+<p>Read like decimals.</p>
 <p>.B4 comes before .B45</p>
 `,
 question: "Which comes first?",
@@ -107,10 +108,8 @@ answer: 1
 {
 lesson: `
 <h3>Second Cutter</h3>
-
-<p>The second Cutter is also read like a decimal, even without a dot.</p>
-
-<p>T10 behaves like .10</p>
+<p>Still decimal logic.</p>
+<p>T10 comes before T2</p>
 `,
 question: "Which comes first?",
 choices: [
@@ -123,17 +122,9 @@ answer: 1
 
 {
 lesson: `
-<h3>Line 4 — Added Elements</h3>
-
-<p>Extra elements are added to make items unique.</p>
-
-<p>Examples include:</p>
-<ul>
-<li>Opus numbers</li>
-<li>Numbers within a work</li>
-</ul>
-
-<p><strong>Compare left to right.</strong></p>
+<h3>Line 4</h3>
+<p>Compare what you see.</p>
+<p>Left to right.</p>
 `,
 question: "Which comes first?",
 choices: [
@@ -146,8 +137,11 @@ answer: 0
 
 ];
 
+// ---------- NORMAL ----------
+
 function render(){
-if(round >= rounds.length) return end();
+if(round === rounds.length) return dragRound();
+if(round > rounds.length) return end();
 
 let r = rounds[round];
 
@@ -179,9 +173,106 @@ render();
 }, 800);
 }
 
+// ---------- DRAG ----------
+
+const correctOrder = [
+["M","500",".B4","op. 42"],
+["M","1010",".B4","op. 42"],
+["M","1010",".B585","op. 42"],
+["M","1010",".B585","op. 100"]
+];
+
+let placed = [];
+
+function dragRound(){
+
+placed = [];
+
+let shuffled = [...correctOrder].sort(()=>Math.random()-0.5);
+
+document.getElementById("app").innerHTML = `
+<h3>Final Task</h3>
+<p>Put in order. Feedback appears after each move.</p>
+
+<div>
+${shuffled.map((l,i)=>`
+<div class="choice" draggable="true" id="item${i}" data='${JSON.stringify(l)}'>
+${label(l)}
+</div>
+`).join("")}
+</div>
+
+<hr>
+
+<div>
+${[0,1,2,3].map(i=>`
+<div class="dropzone" data-pos="${i}"></div>
+`).join("")}
+</div>
+
+<p id="feedback"></p>
+`;
+
+enableDrag();
+}
+
+function enableDrag(){
+
+document.querySelectorAll(".choice").forEach(el=>{
+el.addEventListener("dragstart", e=>{
+e.dataTransfer.setData("text", el.id);
+});
+});
+
+document.querySelectorAll(".dropzone").forEach(zone=>{
+zone.addEventListener("dragover", e=> e.preventDefault());
+
+zone.addEventListener("drop", e=>{
+e.preventDefault();
+
+let id = e.dataTransfer.getData("text");
+let el = document.getElementById(id);
+
+if(zone.children.length > 0) return;
+
+zone.appendChild(el);
+check(zone);
+});
+});
+}
+
+function check(zone){
+
+let pos = zone.dataset.pos;
+let val = JSON.parse(zone.firstChild.dataset.data);
+
+placed[pos] = val;
+
+let ok = true;
+
+for(let i=0;i<=pos;i++){
+if(JSON.stringify(placed[i]) !== JSON.stringify(correctOrder[i])){
+ok = false;
+break;
+}
+}
+
+let f = document.getElementById("feedback");
+
+if(ok){
+zone.classList.add("correct");
+f.innerText = "Correct so far.";
+}else{
+zone.classList.add("wrong");
+f.innerText = "Not quite.";
+}
+}
+
+// ---------- END ----------
+
 function end(){
 document.getElementById("app").innerHTML = `
-<h2>V2 Stable</h2>
+<h2>Done</h2>
 <p>Score: ${score}/${rounds.length}</p>
 <button onclick="location.reload()">Restart</button>
 `;
