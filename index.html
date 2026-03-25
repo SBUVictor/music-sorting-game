@@ -73,14 +73,6 @@
       font-size: 1.02rem;
     }
 
-    .lesson-note {
-      background: #f8fafc;
-      border-left: 4px solid var(--accent);
-      padding: 12px 14px;
-      border-radius: 10px;
-      margin: 14px 0;
-    }
-
     .pill {
       display: inline-block;
       padding: 6px 10px;
@@ -258,7 +250,9 @@
       letter-spacing: .04em;
     }
 
-    .draggable:focus {
+    .draggable:focus,
+    button:focus,
+    input:focus {
       outline: 3px solid var(--accent);
       outline-offset: 2px;
     }
@@ -273,55 +267,121 @@
       border-color: var(--accent);
     }
 
-    button:focus {
-      outline: 3px solid var(--accent);
-      outline-offset: 2px;
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin: 14px 0 18px;
     }
 
-    button.choice:focus {
-      border-color: var(--accent);
+    .field label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .summary-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .summary-box .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-box .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .status-line {
+      margin-top: 14px;
     }
 
     @media (max-width: 700px) {
       .wrap { padding: 14px; }
       .card { padding: 18px; }
       h1 { font-size: 2.1rem; }
-      .draggable { min-width: 160px; }
-      .slot { min-width: 160px; }
+      .draggable, .slot { min-width: 160px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="version">Version 6.1</div>
+      <div class="version">Version 7.0</div>
       <h1>Shelf It Right</h1>
-      <p>This version is a stable training prototype. It defines the main terms clearly, teaches one skill at a time, and uses repeated practice instead of one quick quiz. Your previous page had a very small script with only two lessons and a simple start button setup.</p>
+      <p>This version is ready for score recording. It collects student identity, runs the training, calculates pass data, and prepares a result payload for Google Sheets.</p>
+
+      <div class="info-box">
+        <strong>Student Information</strong>
+        <div class="form-grid">
+          <div class="field">
+            <label for="realName">Real Name</label>
+            <input id="realName" type="text" autocomplete="name" placeholder="Enter full name" />
+          </div>
+          <div class="field">
+            <label for="preferredName">Preferred Name</label>
+            <input id="preferredName" type="text" placeholder="Enter preferred name" />
+          </div>
+          <div class="field">
+            <label for="sbuEmail">SBU Email</label>
+            <input id="sbuEmail" type="email" autocomplete="email" placeholder="name@stonybrook.edu" />
+          </div>
+        </div>
+        <div id="intakeFeedback"></div>
+      </div>
 
       <div class="info-box">
         <strong>Key Terms</strong>
         <div>
           <p><strong>Whole number</strong><br>The number after the class.<br>Examples: <code class="call">M 2</code>, <code class="call">M 2.3</code>, <code class="call">M 3</code></p>
-
           <p><strong>First cutter</strong><br>The first letter-number group after the class number.<br>Examples: <code class="call">.B103</code>, <code class="call">.C4</code>, <code class="call">.S36</code></p>
-
           <p><strong>Later work element</strong><br>A short work-style code that comes after the first cutter in some labels.<br>Example: <code class="call">R4</code> in <code class="call">M 2.3 .U6 R4 V.66</code></p>
-
           <p><strong>Year</strong><br>The publication year.<br>Example: <code class="call">1994</code></p>
-
-          <p><strong>Later-line details</strong><br>Extra details that appear after the main call number parts.<br>Examples: <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code>, <code class="call">FASC.3</code>, <code class="call">ABT.5</code>, <code class="call">REIHE B</code>, <code class="call">T.2</code>, <code class="call">H.III:E2</code></p>
+          <p><strong>Later-line details</strong><br>Extra details that appear after the main call number parts.<br>Examples: <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code>, <code class="call">FASC.3</code>, <code class="call">H.III:E2</code></p>
         </div>
       </div>
 
       <div class="info-box">
         <strong>How This Version Works</strong>
-        <div>
-          Each module teaches first, gives a worked example, then serves similar practice problems until the learner passes that skill.
-        </div>
+        <div>Each module teaches first, gives a worked example, then serves similar practice problems until the learner passes that skill. After the final activity, a score record is prepared for Google Sheets.</div>
       </div>
 
-      <button onclick="startTraining()" aria-label="Begin the training modules">Start Training</button>
-      <button class="secondary" onclick="toggleRules()" style="margin-left:10px;" aria-label="Display the call number sorting rules">Show Sorting Rules</button>
+      <div class="inline-actions">
+        <button id="startBtn" type="button" aria-label="Begin the training modules">Start Training</button>
+        <button id="rulesBtn" type="button" class="secondary" aria-label="Display the call number sorting rules">Show Sorting Rules</button>
+      </div>
     </div>
 
     <div id="rulesCard" class="card hidden rules"></div>
@@ -336,10 +396,11 @@
   </div>
 
   <script>
-    // Error handling and validation helpers
+    var APP_SCRIPT_URL = ''; // paste your deployed Apps Script URL here later
+
     function safeGetElement(id) {
       var el = document.getElementById(id);
-      if (!el) console.warn('Element not found: ' + id);
+      if (!el) console.warn('Element not found:', id);
       return el;
     }
 
@@ -347,31 +408,26 @@
       try {
         return document.querySelectorAll(selector);
       } catch (e) {
-        console.error('Query selector error: ' + e.message);
+        console.error('Query selector error:', e.message);
         return [];
       }
     }
 
-    function validateModule(module) {
-      if (!module) return false;
-      if (module.type === 'drag') return true;
-      if (module.type === 'done') return true;
-      return module.title && module.teach && module.questions && module.questions.length > 0;
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
-    function createButton(text, onclick, ariaLabel, className) {
-      var btn = document.createElement('button');
-      btn.textContent = text;
-      btn.onclick = onclick;
-      if (className) btn.className = className;
-      if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
-      btn.onkeydown = function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onclick(e);
-        }
-      };
-      return btn;
+    function isValidSbuEmail(email) {
+      return /^[A-Za-z0-9._%+-]+@stonybrook\.edu$/i.test(String(email || '').trim());
+    }
+
+    function nowIso() {
+      return new Date().toISOString();
     }
 
     var app = safeGetElement('app');
@@ -379,17 +435,192 @@
     var stageLabel = safeGetElement('stageLabel');
     var bar = safeGetElement('bar');
     var rulesCard = safeGetElement('rulesCard');
+    var intakeFeedback = safeGetElement('intakeFeedback');
+
+    var realNameInput = safeGetElement('realName');
+    var preferredNameInput = safeGetElement('preferredName');
+    var emailInput = safeGetElement('sbuEmail');
+    var startBtn = safeGetElement('startBtn');
+    var rulesBtn = safeGetElement('rulesBtn');
 
     var state = {
+      sessionStartedAt: null,
+      sessionCompletedAt: null,
+      submitted: false,
       step: 0,
       phase: 'teach',
       score: 0,
-      total: 0,
       streak: 0,
-      attempts: 0,
       currentQuestion: null,
-      tryCount: 0
+      tryCount: 0,
+      currentQuestionId: null,
+
+      student: {
+        realName: '',
+        preferredName: '',
+        sbuEmail: ''
+      },
+
+      metrics: {
+        moduleAttempts: {
+          module1: 0,
+          module2: 0,
+          module3: 0,
+          finalActivity: 0
+        },
+        modulePassed: {
+          module1: false,
+          module2: false,
+          module3: false,
+          finalActivity: false
+        },
+        moduleCompletedCount: 0,
+        modulePassedCount: 0,
+        lessonsCompleted: 0,
+        lessonsPassed: 0,
+        finalActivityPass: false,
+        totalPossibleScore: 10,
+        overallPass: false
+      }
     };
+
+    var rulesText = `Local practice used in this prototype
+
+1. Start with the class and the whole number.
+   Examples:
+   M 2 comes before M 2.3
+   M 2.3 comes before M 3
+   M 3 comes before M 452
+
+2. If the whole number matches, compare the first cutter.
+   Examples within M 3:
+   .B103 comes before .C4
+   .C4 comes before .H26
+   .H26 comes before .O35
+   .O35 comes before .S36
+
+3. If the earlier parts match, compare later work elements, year, and later-line details.
+
+4. Roman numerals matter in later-line details.
+   Example:
+   SER.I comes before SER.II, which comes before SER.VI
+
+5. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
+
+    var modules = [
+      {
+        key: 'module1',
+        label: 'Module 1',
+        title: 'Whole Number',
+        masteryText: 'Pass target: 3 correct in a row.',
+        teach:
+          '<p>Always start with the class and whole number. Do not jump to the cutter too early.</p>' +
+          '<p>Examples: <code class="call">M 2</code> comes before <code class="call">M 2.3</code>, and both come before <code class="call">M 3</code>.</p>',
+        worked:
+          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 2.3 .U6 R4 V.66</code> comes before <code class="call">M 3 .B103 2005 SER.8 V.2</code> because 2.3 comes before 3. Stop there. Do not look at the cutter yet.</p></div>',
+        questions: [
+          { id: 'm1q1', prompt: 'Which call number comes first?', choices: ['M 3', 'M 2.3', 'M 452'], answer: 1, explain: '2.3 comes before 3 and 452.' },
+          { id: 'm1q2', prompt: 'Which call number comes first?', choices: ['M 2', 'M 3', 'M 2.3'], answer: 0, explain: '2 comes before 2.3 and 3.' },
+          { id: 'm1q3', prompt: 'Which call number comes first?', choices: ['M 452 .H42 H.III:E2', 'M 2 .G39 1966 BD.23', 'M 3 .C4 1993 SER.VI V.69A'], answer: 1, explain: '2 comes before 3 and 452.' }
+        ]
+      },
+      {
+        key: 'module2',
+        label: 'Module 2',
+        title: 'First Cutter',
+        masteryText: 'Pass target: 3 correct in a row.',
+        teach:
+          '<p>If the whole number matches, compare the first cutter.</p>' +
+          '<p>Examples within <code class="call">M 3</code>: <code class="call">.B103</code> comes before <code class="call">.C4</code>, which comes before <code class="call">.H26</code>.</p>',
+        worked:
+          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .B1133 SER.I BD.32 PT.1</code> comes before <code class="call">M 3 .C4 1993 SER.VI V.69A</code> because the whole number matches and B comes before C.</p></div>',
+        questions: [
+          { id: 'm2q1', prompt: 'Which call number comes first?', choices: ['M 3 .C4', 'M 3 .B103', 'M 3 .S36'], answer: 1, explain: 'B comes before C and S.' },
+          { id: 'm2q2', prompt: 'Which call number comes first?', choices: ['M 3 .H26', 'M 3 .O35', 'M 3 .C4'], answer: 2, explain: 'C comes before H and O.' },
+          { id: 'm2q3', prompt: 'Which call number comes first?', choices: ['M 3 .S36', 'M 3 .O35', 'M 3 .H26'], answer: 2, explain: 'H comes before O and S.' }
+        ]
+      },
+      {
+        key: 'module3',
+        label: 'Module 3',
+        title: 'Year And Later Details',
+        masteryText: 'Pass target: 3 correct in a row.',
+        teach:
+          '<p>If the earlier parts match, later details decide the order. That can include year, series, and other later-line details.</p>' +
+          '<p>Example: <code class="call">M 3 .O35 1994 SER.II FASC.3</code> comes before <code class="call">M 3 .O35 2001 SER.II FASC.3</code>.</p>',
+        worked:
+          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .O35 1994 SER.II FASC.3</code> comes before <code class="call">M 3 .O35 2001 SER.II FASC.3</code> because the earlier parts match, so the year decides it.</p></div>',
+        questions: [
+          { id: 'm3q1', prompt: 'Which call number comes first?', choices: ['M 3 .O35 1994 SER.II FASC.3', 'M 3 .O35 2001 SER.II FASC.3'], answer: 0, explain: '1994 comes before 2001.' },
+          { id: 'm3q2', prompt: 'Which later detail comes first?', choices: ['SER.VI', 'SER.I', 'SER.II'], answer: 1, explain: 'SER.I comes before SER.II, which comes before SER.VI.' },
+          { id: 'm3q3', prompt: 'Which call number comes first?', choices: ['M 452 .H42 H.III:E2', 'M 452 .H42 H.II:E2'], answer: 1, explain: 'II comes before III.' }
+        ]
+      },
+      {
+        key: 'finalActivity',
+        label: 'Final Activity',
+        type: 'drag'
+      },
+      {
+        key: 'done',
+        label: 'Complete',
+        type: 'done'
+      }
+    ];
+
+    function resetMetrics() {
+      state.metrics = {
+        moduleAttempts: {
+          module1: 0,
+          module2: 0,
+          module3: 0,
+          finalActivity: 0
+        },
+        modulePassed: {
+          module1: false,
+          module2: false,
+          module3: false,
+          finalActivity: false
+        },
+        moduleCompletedCount: 0,
+        modulePassedCount: 0,
+        lessonsCompleted: 0,
+        lessonsPassed: 0,
+        finalActivityPass: false,
+        totalPossibleScore: 10,
+        overallPass: false
+      };
+    }
+
+    function syncStudentInfo() {
+      state.student.realName = String(realNameInput.value || '').trim();
+      state.student.preferredName = String(preferredNameInput.value || '').trim();
+      state.student.sbuEmail = String(emailInput.value || '').trim();
+    }
+
+    function validateStudentInfo() {
+      syncStudentInfo();
+
+      if (!state.student.realName) {
+        return 'Please enter the student’s real name.';
+      }
+      if (!state.student.preferredName) {
+        return 'Please enter the student’s preferred name.';
+      }
+      if (!isValidSbuEmail(state.student.sbuEmail)) {
+        return 'Please enter a valid SBU email ending in @stonybrook.edu.';
+      }
+      return '';
+    }
+
+    function showIntakeMessage(message, type) {
+      if (!intakeFeedback) return;
+      if (!message) {
+        intakeFeedback.innerHTML = '';
+        return;
+      }
+      intakeFeedback.innerHTML = '<div class="feedback ' + (type || 'warn') + '">' + escapeHtml(message) + '</div>';
+    }
 
     function compareCallNumbers(a, b) {
       function getWhole(x) {
@@ -413,10 +644,10 @@
       }
 
       function cmpNum(x, y) {
-        var a = x == null ? -Infinity : x;
-        var b = y == null ? -Infinity : y;
-        if (a < b) return -1;
-        if (a > b) return 1;
+        var aa = x == null ? -Infinity : x;
+        var bb = y == null ? -Infinity : y;
+        if (aa < bb) return -1;
+        if (aa > bb) return 1;
         return 0;
       }
 
@@ -471,187 +702,98 @@
       return 'The earlier parts match, so you have to compare what comes later.';
     }
 
-    var rulesText = `Local practice used in this prototype
-
-1. Start with the class and the whole number.
-   Examples:
-   M 2 comes before M 2.3
-   M 2.3 comes before M 3
-   M 3 comes before M 452
-
-2. If the whole number matches, compare the first cutter.
-   Examples within M 3:
-   .B103 comes before .C4
-   .C4 comes before .H26
-   .H26 comes before .O35
-   .O35 comes before .S36
-
-3. If the earlier parts match, compare later work elements, year, and later-line details.
-
-4. Roman numerals matter in later-line details.
-   Example:
-   SER.I comes before SER.II, which comes before SER.VI
-
-5. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
-
     function toggleRules() {
       if (!rulesCard) return;
-      try {
-        if (rulesCard.classList.contains('hidden')) {
-          rulesCard.classList.remove('hidden');
-          rulesCard.innerHTML = '<h2>Sorting Rules Used In This Prototype</h2><pre role="doc-example">' + rulesText + '</pre>';
-          rulesCard.setAttribute('role', 'region');
-          rulesCard.setAttribute('aria-label', 'Sorting rules reference');
-        } else {
-          rulesCard.classList.add('hidden');
-          rulesCard.setAttribute('aria-hidden', 'true');
-        }
-      } catch (e) {
-        console.error('Toggle rules failed: ' + e.message);
+      if (rulesCard.classList.contains('hidden')) {
+        rulesCard.classList.remove('hidden');
+        rulesCard.innerHTML = '<h2>Sorting Rules Used In This Prototype</h2><pre role="doc-example">' + escapeHtml(rulesText) + '</pre>';
+        rulesCard.setAttribute('role', 'region');
+        rulesCard.setAttribute('aria-label', 'Sorting rules reference');
+      } else {
+        rulesCard.classList.add('hidden');
+        rulesCard.innerHTML = '';
       }
     }
 
-    var modules = [
-      {
-        label: 'Module 1',
-        title: 'Whole Number',
-        masteryText: 'Pass target: 3 correct in a row.',
-        teach:
-          '<p>Always start with the class and whole number. Do not jump to the cutter too early.</p>' +
-          '<p>Examples: <code class="call">M 2</code> comes before <code class="call">M 2.3</code>, and both come before <code class="call">M 3</code>.</p>',
-        worked:
-          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 2.3 .U6 R4 V.66</code> comes before <code class="call">M 3 .B103 2005 SER.8 V.2</code> because 2.3 comes before 3. Stop there. Do not look at the cutter yet.</p></div>',
-        questions: [
-          {
-            prompt: 'Which call number comes first?',
-            choices: ['M 3', 'M 2.3', 'M 452'],
-            answer: 1,
-            explain: '2.3 comes before 3 and 452.'
-          },
-          {
-            prompt: 'Which call number comes first?',
-            choices: ['M 2', 'M 3', 'M 2.3'],
-            answer: 0,
-            explain: '2 comes before 2.3 and 3.'
-          },
-          {
-            prompt: 'Which call number comes first?',
-            choices: ['M 452 .H42 H.III:E2', 'M 2 .G39 1966 BD.23', 'M 3 .C4 1993 SER.VI V.69A'],
-            answer: 1,
-            explain: '2 comes before 3 and 452.'
-          }
-        ]
-      },
-      {
-        label: 'Module 2',
-        title: 'First Cutter',
-        masteryText: 'Pass target: 3 correct in a row.',
-        teach:
-          '<p>If the whole number matches, compare the first cutter.</p>' +
-          '<p>Examples within <code class="call">M 3</code>: <code class="call">.B103</code> comes before <code class="call">.C4</code>, which comes before <code class="call">.H26</code>.</p>',
-        worked:
-          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .B1133 SER.I BD.32 PT.1</code> comes before <code class="call">M 3 .C4 1993 SER.VI V.69A</code> because the whole number matches and B comes before C.</p></div>',
-        questions: [
-          {
-            prompt: 'Which call number comes first?',
-            choices: ['M 3 .C4', 'M 3 .B103', 'M 3 .S36'],
-            answer: 1,
-            explain: 'B comes before C and S.'
-          },
-          {
-            prompt: 'Which call number comes first?',
-            choices: ['M 3 .H26', 'M 3 .O35', 'M 3 .C4'],
-            answer: 2,
-            explain: 'C comes before H and O.'
-          },
-          {
-            prompt: 'Which call number comes first?',
-            choices: ['M 3 .S36', 'M 3 .O35', 'M 3 .H26'],
-            answer: 2,
-            explain: 'H comes before O and S.'
-          }
-        ]
-      },
-      {
-        label: 'Module 3',
-        title: 'Year And Later Details',
-        masteryText: 'Pass target: 3 correct in a row.',
-        teach:
-          '<p>If the earlier parts match, later details decide the order. That can include year, series, and other later-line details.</p>' +
-          '<p>Example: <code class="call">M 3 .O35 1994 SER.II FASC.3</code> comes before <code class="call">M 3 .O35 2001 SER.II FASC.3</code>.</p>',
-        worked:
-          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .O35 1994 SER.II FASC.3</code> comes before <code class="call">M 3 .O35 2001 SER.II FASC.3</code> because the earlier parts match, so the year decides it.</p></div>',
-        questions: [
-          {
-            prompt: 'Which call number comes first?',
-            choices: ['M 3 .O35 1994 SER.II FASC.3', 'M 3 .O35 2001 SER.II FASC.3'],
-            answer: 0,
-            explain: '1994 comes before 2001.'
-          },
-          {
-            prompt: 'Which later detail comes first?',
-            choices: ['SER.VI', 'SER.I', 'SER.II'],
-            answer: 1,
-            explain: 'SER.I comes before SER.II, which comes before SER.VI.'
-          },
-          {
-            prompt: 'Which call number comes first?',
-            choices: ['M 452 .H42 H.III:E2', 'M 452 .H42 H.II:E2'],
-            answer: 1,
-            explain: 'II comes before III.'
-          }
-        ]
-      },
-      {
-        label: 'Final Activity',
-        type: 'drag'
-      },
-      {
-        label: 'Complete',
-        type: 'done'
-      }
-    ];
+    function validateModule(module) {
+      if (!module) return false;
+      if (module.type === 'drag' || module.type === 'done') return true;
+      return !!(module.title && module.teach && module.worked && module.questions && module.questions.length);
+    }
 
-    function render() {
-      if (!app || !modules || !modules[state.step]) {
-        console.error('Render failed: missing app or module');
+    function updateProgress() {
+      if (!bar || !stageLabel) return;
+      var item = modules[state.step];
+      stageLabel.textContent = item.label;
+      bar.style.width = ((state.step) / (modules.length - 1)) * 100 + '%';
+    }
+
+    function startTraining() {
+      var validationMessage = validateStudentInfo();
+      if (validationMessage) {
+        showIntakeMessage(validationMessage, 'warn');
         return;
       }
-      try {
-        app.classList.remove('hidden');
-        var item = modules[state.step];
-        if (!validateModule(item)) {
-          console.error('Invalid module at step ' + state.step);
-          return;
-        }
-        if (stageLabel) stageLabel.textContent = item.label;
-        if (bar) bar.style.width = ((state.step) / (modules.length - 1) * 100) + '%';
 
-        if (item.type === 'drag') return renderDrag();
-        if (item.type === 'done') return renderDone();
-        return renderModule(item);
-      } catch (e) {
-        console.error('Render error: ' + e.message);
+      showIntakeMessage('', '');
+      app.classList.remove('hidden');
+
+      state.sessionStartedAt = nowIso();
+      state.sessionCompletedAt = null;
+      state.submitted = false;
+      state.step = 0;
+      state.phase = 'teach';
+      state.score = 0;
+      state.streak = 0;
+      state.currentQuestion = null;
+      state.tryCount = 0;
+      state.currentQuestionId = null;
+      resetMetrics();
+
+      render();
+    }
+
+    function render() {
+      if (!app || !screen || !modules[state.step]) return;
+      var item = modules[state.step];
+      if (!validateModule(item)) {
+        screen.innerHTML = '<div class="feedback bad">There is a problem with this module configuration.</div>';
+        return;
       }
+
+      updateProgress();
+
+      if (item.type === 'drag') {
+        renderDrag();
+        return;
+      }
+      if (item.type === 'done') {
+        renderDone();
+        return;
+      }
+      renderModule(item);
     }
 
     function renderModule(module) {
-      if (!screen) return;
       if (state.phase === 'teach') {
         screen.innerHTML =
-          '<h2>' + module.title + '</h2>' +
+          '<h2>' + escapeHtml(module.title) + '</h2>' +
           module.teach +
-          '<div class="mastery" role="status" aria-live="polite">' + module.masteryText + ' Current streak: ' + state.streak + '</div>' +
-          '<button onclick="showWorked()" aria-label="Continue to worked example">Continue</button>';
-      } else if (state.phase === 'worked') {
-        screen.innerHTML =
-          '<h2>' + module.title + '</h2>' +
-          module.worked +
-          '<div class="mastery" role="status" aria-live="polite">' + module.masteryText + ' Current streak: ' + state.streak + '</div>' +
-          '<button onclick="showPractice()" aria-label="Continue to practice questions">Continue</button>';
-      } else {
-        renderPracticeQuestion(module);
+          '<div class="mastery" role="status" aria-live="polite">' + escapeHtml(module.masteryText) + ' Current streak: ' + state.streak + '</div>' +
+          '<button type="button" onclick="showWorked()">Continue</button>';
+        return;
       }
+
+      if (state.phase === 'worked') {
+        screen.innerHTML =
+          '<h2>' + escapeHtml(module.title) + '</h2>' +
+          module.worked +
+          '<div class="mastery" role="status" aria-live="polite">' + escapeHtml(module.masteryText) + ' Current streak: ' + state.streak + '</div>' +
+          '<button type="button" onclick="showPractice()">Continue</button>';
+        return;
+      }
+
+      renderPracticeQuestion(module);
     }
 
     function showWorked() {
@@ -661,46 +803,40 @@
 
     function showPractice() {
       state.phase = 'practice';
-      state.tryCount = 0;
       state.currentQuestion = null;
+      state.tryCount = 0;
       render();
     }
 
     function renderPracticeQuestion(module) {
-      if (!screen) return;
       if (!state.currentQuestion) {
         var questions = module.questions || [];
-        if (questions.length === 0) {
-          console.error('No questions in module');
-          return;
-        }
         state.currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+        state.currentQuestionId = state.currentQuestion.id || '';
         state.tryCount = 0;
+        state.metrics.moduleAttempts[module.key] += 1;
       }
 
       var q = state.currentQuestion;
 
       screen.innerHTML =
-        '<h2>' + module.title + '</h2>' +
-        '<p><strong>' + q.prompt + '</strong></p>' +
+        '<h2>' + escapeHtml(module.title) + '</h2>' +
+        '<p><strong>' + escapeHtml(q.prompt) + '</strong></p>' +
         '<div id="choices" role="group" aria-label="Answer choices"></div>' +
         '<div id="feedback" role="alert" aria-live="assertive"></div>' +
-        '<div class="mastery" role="status" aria-live="polite">' + module.masteryText + ' Current streak: ' + state.streak + '</div>';
+        '<div class="mastery" role="status" aria-live="polite">' + escapeHtml(module.masteryText) + ' Current streak: ' + state.streak + '</div>';
 
       var choicesDiv = safeGetElement('choices');
       if (!choicesDiv) return;
 
-      q.choices.forEach(function(choice, i) {
+      q.choices.forEach(function(choice, index) {
         var btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = 'choice';
         btn.textContent = choice;
-        btn.setAttribute('aria-label', 'Option ' + (i + 1) + ': ' + choice);
-        btn.onclick = function() { handleAnswer(i); };
-        btn.onkeydown = function(e) {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleAnswer(i);
-          }
+        btn.setAttribute('aria-label', 'Option ' + (index + 1) + ': ' + choice);
+        btn.onclick = function() {
+          handleAnswer(index);
         };
         choicesDiv.appendChild(btn);
       });
@@ -712,104 +848,90 @@
       });
     }
 
-    function handleAnswer(index) {
-      if (!modules || !modules[state.step] || !state.currentQuestion) {
-        console.error('HandleAnswer failed: invalid state');
-        return;
+    function markModulePassed(moduleKey) {
+      if (!state.metrics.modulePassed[moduleKey]) {
+        state.metrics.modulePassed[moduleKey] = true;
+        state.metrics.modulePassedCount += 1;
+        state.metrics.lessonsPassed = state.metrics.modulePassedCount;
       }
-      var module = modules[state.step];
-      var q = state.currentQuestion;
-      var feedback = safeGetElement('feedback');
-      if (!feedback) return;
+    }
 
-      if (index === q.answer) {
-        state.score++;
-        state.streak++;
-        feedback.className = 'feedback good';
-        feedback.setAttribute('role', 'alert');
-        feedback.innerHTML =
-          'Correct. ' + q.explain + '<br><br>' +
-          (state.streak >= 3
-            ? '<button onclick="advanceModule()" aria-label="Pass lesson and advance to next module">Pass Lesson</button>'
-            : '<button onclick="nextQuestion()" aria-label="Continue to next practice question">Next Similar Problem</button>');
-        disableChoices();
-      } else {
-        state.streak = 0;
-        state.tryCount++;
-
-        if (state.tryCount === 1) {
-          feedback.className = 'feedback bad';
-          feedback.setAttribute('role', 'alert');
-          feedback.innerHTML =
-            'Not quite. ' + explainDifference(q.choices[q.answer], q.choices[index]) +
-            '<br><br>Try again before the answer is revealed.';
-        } else {
-          feedback.className = 'feedback bad';
-          feedback.setAttribute('role', 'alert');
-          feedback.innerHTML =
-            'Not quite. The correct answer is <code class="call">' + q.choices[q.answer] + '</code>.<br><br>' +
-            q.explain +
-            '<br><br><button onclick="nextQuestion()" aria-label="Try another similar problem">Try Another Similar Problem</button>';
-          disableChoices();
-        }
+    function advanceModule() {
+      var currentModule = modules[state.step];
+      if (currentModule && currentModule.key && currentModule.key !== 'finalActivity' && currentModule.key !== 'done') {
+        markModulePassed(currentModule.key);
+        state.metrics.moduleCompletedCount += 1;
+        state.metrics.lessonsCompleted = state.metrics.moduleCompletedCount;
       }
+
+      state.step += 1;
+      state.phase = 'teach';
+      state.streak = 0;
+      state.currentQuestion = null;
+      state.tryCount = 0;
+      render();
     }
 
     function nextQuestion() {
       state.currentQuestion = null;
+      state.currentQuestionId = null;
       state.tryCount = 0;
       render();
     }
 
-    function advanceModule() {
-      if (!modules || state.step >= modules.length) {
-        console.error('Invalid module progression');
+    function handleAnswer(index) {
+      var module = modules[state.step];
+      var q = state.currentQuestion;
+      var feedback = safeGetElement('feedback');
+      if (!module || !q || !feedback) return;
+
+      if (index === q.answer) {
+        state.score += 1;
+        state.streak += 1;
+
+        feedback.className = 'feedback good';
+        feedback.innerHTML =
+          'Correct. ' + escapeHtml(q.explain) + '<br><br>' +
+          (state.streak >= 3
+            ? '<button type="button" onclick="advanceModule()">Pass Lesson</button>'
+            : '<button type="button" onclick="nextQuestion()">Next Similar Problem</button>');
+
+        disableChoices();
         return;
       }
-      state.step++;
-      state.phase = 'teach';
-      state.streak = 0;
-      state.tryCount = 0;
-      state.currentQuestion = null;
-      render();
-    }
 
-    function startTraining() {
-      try {
-        if (!modules || modules.length === 0) {
-          console.error('No modules available');
-          return;
-        }
-        state.step = 0;
-        state.phase = 'teach';
-        state.score = 0;
-        state.streak = 0;
-        state.tryCount = 0;
-        state.currentQuestion = null;
-        render();
-      } catch (e) {
-        console.error('Start training failed: ' + e.message);
+      state.streak = 0;
+      state.tryCount += 1;
+
+      if (state.tryCount === 1) {
+        feedback.className = 'feedback bad';
+        feedback.innerHTML =
+          'Not quite. ' + escapeHtml(explainDifference(q.choices[q.answer], q.choices[index])) +
+          '<br><br>Try again before the answer is revealed.';
+        return;
       }
+
+      feedback.className = 'feedback bad';
+      feedback.innerHTML =
+        'Not quite. The correct answer is <code class="call">' + escapeHtml(q.choices[q.answer]) + '</code>.<br><br>' +
+        escapeHtml(q.explain) +
+        '<br><br><button type="button" onclick="nextQuestion()">Try Another Similar Problem</button>';
+
+      disableChoices();
     }
 
     function shuffle(arr) {
-      if (!arr || arr.length === 0) return [];
       var copy = arr.slice();
-      // Fisher-Yates shuffle algorithm
       for (var i = copy.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
-        var temp = copy[i];
+        var tmp = copy[i];
         copy[i] = copy[j];
-        copy[j] = temp;
+        copy[j] = tmp;
       }
       return copy;
     }
 
     function makeDraggable(text, id) {
-      if (!text || !id) {
-        console.warn('makeDraggable: missing text or id');
-        return null;
-      }
       var div = document.createElement('div');
       div.className = 'draggable';
       div.draggable = true;
@@ -823,10 +945,6 @@
     }
 
     function makeSlot(n) {
-      if (!n || n < 1) {
-        console.warn('makeSlot: invalid position');
-        return null;
-      }
       var div = document.createElement('div');
       div.className = 'slot';
       div.tabIndex = 0;
@@ -837,42 +955,16 @@
     }
 
     function enableDnD() {
-      var draggedElement = null;
-
-      function startDrag(el) {
-        draggedElement = el;
-        el.classList.add('dragging');
-        if (el.dataTransfer) el.dataTransfer.effectAllowed = 'move';
-      }
-
-      function stopDrag(el) {
-        if (el === draggedElement) draggedElement = null;
-        el.classList.remove('dragging');
-      }
-
       safeQuery('.draggable').forEach(function(el) {
         el.addEventListener('dragstart', function(e) {
-          if (e.dataTransfer) {
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', this.id);
-          }
-          startDrag(this);
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', this.id);
+          this.classList.add('dragging');
         });
 
-        el.addEventListener('dragend', function(e) {
-          stopDrag(this);
+        el.addEventListener('dragend', function() {
+          this.classList.remove('dragging');
         });
-
-        // Touch support
-        el.addEventListener('touchstart', function(e) {
-          startDrag(this);
-          draggedElement = this;
-        }, false);
-
-        el.addEventListener('touchend', function(e) {
-          stopDrag(this);
-          draggedElement = null;
-        }, false);
       });
 
       safeQuery('.slot').forEach(function(target) {
@@ -881,30 +973,22 @@
           this.classList.add('drag-over');
         });
 
-        target.addEventListener('dragleave', function(e) {
+        target.addEventListener('dragleave', function() {
           this.classList.remove('drag-over');
         });
 
         target.addEventListener('drop', function(e) {
           e.preventDefault();
           this.classList.remove('drag-over');
-          if (!e.dataTransfer) return;
           var id = e.dataTransfer.getData('text/plain');
           var el = safeGetElement(id);
-          if (!el) return;
           var bank = safeGetElement('bank');
+          if (!el) return;
+
           var existing = this.querySelector('.draggable');
           if (existing && bank) bank.appendChild(existing);
+
           this.appendChild(el);
-        });
-
-        // Touch support for slots
-        target.addEventListener('touchover', function(e) {
-          this.classList.add('drag-over');
-        });
-
-        target.addEventListener('touchleave', function(e) {
-          this.classList.remove('drag-over');
         });
       });
 
@@ -916,16 +1000,14 @@
 
         bank.addEventListener('drop', function(e) {
           e.preventDefault();
-          if (!e.dataTransfer) return;
           var id = e.dataTransfer.getData('text/plain');
           var el = safeGetElement(id);
-          if (el) this.appendChild(el);
+          if (el) bank.appendChild(el);
         });
       }
     }
 
     function renderDrag() {
-      if (!screen) return;
       var items = [
         'M 3 .C4 1993 SER.VI V.69A',
         'M 2.3 .U6 R4 V.66',
@@ -937,17 +1019,19 @@
       var shuffled = shuffle(items);
       var correct = items.slice().sort(compareCallNumbers);
 
+      state.metrics.moduleAttempts.finalActivity += 1;
+
       screen.innerHTML =
         '<h2>Final Activity</h2>' +
-        '<p>Drag each call number into the slots from first to last. Keyboard: Use Tab to focus, Enter to select.</p>' +
+        '<p>Drag each call number into the slots from first to last.</p>' +
         '<h3>Call Number Bank</h3>' +
         '<div class="sortbank" id="bank" role="region" aria-label="Draggable call numbers"></div>' +
         '<h3>Order Slots</h3>' +
         '<div class="sortslots" id="slots" role="region" aria-label="Drop zones for ordering"></div>' +
         '<div id="dragFeedback" role="alert" aria-live="assertive"></div>' +
-        '<div style="margin-top:14px;">' +
-          '<button id="checkDrag" aria-label="Check if the order is correct">Check Order</button> ' +
-          '<button id="resetDrag" class="secondary" aria-label="Reset all items to the bank">Reset</button>' +
+        '<div class="inline-actions">' +
+          '<button id="checkDrag" type="button">Check Order</button>' +
+          '<button id="resetDrag" type="button" class="secondary">Reset</button>' +
         '</div>';
 
       var bank = safeGetElement('bank');
@@ -956,7 +1040,7 @@
       var checkBtn = safeGetElement('checkDrag');
       var resetBtn = safeGetElement('resetDrag');
 
-      if (!bank || !slots) return;
+      if (!bank || !slots || !dragFeedback || !checkBtn || !resetBtn) return;
 
       shuffled.forEach(function(item, i) {
         bank.appendChild(makeDraggable(item, 'item-' + i));
@@ -968,63 +1052,190 @@
 
       enableDnD();
 
-      if (resetBtn) {
-        resetBtn.onclick = function() { renderDrag(); };
+      resetBtn.onclick = function() {
+        renderDrag();
+      };
+
+      checkBtn.onclick = function() {
+        var chosen = [];
+        safeQuery('.slot').forEach(function(slot) {
+          var item = slot.querySelector('.draggable');
+          if (item) chosen.push(item.getAttribute('data-value'));
+        });
+
+        if (chosen.length !== items.length) {
+          dragFeedback.className = 'feedback warn';
+          dragFeedback.textContent = 'Please place every call number into a slot before checking the order.';
+          return;
+        }
+
+        var ok = true;
+        for (var i = 0; i < chosen.length; i++) {
+          if (chosen[i] !== correct[i]) {
+            ok = false;
+            break;
+          }
+        }
+
+        if (ok) {
+          state.score += 1;
+          state.metrics.finalActivityPass = true;
+          state.metrics.modulePassed.finalActivity = true;
+          state.metrics.modulePassedCount += 1;
+          state.metrics.lessonsPassed = state.metrics.modulePassedCount;
+        } else {
+          state.metrics.finalActivityPass = false;
+        }
+
+        state.metrics.moduleCompletedCount += 1;
+        state.metrics.lessonsCompleted = state.metrics.moduleCompletedCount;
+
+        dragFeedback.className = ok ? 'feedback good' : 'feedback bad';
+        dragFeedback.innerHTML = ok
+          ? 'Correct. You placed the call numbers in the right order.<br><br><button type="button" onclick="finishTraining()">Finish</button>'
+          : 'Not quite. The correct order is:<br>' + correct.map(function(x) {
+              return '<code class="call">' + escapeHtml(x) + '</code>';
+            }).join(' ') +
+            '<br><br><button type="button" onclick="finishTraining()">Continue</button>';
+      };
+    }
+
+    function calculateOverallPass() {
+      var allCorePassed =
+        state.metrics.modulePassed.module1 &&
+        state.metrics.modulePassed.module2 &&
+        state.metrics.modulePassed.module3 &&
+        state.metrics.finalActivityPass;
+
+      state.metrics.overallPass = allCorePassed;
+      return state.metrics.overallPass;
+    }
+
+    function buildSubmissionPayload() {
+      calculateOverallPass();
+      state.sessionCompletedAt = nowIso();
+
+      return {
+        timestamp: state.sessionCompletedAt,
+        sessionStartedAt: state.sessionStartedAt,
+        realName: state.student.realName,
+        preferredName: state.student.preferredName,
+        sbuEmail: state.student.sbuEmail,
+        lessonsCompleted: state.metrics.lessonsCompleted,
+        lessonsPassed: state.metrics.lessonsPassed,
+        module1Passed: state.metrics.modulePassed.module1,
+        module2Passed: state.metrics.modulePassed.module2,
+        module3Passed: state.metrics.modulePassed.module3,
+        finalActivityPassed: state.metrics.finalActivityPass,
+        totalScore: state.score,
+        totalPossibleScore: state.metrics.totalPossibleScore,
+        overallPass: state.metrics.overallPass,
+        module1Attempts: state.metrics.moduleAttempts.module1,
+        module2Attempts: state.metrics.moduleAttempts.module2,
+        module3Attempts: state.metrics.moduleAttempts.module3,
+        finalActivityAttempts: state.metrics.moduleAttempts.finalActivity,
+        userAgent: navigator.userAgent
+      };
+    }
+
+    async function submitResults() {
+      var status = safeGetElement('submitStatus');
+      var submitBtn = safeGetElement('submitResultsBtn');
+      var payload = buildSubmissionPayload();
+
+      if (!APP_SCRIPT_URL) {
+        if (status) {
+          status.className = 'feedback warn status-line';
+          status.innerHTML = 'Apps Script URL not added yet. The score record is ready, but it cannot be sent until we add the script URL.';
+        }
+        return;
       }
 
-      if (checkBtn) {
-        checkBtn.onclick = function() {
-          var chosen = [];
-          safeQuery('.slot').forEach(function(slot) {
-            var item = slot.querySelector('.draggable');
-            if (item) chosen.push(item.getAttribute('data-value'));
-          });
+      if (submitBtn) submitBtn.disabled = true;
 
-          if (chosen.length !== items.length) {
-            if (dragFeedback) {
-              dragFeedback.className = 'feedback warn';
-              dragFeedback.textContent = 'Please place every call number into a slot before checking the order.';
-            }
-            return;
-          }
+      try {
+        if (status) {
+          status.className = 'feedback warn status-line';
+          status.textContent = 'Submitting results...';
+        }
 
-          var ok = true;
-          for (var i = 0; i < chosen.length; i++) {
-            if (chosen[i] !== correct[i]) {
-              ok = false;
-              break;
-            }
-          }
+        var response = await fetch(APP_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(payload)
+        });
 
-          if (ok) state.score++;
+        var text = await response.text();
 
-          if (dragFeedback) {
-            dragFeedback.className = ok ? 'feedback good' : 'feedback bad';
-            dragFeedback.innerHTML = ok
-              ? 'Correct. You placed the call numbers in the right order.<br><br><button onclick="finishTraining()" aria-label="Finish training">Finish</button>'
-              : 'Not quite. The correct order is:<br>' + correct.map(function(x) { return '<code class="call">' + x + '</code>'; }).join(' ') + '<br><br><button onclick="finishTraining()" aria-label="Continue anyway">Continue</button>';
-          }
-        };
+        if (!response.ok) {
+          throw new Error('Server returned ' + response.status + ': ' + text);
+        }
+
+        state.submitted = true;
+
+        if (status) {
+          status.className = 'feedback good status-line';
+          status.textContent = 'Results submitted successfully.';
+        }
+      } catch (error) {
+        console.error('Submit failed:', error);
+        if (status) {
+          status.className = 'feedback bad status-line';
+          status.textContent = 'Submission failed: ' + error.message;
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     }
 
     function finishTraining() {
-      if (!modules || state.step >= modules.length - 1) {
-        console.error('Cannot advance past final module');
-        return;
-      }
-      state.step++;
+      state.step += 1;
       render();
     }
 
     function renderDone() {
-      if (!screen) return;
+      var payload = buildSubmissionPayload();
+
       screen.innerHTML =
         '<h2>Training Complete</h2>' +
         '<p>You finished the current prototype.</p>' +
-        '<div class="feedback good" role="status">Score: ' + state.score + '</div>' +
-        '<button onclick="startTraining()" aria-label="Restart the training from the beginning">Restart</button>';
+
+        '<div class="summary-grid">' +
+          '<div class="summary-box"><div class="label">Student</div><div class="value">' + escapeHtml(payload.preferredName) + '</div></div>' +
+          '<div class="summary-box"><div class="label">Real Name</div><div class="value">' + escapeHtml(payload.realName) + '</div></div>' +
+          '<div class="summary-box"><div class="label">Email</div><div class="value">' + escapeHtml(payload.sbuEmail) + '</div></div>' +
+          '<div class="summary-box"><div class="label">Total Score</div><div class="value">' + payload.totalScore + ' / ' + payload.totalPossibleScore + '</div></div>' +
+          '<div class="summary-box"><div class="label">Lessons Completed</div><div class="value">' + payload.lessonsCompleted + '</div></div>' +
+          '<div class="summary-box"><div class="label">Lessons Passed</div><div class="value">' + payload.lessonsPassed + '</div></div>' +
+          '<div class="summary-box"><div class="label">Final Activity</div><div class="value">' + (payload.finalActivityPassed ? 'Passed' : 'Not Passed') + '</div></div>' +
+          '<div class="summary-box"><div class="label">Overall Result</div><div class="value">' + (payload.overallPass ? 'PASS' : 'FAIL') + '</div></div>' +
+        '</div>' +
+
+        '<div class="info-box">' +
+          '<strong>Attempt Counts</strong>' +
+          '<p>Module 1: ' + payload.module1Attempts + '<br>' +
+          'Module 2: ' + payload.module2Attempts + '<br>' +
+          'Module 3: ' + payload.module3Attempts + '<br>' +
+          'Final Activity: ' + payload.finalActivityAttempts + '</p>' +
+        '</div>' +
+
+        '<div class="inline-actions">' +
+          '<button id="submitResultsBtn" type="button">Submit Results</button>' +
+          '<button type="button" class="secondary" onclick="startTraining()">Restart</button>' +
+        '</div>' +
+        '<div id="submitStatus"></div>';
+
+      var submitBtn = safeGetElement('submitResultsBtn');
+      if (submitBtn) {
+        submitBtn.onclick = submitResults;
+      }
     }
+
+    if (startBtn) startBtn.onclick = startTraining;
+    if (rulesBtn) rulesBtn.onclick = toggleRules;
   </script>
 </body>
 </html>
