@@ -46,10 +46,10 @@
       box-shadow: 0 6px 20px rgba(0,0,0,.05);
     }
 
-    h1,h2,h3 { margin-top: 0; }
+    h1, h2, h3 { margin-top: 0; }
     h1 { font-size: 2.7rem; line-height: 1.1; margin-bottom: 12px; }
-    h2 { font-size: 1.6rem; }
-    h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    h2 { font-size: 1.65rem; margin-bottom: 10px; }
+    h3 { font-size: 1.08rem; margin-bottom: 8px; }
     p { margin: 0 0 14px 0; font-size: 1.02rem; }
 
     .version {
@@ -143,9 +143,7 @@
       border: 1px solid var(--line);
     }
 
-    button.secondary:hover {
-      background: #f8fafc;
-    }
+    button.secondary:hover { background: #f8fafc; }
 
     button.choice {
       display: block;
@@ -204,6 +202,59 @@
       line-height: 1.6;
     }
 
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 14px;
+      align-items: stretch;
+      margin: 16px 0;
+    }
+
+    .compare-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .compare-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .compare-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 56px;
+    }
+
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: .96rem;
+    }
+
+    .token-table th,
+    .token-table td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .token-table th {
+      background: #f8fafc;
+    }
+
     .sortbank, .sortslots {
       display: flex;
       flex-wrap: wrap;
@@ -243,6 +294,39 @@
       letter-spacing: .04em;
     }
 
+    .difficulty-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .difficulty-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .difficulty-card h3 {
+      margin-bottom: 6px;
+    }
+
+    .meter {
+      margin-top: 8px;
+      font-size: .95rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 800px) {
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
+      .compare-arrow {
+        min-height: 40px;
+      }
+    }
+
     @media (max-width: 700px) {
       .wrap { padding: 14px; }
       .card { padding: 18px; }
@@ -253,25 +337,40 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="version">Version 4.0</div>
+      <div class="version">Version 5.0</div>
       <h1>Shelf It Right</h1>
-      <p>This version teaches music-score call numbers using the actual kinds of complicated labels you showed: decimals, cutters, Roman numerals, bands, fascicles, parts, sections, and work-style marks.</p>
+      <p>This version leans harder into teaching. It gives worked examples, repeated practice, error-specific feedback, a cumulative checkpoint, and a final sorting activity using realistic music-score call numbers.</p>
 
       <div class="info-box">
         <strong>What This Covers</strong>
         <div>
-          Whole numbers, first cutters, possible second-cutter or work-mark elements, year, and later-line details such as <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code>, <code class="call">FASC.3</code>, <code class="call">ABT.5</code>, <code class="call">REIHE B</code>, <code class="call">T.2</code>, and <code class="call">H.III:E2</code>.
+          Whole numbers, first cutters, later work-like elements such as <code class="call">R4</code>, year, and later-line details such as <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code>, <code class="call">FASC.3</code>, <code class="call">ABT.5</code>, <code class="call">REIHE B</code>, <code class="call">T.2</code>, and <code class="call">H.III:E2</code>.
         </div>
       </div>
 
       <div class="info-box">
-        <strong>How The Training Works</strong>
+        <strong>How This Version Is Different</strong>
         <div>
-          Each section teaches one layer of sorting, then tests it right away. The final activity asks you to place realistic music-score call numbers in proper order.
+          Each concept teaches first, then walks through a worked example, then gives multiple practice questions, then checks cumulative understanding before the final drag-and-drop exercise.
         </div>
       </div>
 
-      <div class="row">
+      <div class="difficulty-grid">
+        <div class="difficulty-card">
+          <h3>Beginner</h3>
+          <p class="small">Whole numbers and the big shape of the call number.</p>
+        </div>
+        <div class="difficulty-card">
+          <h3>Intermediate</h3>
+          <p class="small">First cutter, later work-like elements, and year.</p>
+        </div>
+        <div class="difficulty-card">
+          <h3>Advanced</h3>
+          <p class="small">Series, bands, parts, fascicles, sections, and structured work marks.</p>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:16px;">
         <div class="col">
           <button id="startBtn">Start Training</button>
         </div>
@@ -301,8 +400,10 @@
 
     const state = {
       step: 0,
+      substep: 0,
       score: 0,
-      totalQuestions: 0
+      totalScored: 0,
+      tryCount: 0
     };
 
     function romanToInt(r) {
@@ -370,16 +471,15 @@
         suffix: cutterMatches[0][3] || ''
       } : null;
 
-      // This catches things like R4 after .U6 in "M 2.3 .U6 R4 V.66"
-      const secondWorkMatch = s.match(/\b([A-Z]\d{1,4})\b(?!.*\b[A-Z]\d{1,4}\b)/);
-      let secondWork = null;
-      if (secondWorkMatch) {
-        const val = secondWorkMatch[1];
+      const laterWorkMatch = s.match(/\b([A-Z]\d{1,4})\b(?!.*\b[A-Z]\d{1,4}\b)/);
+      let laterWork = null;
+      if (laterWorkMatch) {
+        const val = laterWorkMatch[1];
         const isClassLike = /^M[T|L]?\d/.test(val);
         const isYearLike = /^(1[6-9]\d{2}|20\d{2})$/.test(val);
         const isTokenLike = /^(SER|BD|V|PT|PTS|FASC|ABT|T)\.?/.test(val);
         if (!isClassLike && !isYearLike && !isTokenLike && !/^[A-Z]\.[IVXLC]+:/.test(s)) {
-          secondWork = val;
+          laterWork = val;
         }
       }
 
@@ -389,7 +489,7 @@
         classLetters: classMatch ? classMatch[1] : '',
         whole: classMatch ? parseFloat(classMatch[2]) : Number.POSITIVE_INFINITY,
         firstCutter,
-        secondWork,
+        laterWork,
         year: yearMatch ? parseInt(yearMatch[1], 10) : null,
         line4: {
           abt: abtMatch ? parseInt(abtMatch[1], 10) : null,
@@ -424,7 +524,7 @@
         || compareStrings(a.suffix, b.suffix);
     }
 
-    function compareSecondWork(a, b) {
+    function compareLaterWork(a, b) {
       return compareStrings(a || '', b || '');
     }
 
@@ -454,7 +554,7 @@
       return compareStrings(a.classLetters, b.classLetters)
         || compareNums(a.whole, b.whole)
         || compareCutter(a.firstCutter, b.firstCutter)
-        || compareSecondWork(a.secondWork, b.secondWork)
+        || compareLaterWork(a.laterWork, b.laterWork)
         || compareNums(a.year, b.year)
         || compareLine4(a, b);
     }
@@ -463,11 +563,49 @@
       return [...arr].sort(compareCallNumbers);
     }
 
+    function explainDifference(aRaw, bRaw) {
+      const a = parseCallNumber(aRaw);
+      const b = parseCallNumber(bRaw);
+
+      if (a.classLetters !== b.classLetters) {
+        return `Start with the class. ${a.classLetters} and ${b.classLetters} do not match, so class decides the order first.`;
+      }
+
+      if (a.whole !== b.whole) {
+        return `Start with the class number. ${a.whole} comes before ${b.whole}. Do not look at cutters yet.`;
+      }
+
+      if (compareCutter(a.firstCutter, b.firstCutter) !== 0) {
+        return `The class number matches, so compare the first cutter. ${formatCutter(a.firstCutter)} comes before ${formatCutter(b.firstCutter)}.`;
+      }
+
+      if ((a.laterWork || '') !== (b.laterWork || '')) {
+        return `The earlier parts match, so compare the later work-like element. ${a.laterWork || '(none)'} is read before ${b.laterWork || '(none)'}.`;
+      }
+
+      if (a.year !== b.year) {
+        return `The base call number matches, so compare the year. ${a.year} comes before ${b.year}.`;
+      }
+
+      return `The earlier lines match, so compare the later-line details such as series, band, volume, part, fascicle, section, or structured work mark.`;
+    }
+
+    function formatCutter(c) {
+      if (!c) return '(none)';
+      return `.${c.letters}${c.num}${c.suffix}`;
+    }
+
+    function inferErrorReason(questionObj, chosenIndex) {
+      const chosen = questionObj.choices[chosenIndex];
+      const correct = questionObj.choices[questionObj.answer];
+      return explainDifference(correct, chosen);
+    }
+
     const rulesText = `Local practice used in this prototype
 
 1. Start with the class and the class number.
-   Read the class first, then the number after it.
-   Example:
+   Read the class first, then the number that follows it.
+   Examples:
    M 2 comes before M 2.3
    M 2.3 comes before M 3
    M 3 comes before M 452
@@ -485,7 +623,7 @@
 3. If there is another work-like element after the first cutter, compare it next.
    Example:
    M 2.3 .U6 R4 V.66
-   In this prototype, R4 is treated as a later work element after .U6 and before the remaining volume-style detail.
+   In this prototype, R4 is treated as a later work element after .U6 and before the remaining later-line detail.
 
 4. Compare the year after the base class number and cutter structure is settled.
    Example:
@@ -493,7 +631,7 @@
    comes before
    M 3 .O35 2001 SER.II FASC.3
 
-5. After the earlier parts are settled, compare later-line details that distinguish sets, series, bands, volumes, parts, fascicles, sections, and related music-score subdivisions.
+5. After the earlier parts are settled, compare later-line details that distinguish series, bands, volumes, parts, fascicles, sections, and related music-score subdivisions.
    In this prototype, those later details are compared in this order:
    ABT.
    REIHE
@@ -506,7 +644,7 @@
    structured work marks such as H.III:E2
 
 6. Roman numerals are converted to numbers when they appear in sortable places.
-   Example:
+   Examples:
    SER.I comes before SER.II
    SER.II comes before SER.VI
    H.I:E2 comes before H.II:E2
@@ -516,62 +654,67 @@
    Example:
    PTS.1-6 is treated as beginning with part 1.
 
-8. This tool is meant to reflect local shelf logic for music scores, using the kinds of labels shown in the training examples.
-   If local practice changes, the rule order here should be revised and tested again.`;
+8. This tool is built around the kinds of music-score call numbers shown in the training set.
+   If local practice changes, the rules here should be revised and tested again.`;
 
     document.getElementById('showRulesBtn').addEventListener('click', () => {
       rulesCard.classList.toggle('hidden');
-      rulesCard.innerHTML = `<h2>Sorting Rules Used in This Prototype</h2><pre>${rulesText}</pre>`;
+      rulesCard.innerHTML = `<h2>Sorting Rules Used In This Prototype</h2><pre>${rulesText}</pre>`;
     });
 
-    const lessons = [
+    const modules = [
       {
-        type: 'teach',
-        label: 'Lesson 1',
-        title: 'Start With The Big Shape Of The Call Number',
-        html: `
-          <p>When you shelf-read music scores, do not try to read everything at once. Start with the largest structure first, then move downward into the details.</p>
+        label: 'Module 1',
+        title: 'Class And Class Number',
+        teach: `
+          <p>Start with the largest shape of the call number. Do not read the whole label at once. First decide the class and class number. Only after that do you move to cutters and later details.</p>
           <div class="lesson-note">
-            The safe rhythm is:
-            class and class number → first cutter → later work element if present → year → later-line details
+            Safe rhythm:
+            class and class number → first cutter → later work-like element if present → year → later-line details
           </div>
-          <p>This matters because many music-score call numbers look scary, but the order becomes manageable when you compare only one layer at a time.</p>
-        `
-      },
-      {
-        type: 'teach',
-        label: 'Lesson 2',
-        title: 'Class And Class Number Come First',
-        html: `
-          <p>Read the class and class number before anything else.</p>
-          <p>Examples from this training:</p>
+          <p>Examples you will see in this training:</p>
           <p>
             <code class="call">M 2 .G39 1966 BD.23</code>
             <code class="call">M 2.3 .U6 R4 V.66</code>
             <code class="call">M 3 .B103 2005 SER.8 V.2</code>
             <code class="call">M 452 .H42 H.III:E2</code>
           </p>
-          <p>That order starts with 2, then 2.3, then 3, then 452. Do not jump ahead to <code class="call">.G39</code> or <code class="call">.B103</code> until the class number is settled.</p>
-        `
+          <p>That order begins with 2, then 2.3, then 3, then 452.</p>
+        `,
+        workedExample: {
+          left: 'M 2.3 .U6 R4 V.66',
+          right: 'M 3 .B103 2005 SER.8 V.2',
+          winner: 'left',
+          explanation: 'Start with the class number. 2.3 comes before 3. Stop there. Do not look at cutters yet.'
+        },
+        practice: [
+          {
+            prompt: 'Which call number should shelve first?',
+            choices: [
+              'M 3 .B103 2005 SER.8 V.2',
+              'M 2.3 .U6 R4 V.66',
+              'M 452 .H42 H.III:E2'
+            ],
+            answer: 1,
+            correctExplain: 'Read the class number first. 2.3 comes before 3, and both come before 452.'
+          },
+          {
+            prompt: 'Which call number should shelve first?',
+            choices: [
+              'M 3 .C4 1993 SER.VI V.69A',
+              'M 2 .G39 1966 BD.23',
+              'M 3 .O35 1994 SER.II FASC.3'
+            ],
+            answer: 1,
+            correctExplain: 'Start with the class number. 2 comes before 3.'
+          }
+        ]
       },
       {
-        type: 'quiz',
-        label: 'Quiz 1',
-        question: 'Which call number should shelve first?',
-        choices: [
-          'M 3 .B103 2005 SER.8 V.2',
-          'M 2.3 .U6 R4 V.66',
-          'M 452 .H42 H.III:E2'
-        ],
-        answer: 1,
-        explain: 'Read the class number first. 2.3 comes before 3, and both come before 452.'
-      },
-      {
-        type: 'teach',
-        label: 'Lesson 3',
-        title: 'The First Cutter Comes Next',
-        html: `
-          <p>Once the class number matches, compare the first cutter.</p>
+        label: 'Module 2',
+        title: 'First Cutter',
+        teach: `
+          <p>Once the class number matches, compare the first cutter. This is where many score labels begin to look crowded, so stay calm and compare one layer only.</p>
           <p>Examples within <code class="call">M 3</code>:</p>
           <p>
             <code class="call">M 3 .B103 2005 SER.8 V.2</code><br>
@@ -582,34 +725,43 @@
             <code class="call">M 3 .O35 1994 SER.II FASC.3</code><br>
             <code class="call">M 3 .S36 ABT.5 REIHE B BD.26 T.2</code>
           </p>
-          <p>Among these, the B cutters come before the C cutter, which comes before H, then O, then S.</p>
-          <p>Inside the B group, this prototype orders them as:</p>
-          <p>
-            <code class="call">.B103</code>
-            <code class="call">.B1133</code>
-            <code class="call">.B88R</code>
-          </p>
-        `
+          <p>In this prototype, the B cutters come first, then C, then H, then O, then S.</p>
+        `,
+        workedExample: {
+          left: 'M 3 .B1133 SER.I BD.32 PT.1',
+          right: 'M 3 .C4 1993 SER.VI V.69A',
+          winner: 'left',
+          explanation: 'The class number matches, so compare the first cutter. B comes before C.'
+        },
+        practice: [
+          {
+            prompt: 'Which call number comes first within M 3?',
+            choices: [
+              'M 3 .C4 1993 SER.VI V.69A',
+              'M 3 .B1133 SER.I BD.32 PT.1',
+              'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
+            ],
+            answer: 1,
+            correctExplain: 'All three are M 3, so compare the first cutter. B comes before C and S.'
+          },
+          {
+            prompt: 'Which call number comes first within M 3?',
+            choices: [
+              'M 3 .O35 1994 SER.II FASC.3',
+              'M 3 .H26 SER.2 BD.8 2008',
+              'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
+            ],
+            answer: 1,
+            correctExplain: 'All three are M 3, so compare the first cutter. H comes before O and S.'
+          }
+        ]
       },
       {
-        type: 'quiz',
-        label: 'Quiz 2',
-        question: 'Which call number comes first within M 3?',
-        choices: [
-          'M 3 .C4 1993 SER.VI V.69A',
-          'M 3 .B1133 SER.I BD.32 PT.1',
-          'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
-        ],
-        answer: 1,
-        explain: 'All three are M 3, so compare the first cutter. B comes before C and S.'
-      },
-      {
-        type: 'teach',
-        label: 'Lesson 4',
-        title: 'Later Work Elements And Year',
-        html: `
-          <p>Some labels contain another work-like element after the first cutter, such as <code class="call">R4</code> in <code class="call">M 2.3 .U6 R4 V.66</code>. In this prototype, that kind of element is treated after the first cutter and before later-line details.</p>
-          <p>The year is compared after the main class number and cutter structure is settled.</p>
+        label: 'Module 3',
+        title: 'Later Work Element And Year',
+        teach: `
+          <p>Some labels contain another work-like element after the first cutter. In this prototype, <code class="call">R4</code> in <code class="call">M 2.3 .U6 R4 V.66</code> is treated after the first cutter and before the remaining later-line detail.</p>
+          <p>The year is compared after the base class number and cutter structure is settled.</p>
           <p>Example:</p>
           <p>
             <code class="call">M 3 .O35 1994 SER.II FASC.3</code><br>
@@ -617,27 +769,42 @@
             <code class="call">M 3 .O35 2001 SER.II FASC.3</code>
           </p>
           <p>That is because the class number and first cutter match, so the year decides the order.</p>
-        `
+        `,
+        workedExample: {
+          left: 'M 3 .O35 1994 SER.II FASC.3',
+          right: 'M 3 .O35 2001 SER.II FASC.3',
+          winner: 'left',
+          explanation: 'The class number and first cutter match, so compare the year. 1994 comes before 2001.'
+        },
+        practice: [
+          {
+            prompt: 'Which one should shelve first?',
+            choices: [
+              'M 3 .O35 1994 SER.II FASC.3',
+              'M 3 .O35 2001 SER.II FASC.3',
+              'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
+            ],
+            answer: 0,
+            correctExplain: 'The first two have the same class number and first cutter. Compare the year. 1994 comes before 2001.'
+          },
+          {
+            prompt: 'Which call number comes first?',
+            choices: [
+              'M 2.3 .U6 R4 V.66',
+              'M 2.3 .U6 R7 V.66',
+              'M 3 .B103 2005 SER.8 V.2'
+            ],
+            answer: 0,
+            correctExplain: 'The class number and first cutter match for the first two. In this prototype, compare the later work-like element next. R4 comes before R7.'
+          }
+        ]
       },
       {
-        type: 'quiz',
-        label: 'Quiz 3',
-        question: 'Which one should shelve first?',
-        choices: [
-          'M 3 .O35 1994 SER.II FASC.3',
-          'M 3 .O35 2001 SER.II FASC.3',
-          'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
-        ],
-        answer: 0,
-        explain: 'The first two have the same class number and first cutter. Compare the year. 1994 comes before 2001.'
-      },
-      {
-        type: 'teach',
-        label: 'Lesson 5',
-        title: 'Later-Line Details: Series, Band, Volume, Part, Fascicle, Section',
-        html: `
-          <p>After the earlier parts are settled, compare the later-line details. These details help sort sets, collected works, volumes, parts, fascicles, sections, and related subdivisions.</p>
-          <p>Examples from the training set:</p>
+        label: 'Module 4',
+        title: 'Later-Line Details',
+        teach: `
+          <p>After the earlier parts are settled, compare later-line details such as series, band, volume, part, fascicle, section, and structured work marks.</p>
+          <p>Examples from this training set:</p>
           <p>
             <code class="call">SER.I</code>
             <code class="call">SER.II</code>
@@ -649,82 +816,112 @@
             <code class="call">ABT.5</code>
             <code class="call">REIHE B</code>
             <code class="call">T.2</code>
+            <code class="call">H.III:E2</code>
           </p>
-          <p>Roman numerals are converted to numbers. So <code class="call">SER.I</code> comes before <code class="call">SER.II</code>, and <code class="call">SER.II</code> comes before <code class="call">SER.VI</code>.</p>
-          <p>Ranges are sorted by their starting value. So <code class="call">PTS.1-6</code> is treated as beginning with part 1.</p>
-          <p>Structured work marks like <code class="call">H.III:E2</code> are also read in order. The Roman numeral part matters there too.</p>
-        `
-      },
-      {
-        type: 'quiz',
-        label: 'Quiz 4',
-        question: 'Which call number comes first?',
-        choices: [
-          'M 3 .B1133 SER.I BD.32 PT.1',
-          'M 3 .B1133 SER.VI BD.32 PT.1',
-          'M 3 .B1133 SER.II BD.32 PT.1'
-        ],
-        answer: 0,
-        explain: 'The class number and cutter match, so compare the later-line details. SER.I comes before SER.II, which comes before SER.VI.'
-      },
-      {
-        type: 'quiz',
-        label: 'Quiz 5',
-        question: 'Which call number should shelve first?',
-        choices: [
-          'M 3 .B88R BD.20 PTS.1-6',
-          'M 3 .C4 1993 SER.VI V.69A',
-          'M 3 .B103 2005 SER.8 V.2'
-        ],
-        answer: 2,
-        explain: 'All three are M 3. Compare the first cutter first. .B103 comes before .B88R, and both come before .C4.'
-      },
-      {
-        type: 'drag',
-        label: 'Final Activity',
-        title: 'Place These Realistic Music Score Call Numbers In Correct Order',
-        instructions: 'Drag each call number into the slots from first to last according to the local shelf logic used in this prototype.',
-        items: [
-          'M 3 .C4 1993 SER.VI V.69A',
-          'M 2.3 .U6 R4 V.66',
-          'M 3 .B103 2005 SER.8 V.2',
-          'M 2 .G39 1966 BD.23',
-          'M 3 .B1133 SER.I BD.32 PT.1',
-          'M 3 .B88R BD.20 PTS.1-6',
-          'M 452 .H42 H.III:E2',
-          'M 3 .O35 1994 SER.II FASC.3',
-          'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
+          <p>Roman numerals are converted to numbers. Ranges are sorted by their starting value. Structured work marks are read piece by piece.</p>
+        `,
+        workedExample: {
+          left: 'M 3 .B1133 SER.I BD.32 PT.1',
+          right: 'M 3 .B1133 SER.VI BD.32 PT.1',
+          winner: 'left',
+          explanation: 'The earlier parts match, so compare the later-line detail. SER.I comes before SER.VI.'
+        },
+        practice: [
+          {
+            prompt: 'Which call number comes first?',
+            choices: [
+              'M 3 .B1133 SER.I BD.32 PT.1',
+              'M 3 .B1133 SER.VI BD.32 PT.1',
+              'M 3 .B1133 SER.II BD.32 PT.1'
+            ],
+            answer: 0,
+            correctExplain: 'The class number and cutter match. Compare the series. SER.I comes before SER.II, which comes before SER.VI.'
+          },
+          {
+            prompt: 'Which call number should shelve first?',
+            choices: [
+              'M 3 .B88R BD.20 PTS.1-6',
+              'M 3 .B88R BD.26 PTS.1-6',
+              'M 3 .B88R BD.20 PTS.7-9'
+            ],
+            answer: 0,
+            correctExplain: 'The earlier parts match, so compare the later-line details. BD.20 comes before BD.26. If BD matched, the part range would be read by its starting value.'
+          }
         ]
       },
       {
-        type: 'done',
-        label: 'Complete'
+        label: 'Cumulative Checkpoint',
+        type: 'cumulative'
+      },
+      {
+        label: 'Final Activity',
+        type: 'drag'
+      },
+      {
+        label: 'Complete',
+        type: 'done'
       }
     ];
 
-    state.totalQuestions = lessons.filter(x => x.type === 'quiz').length + 1;
+    state.totalScored =
+      modules
+        .filter(m => !m.type)
+        .reduce((sum, m) => sum + m.practice.length, 0)
+      + 1
+      + 1;
 
     function setProgress() {
-      bar.style.width = `${(state.step) / (lessons.length - 1) * 100}%`;
+      bar.style.width = `${(state.step) / (modules.length - 1) * 100}%`;
     }
 
     function nextStep() {
-      state.step++;
+      state.substep++;
       render();
     }
 
-    function renderTeach(lesson) {
+    function nextModule() {
+      state.step++;
+      state.substep = 0;
+      render();
+    }
+
+    function disableChoices() {
+      document.querySelectorAll('.choice').forEach(b => b.disabled = true);
+    }
+
+    function renderWorkedExample(module) {
+      const ex = module.workedExample;
+      const arrow = ex.winner === 'left' ? '&larr; First' : 'First &rarr;';
       screen.innerHTML = `
-        <h2>${lesson.title}</h2>
-        ${lesson.html}
+        <h2>Worked Example</h2>
+        <p>Look at this pair. The goal here is not speed. The goal is to see exactly which layer decides the order.</p>
+
+        <div class="compare-grid">
+          <div class="compare-box">
+            <div class="compare-label">Option A</div>
+            <code class="call">${ex.left}</code>
+          </div>
+          <div class="compare-arrow">${arrow}</div>
+          <div class="compare-box">
+            <div class="compare-label">Option B</div>
+            <code class="call">${ex.right}</code>
+          </div>
+        </div>
+
+        <div class="feedback good">${ex.explanation}</div>
+
         <button id="nextBtn">Continue</button>
       `;
       document.getElementById('nextBtn').onclick = nextStep;
     }
 
-    function renderQuiz(lesson) {
+    function renderPractice(module, questionIndex) {
+      state.tryCount = 0;
+      const q = module.practice[questionIndex];
+
       screen.innerHTML = `
-        <h2>${lesson.question}</h2>
+        <h2>Practice</h2>
+        <p>${q.prompt}</p>
         <div id="choices"></div>
         <div id="feedback"></div>
       `;
@@ -732,23 +929,152 @@
       const choices = document.getElementById('choices');
       const feedback = document.getElementById('feedback');
 
-      lesson.choices.forEach((choice, i) => {
+      q.choices.forEach((choice, i) => {
         const btn = document.createElement('button');
         btn.className = 'choice';
         btn.textContent = choice;
         btn.onclick = () => {
-          const correct = i === lesson.answer;
-          if (correct) state.score++;
+          const correct = i === q.answer;
+          if (correct) {
+            state.score++;
+            feedback.className = 'feedback good';
+            feedback.innerHTML = `
+              Correct. ${q.correctExplain}
+              <br><br>
+              <button id="continueBtn">Continue</button>
+            `;
+            disableChoices();
+            document.getElementById('continueBtn').onclick = nextStep;
+          } else {
+            state.tryCount++;
+            const reason = inferErrorReason(q, i);
 
-          feedback.className = `feedback ${correct ? 'good' : 'bad'}`;
-          feedback.innerHTML = `
-            ${correct ? 'Correct.' : 'Not quite.'} ${lesson.explain}
-            <br><br>
-            <button id="nextQBtn">Continue</button>
-          `;
+            if (state.tryCount === 1) {
+              feedback.className = 'feedback bad';
+              feedback.innerHTML = `
+                Not quite. ${reason}
+                <br><br>
+                Try again before the answer is revealed.
+              `;
+            } else {
+              feedback.className = 'feedback bad';
+              feedback.innerHTML = `
+                Not quite. The correct answer is:
+                <br><br>
+                <code class="call">${q.choices[q.answer]}</code>
+                <br><br>
+                ${q.correctExplain}
+                <br><br>
+                <button id="continueBtn">Continue</button>
+              `;
+              disableChoices();
+              document.getElementById('continueBtn').onclick = nextStep;
+            }
+          }
+        };
+        choices.appendChild(btn);
+      });
+    }
 
-          [...choices.querySelectorAll('button')].forEach(b => b.disabled = true);
-          document.getElementById('nextQBtn').onclick = nextStep;
+    function renderTeach(module) {
+      screen.innerHTML = `
+        <h2>${module.title}</h2>
+        ${module.teach}
+        <button id="nextBtn">Continue</button>
+      `;
+      document.getElementById('nextBtn').onclick = nextStep;
+    }
+
+    function renderModule(module) {
+      const practiceStart = 2;
+      const practiceCount = module.practice.length;
+
+      if (state.substep === 0) return renderTeach(module);
+      if (state.substep === 1) return renderWorkedExample(module);
+      if (state.substep >= practiceStart && state.substep < practiceStart + practiceCount) {
+        return renderPractice(module, state.substep - practiceStart);
+      }
+      return nextModule();
+    }
+
+    function renderCumulative() {
+      state.tryCount = 0;
+
+      const options = [
+        [
+          'M 3 .C4 1993 SER.VI V.69A',
+          'M 2 .G39 1966 BD.23',
+          'M 3 .B103 2005 SER.8 V.2',
+          'M 3 .O35 1994 SER.II FASC.3',
+          'M 452 .H42 H.III:E2'
+        ],
+        [
+          'M 2 .G39 1966 BD.23',
+          'M 3 .B103 2005 SER.8 V.2',
+          'M 3 .C4 1993 SER.VI V.69A',
+          'M 3 .O35 1994 SER.II FASC.3',
+          'M 452 .H42 H.III:E2'
+        ],
+        [
+          'M 2 .G39 1966 BD.23',
+          'M 3 .O35 1994 SER.II FASC.3',
+          'M 3 .B103 2005 SER.8 V.2',
+          'M 3 .C4 1993 SER.VI V.69A',
+          'M 452 .H42 H.III:E2'
+        ]
+      ];
+
+      const correctIndex = 1;
+
+      screen.innerHTML = `
+        <h2>Cumulative Checkpoint</h2>
+        <p>This section mixes the earlier ideas together. Choose the full sequence that matches the local logic used in this prototype.</p>
+        <div id="choices"></div>
+        <div id="feedback"></div>
+      `;
+
+      const choices = document.getElementById('choices');
+      const feedback = document.getElementById('feedback');
+
+      options.forEach((option, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.innerHTML = option.map(x => `<code class="call">${x}</code>`).join(' &rarr; ');
+        btn.onclick = () => {
+          const correct = i === correctIndex;
+
+          if (correct) {
+            state.score++;
+            feedback.className = 'feedback good';
+            feedback.innerHTML = `
+              Correct. This order starts with the smallest class number, then sorts the M 3 items by first cutter, and leaves M 452 for last.
+              <br><br>
+              <button id="continueBtn">Continue</button>
+            `;
+            disableChoices();
+            document.getElementById('continueBtn').onclick = nextModule;
+          } else {
+            state.tryCount++;
+            if (state.tryCount === 1) {
+              feedback.className = 'feedback bad';
+              feedback.innerHTML = `
+                Not quite. Look again at the order of the M 3 items. Do the B, C, and O cutters line up correctly?
+                <br><br>
+                Try again before the answer is revealed.
+              `;
+            } else {
+              feedback.className = 'feedback bad';
+              feedback.innerHTML = `
+                Not quite. The correct sequence is:
+                <br><br>
+                ${options[correctIndex].map(x => `<code class="call">${x}</code>`).join(' ')}
+                <br><br>
+                <button id="continueBtn">Continue</button>
+              `;
+              disableChoices();
+              document.getElementById('continueBtn').onclick = nextModule;
+            }
+          }
         };
         choices.appendChild(btn);
       });
@@ -801,13 +1127,25 @@
       });
     }
 
-    function renderDrag(lesson) {
-      const shuffled = shuffle(lesson.items);
-      const correct = sortCalls(lesson.items);
+    function renderDrag() {
+      const lessonItems = [
+        'M 3 .C4 1993 SER.VI V.69A',
+        'M 2.3 .U6 R4 V.66',
+        'M 3 .B103 2005 SER.8 V.2',
+        'M 2 .G39 1966 BD.23',
+        'M 3 .B1133 SER.I BD.32 PT.1',
+        'M 3 .B88R BD.20 PTS.1-6',
+        'M 452 .H42 H.III:E2',
+        'M 3 .O35 1994 SER.II FASC.3',
+        'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
+      ];
+
+      const shuffled = shuffle(lessonItems);
+      const correct = sortCalls(lessonItems);
 
       screen.innerHTML = `
-        <h2>${lesson.title}</h2>
-        <p class="small">${lesson.instructions}</p>
+        <h2>Final Activity</h2>
+        <p>Drag each call number into the slots from first to last according to the local shelf logic used in this prototype.</p>
         <h3>Call Number Bank</h3>
         <div class="sortbank" id="bank"></div>
         <h3>Order Slots</h3>
@@ -824,23 +1162,24 @@
       const dragFeedback = document.getElementById('dragFeedback');
 
       shuffled.forEach((item, idx) => bank.appendChild(makeDraggable(item, `item-${idx}`)));
-      lesson.items.forEach((_, i) => slots.appendChild(makeSlot(i + 1)));
+      lessonItems.forEach((_, i) => slots.appendChild(makeSlot(i + 1)));
       enableDnD();
 
-      document.getElementById('resetDrag').onclick = () => renderDrag(lesson);
+      document.getElementById('resetDrag').onclick = () => renderDrag();
 
       document.getElementById('checkDrag').onclick = () => {
         const chosen = [...slots.querySelectorAll('.slot')]
           .map(slot => slot.querySelector('.draggable')?.dataset.value)
           .filter(Boolean);
 
-        if (chosen.length !== lesson.items.length) {
+        if (chosen.length !== lessonItems.length) {
           dragFeedback.className = 'feedback warn';
           dragFeedback.textContent = 'Please place every call number into a slot before checking the order.';
           return;
         }
 
         const ok = chosen.every((x, i) => x === correct[i]);
+
         if (ok) state.score++;
 
         dragFeedback.className = `feedback ${ok ? 'good' : 'bad'}`;
@@ -848,16 +1187,48 @@
           ? `Correct. You placed the scores in the right order.<br><br><button id="finishBtn">Finish</button>`
           : `Not quite. The correct order is:<br>${correct.map(x => `<code class="call">${x}</code>`).join(' ')}<br><br><button id="finishBtn">Continue</button>`;
 
-        document.getElementById('finishBtn').onclick = nextStep;
+        document.getElementById('finishBtn').onclick = nextModule;
       };
     }
 
     function renderDone() {
+      const percent = Math.round((state.score / state.totalScored) * 100);
+
       screen.innerHTML = `
         <h2>Training Complete</h2>
-        <p>You completed the prototype training sequence.</p>
-        <div class="feedback good">Score: ${state.score} / ${state.totalQuestions}</div>
-        <p>This version is built around the actual style of music-score call numbers discussed in this project. Before finalizing it, the exact sorting rules and examples should still be checked against your local practice and adjusted wherever needed.</p>
+        <p>You completed the current training sequence.</p>
+        <div class="feedback good">Score: ${state.score} / ${state.totalScored}</div>
+        <div class="meter">Completion score: ${percent}%</div>
+
+        <table class="token-table" style="margin-top:16px;">
+          <tr>
+            <th>What This Version Now Does Better</th>
+            <th>What It Means</th>
+          </tr>
+          <tr>
+            <td>Worked examples</td>
+            <td>Each concept is demonstrated before the user is tested.</td>
+          </tr>
+          <tr>
+            <td>Repeated practice</td>
+            <td>Each concept gets more than one question before the module moves on.</td>
+          </tr>
+          <tr>
+            <td>Error-specific feedback</td>
+            <td>Wrong answers point back to the exact layer that was missed.</td>
+          </tr>
+          <tr>
+            <td>Try-again step</td>
+            <td>The answer is not revealed immediately on the first mistake.</td>
+          </tr>
+          <tr>
+            <td>Cumulative checkpoint</td>
+            <td>The learner must combine multiple rules before the final task.</td>
+          </tr>
+        </table>
+
+        <p style="margin-top:16px;">This version is stronger as a learning module, but the exact sorting behavior still needs to be checked against local Music Library practice before it is treated as final.</p>
+
         <div class="row">
           <div class="col"><button id="restartBtn">Restart</button></div>
           <div class="col"><button class="secondary" id="rulesAgainBtn">Review Rules</button></div>
@@ -866,6 +1237,7 @@
 
       document.getElementById('restartBtn').onclick = () => {
         state.step = 0;
+        state.substep = 0;
         state.score = 0;
         render();
       };
@@ -879,18 +1251,19 @@
 
     function render() {
       app.classList.remove('hidden');
-      const lesson = lessons[state.step];
-      stageLabel.textContent = lesson.label;
+      const item = modules[state.step];
+      stageLabel.textContent = item.label;
       setProgress();
 
-      if (lesson.type === 'teach') return renderTeach(lesson);
-      if (lesson.type === 'quiz') return renderQuiz(lesson);
-      if (lesson.type === 'drag') return renderDrag(lesson);
-      if (lesson.type === 'done') return renderDone();
+      if (!item.type) return renderModule(item);
+      if (item.type === 'cumulative') return renderCumulative();
+      if (item.type === 'drag') return renderDrag();
+      if (item.type === 'done') return renderDone();
     }
 
     document.getElementById('startBtn').addEventListener('click', () => {
       state.step = 0;
+      state.substep = 0;
       state.score = 0;
       render();
     });
