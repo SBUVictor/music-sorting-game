@@ -130,9 +130,7 @@
       border: 1px solid var(--line);
     }
 
-    button.secondary:hover {
-      background: #f8fafc;
-    }
+    button.secondary:hover { background: #f8fafc; }
 
     button.choice {
       display: block;
@@ -339,9 +337,9 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="version">Version 7.0</div>
+      <div class="version">Version 7.1</div>
       <h1>Shelf It Right</h1>
-      <p>This version is ready for score recording. It collects student identity, runs the training, calculates pass data, and prepares a result payload for Google Sheets.</p>
+      <p>This version is wired to your Google Apps Script endpoint and ready to submit results to the scoreboard sheet.</p>
 
       <div class="info-box">
         <strong>Student Information</strong>
@@ -375,7 +373,7 @@
 
       <div class="info-box">
         <strong>How This Version Works</strong>
-        <div>Each module teaches first, gives a worked example, then serves similar practice problems until the learner passes that skill. After the final activity, a score record is prepared for Google Sheets.</div>
+        <div>Each module teaches first, gives a worked example, then serves similar practice problems until the learner passes that skill. At the end, the result is submitted to the Google Sheet scoreboard.</div>
       </div>
 
       <div class="inline-actions">
@@ -396,7 +394,7 @@
   </div>
 
   <script>
-    var APP_SCRIPT_URL = ''; // paste your deployed Apps Script URL here later
+    var APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUoY2_eFLWVWyw5JX7Vv15ZdbDYYkYceQ_fpn0sZPGb3gpCtsrPfe3i_iItmv3ZFdiPA/exec';
 
     function safeGetElement(id) {
       var el = document.getElementById(id);
@@ -1115,26 +1113,39 @@
       calculateOverallPass();
       state.sessionCompletedAt = nowIso();
 
+      var totalAttemptCount =
+        state.metrics.moduleAttempts.module1 +
+        state.metrics.moduleAttempts.module2 +
+        state.metrics.moduleAttempts.module3 +
+        state.metrics.moduleAttempts.finalActivity;
+
       return {
         timestamp: state.sessionCompletedAt,
-        sessionStartedAt: state.sessionStartedAt,
         realName: state.student.realName,
         preferredName: state.student.preferredName,
         sbuEmail: state.student.sbuEmail,
-        lessonsCompleted: state.metrics.lessonsCompleted,
-        lessonsPassed: state.metrics.lessonsPassed,
+
+        module1Completed: true,
         module1Passed: state.metrics.modulePassed.module1,
+
+        module2Completed: true,
         module2Passed: state.metrics.modulePassed.module2,
+
+        module3Completed: true,
         module3Passed: state.metrics.modulePassed.module3,
-        finalActivityPassed: state.metrics.finalActivityPass,
+
+        module4Completed: true,
+        module4Passed: state.metrics.modulePassed.finalActivity,
+
+        totalModulesCompleted: state.metrics.lessonsCompleted,
+        totalModulesPassed: state.metrics.lessonsPassed,
+
+        cumulativeCheckPassed: state.metrics.overallPass,
+        finalDragDropPassed: state.metrics.finalActivityPass,
+
         totalScore: state.score,
-        totalPossibleScore: state.metrics.totalPossibleScore,
-        overallPass: state.metrics.overallPass,
-        module1Attempts: state.metrics.moduleAttempts.module1,
-        module2Attempts: state.metrics.moduleAttempts.module2,
-        module3Attempts: state.metrics.moduleAttempts.module3,
-        finalActivityAttempts: state.metrics.moduleAttempts.finalActivity,
-        userAgent: navigator.userAgent
+        passFail: state.metrics.overallPass ? 'Pass' : 'Fail',
+        attemptCount: totalAttemptCount
       };
     }
 
@@ -1142,14 +1153,6 @@
       var status = safeGetElement('submitStatus');
       var submitBtn = safeGetElement('submitResultsBtn');
       var payload = buildSubmissionPayload();
-
-      if (!APP_SCRIPT_URL) {
-        if (status) {
-          status.className = 'feedback warn status-line';
-          status.innerHTML = 'Apps Script URL not added yet. The score record is ready, but it cannot be sent until we add the script URL.';
-        }
-        return;
-      }
 
       if (submitBtn) submitBtn.disabled = true;
 
@@ -1161,17 +1164,13 @@
 
         var response = await fetch(APP_SCRIPT_URL, {
           method: 'POST',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
           body: JSON.stringify(payload)
         });
 
-        var text = await response.text();
+        var result = await response.json();
 
-        if (!response.ok) {
-          throw new Error('Server returned ' + response.status + ': ' + text);
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || ('Server returned ' + response.status));
         }
 
         state.submitted = true;
@@ -1207,19 +1206,16 @@
           '<div class="summary-box"><div class="label">Student</div><div class="value">' + escapeHtml(payload.preferredName) + '</div></div>' +
           '<div class="summary-box"><div class="label">Real Name</div><div class="value">' + escapeHtml(payload.realName) + '</div></div>' +
           '<div class="summary-box"><div class="label">Email</div><div class="value">' + escapeHtml(payload.sbuEmail) + '</div></div>' +
-          '<div class="summary-box"><div class="label">Total Score</div><div class="value">' + payload.totalScore + ' / ' + payload.totalPossibleScore + '</div></div>' +
-          '<div class="summary-box"><div class="label">Lessons Completed</div><div class="value">' + payload.lessonsCompleted + '</div></div>' +
-          '<div class="summary-box"><div class="label">Lessons Passed</div><div class="value">' + payload.lessonsPassed + '</div></div>' +
-          '<div class="summary-box"><div class="label">Final Activity</div><div class="value">' + (payload.finalActivityPassed ? 'Passed' : 'Not Passed') + '</div></div>' +
-          '<div class="summary-box"><div class="label">Overall Result</div><div class="value">' + (payload.overallPass ? 'PASS' : 'FAIL') + '</div></div>' +
+          '<div class="summary-box"><div class="label">Total Score</div><div class="value">' + payload.totalScore + '</div></div>' +
+          '<div class="summary-box"><div class="label">Modules Completed</div><div class="value">' + payload.totalModulesCompleted + '</div></div>' +
+          '<div class="summary-box"><div class="label">Modules Passed</div><div class="value">' + payload.totalModulesPassed + '</div></div>' +
+          '<div class="summary-box"><div class="label">Final Drag / Drop</div><div class="value">' + (payload.finalDragDropPassed ? 'Passed' : 'Not Passed') + '</div></div>' +
+          '<div class="summary-box"><div class="label">Overall Result</div><div class="value">' + payload.passFail.toUpperCase() + '</div></div>' +
         '</div>' +
 
         '<div class="info-box">' +
-          '<strong>Attempt Counts</strong>' +
-          '<p>Module 1: ' + payload.module1Attempts + '<br>' +
-          'Module 2: ' + payload.module2Attempts + '<br>' +
-          'Module 3: ' + payload.module3Attempts + '<br>' +
-          'Final Activity: ' + payload.finalActivityAttempts + '</p>' +
+          '<strong>Attempt Count</strong>' +
+          '<p>Total attempts across all modules and the final activity: ' + payload.attemptCount + '</p>' +
         '</div>' +
 
         '<div class="inline-actions">' +
