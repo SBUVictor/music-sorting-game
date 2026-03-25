@@ -258,10 +258,36 @@
       letter-spacing: .04em;
     }
 
+    .draggable:focus {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .draggable.dragging {
+      opacity: 0.7;
+      box-shadow: 0 4px 12px rgba(29, 95, 145, 0.3);
+    }
+
+    .slot.drag-over {
+      background: #eef4ff;
+      border-color: var(--accent);
+    }
+
+    button:focus {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    button.choice:focus {
+      border-color: var(--accent);
+    }
+
     @media (max-width: 700px) {
       .wrap { padding: 14px; }
       .card { padding: 18px; }
       h1 { font-size: 2.1rem; }
+      .draggable { min-width: 160px; }
+      .slot { min-width: 160px; }
     }
   </style>
 </head>
@@ -294,8 +320,8 @@
         </div>
       </div>
 
-      <button onclick="startTraining()">Start Training</button>
-      <button class="secondary" onclick="toggleRules()" style="margin-left:10px;">Show Sorting Rules</button>
+      <button onclick="startTraining()" aria-label="Begin the training modules">Start Training</button>
+      <button class="secondary" onclick="toggleRules()" style="margin-left:10px;" aria-label="Display the call number sorting rules">Show Sorting Rules</button>
     </div>
 
     <div id="rulesCard" class="card hidden rules"></div>
@@ -310,11 +336,49 @@
   </div>
 
   <script>
-    var app = document.getElementById('app');
-    var screen = document.getElementById('screen');
-    var stageLabel = document.getElementById('stageLabel');
-    var bar = document.getElementById('bar');
-    var rulesCard = document.getElementById('rulesCard');
+    // Error handling and validation helpers
+    function safeGetElement(id) {
+      var el = document.getElementById(id);
+      if (!el) console.warn('Element not found: ' + id);
+      return el;
+    }
+
+    function safeQuery(selector) {
+      try {
+        return document.querySelectorAll(selector);
+      } catch (e) {
+        console.error('Query selector error: ' + e.message);
+        return [];
+      }
+    }
+
+    function validateModule(module) {
+      if (!module) return false;
+      if (module.type === 'drag') return true;
+      if (module.type === 'done') return true;
+      return module.title && module.teach && module.questions && module.questions.length > 0;
+    }
+
+    function createButton(text, onclick, ariaLabel, className) {
+      var btn = document.createElement('button');
+      btn.textContent = text;
+      btn.onclick = onclick;
+      if (className) btn.className = className;
+      if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
+      btn.onkeydown = function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onclick(e);
+        }
+      };
+      return btn;
+    }
+
+    var app = safeGetElement('app');
+    var screen = safeGetElement('screen');
+    var stageLabel = safeGetElement('stageLabel');
+    var bar = safeGetElement('bar');
+    var rulesCard = safeGetElement('rulesCard');
 
     var state = {
       step: 0,
@@ -431,11 +495,19 @@
 5. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
 
     function toggleRules() {
-      if (rulesCard.classList.contains('hidden')) {
-        rulesCard.classList.remove('hidden');
-        rulesCard.innerHTML = '<h2>Sorting Rules Used In This Prototype</h2><pre>' + rulesText + '</pre>';
-      } else {
-        rulesCard.classList.add('hidden');
+      if (!rulesCard) return;
+      try {
+        if (rulesCard.classList.contains('hidden')) {
+          rulesCard.classList.remove('hidden');
+          rulesCard.innerHTML = '<h2>Sorting Rules Used In This Prototype</h2><pre role="doc-example">' + rulesText + '</pre>';
+          rulesCard.setAttribute('role', 'region');
+          rulesCard.setAttribute('aria-label', 'Sorting rules reference');
+        } else {
+          rulesCard.classList.add('hidden');
+          rulesCard.setAttribute('aria-hidden', 'true');
+        }
+      } catch (e) {
+        console.error('Toggle rules failed: ' + e.message);
       }
     }
 
@@ -541,29 +613,42 @@
     ];
 
     function render() {
-      app.classList.remove('hidden');
-      var item = modules[state.step];
-      stageLabel.textContent = item.label;
-      bar.style.width = ((state.step) / (modules.length - 1) * 100) + '%';
+      if (!app || !modules || !modules[state.step]) {
+        console.error('Render failed: missing app or module');
+        return;
+      }
+      try {
+        app.classList.remove('hidden');
+        var item = modules[state.step];
+        if (!validateModule(item)) {
+          console.error('Invalid module at step ' + state.step);
+          return;
+        }
+        if (stageLabel) stageLabel.textContent = item.label;
+        if (bar) bar.style.width = ((state.step) / (modules.length - 1) * 100) + '%';
 
-      if (item.type === 'drag') return renderDrag();
-      if (item.type === 'done') return renderDone();
-      return renderModule(item);
+        if (item.type === 'drag') return renderDrag();
+        if (item.type === 'done') return renderDone();
+        return renderModule(item);
+      } catch (e) {
+        console.error('Render error: ' + e.message);
+      }
     }
 
     function renderModule(module) {
+      if (!screen) return;
       if (state.phase === 'teach') {
         screen.innerHTML =
           '<h2>' + module.title + '</h2>' +
           module.teach +
-          '<div class="mastery">' + module.masteryText + ' Current streak: ' + state.streak + '</div>' +
-          '<button onclick="showWorked()">Continue</button>';
+          '<div class="mastery" role="status" aria-live="polite">' + module.masteryText + ' Current streak: ' + state.streak + '</div>' +
+          '<button onclick="showWorked()" aria-label="Continue to worked example">Continue</button>';
       } else if (state.phase === 'worked') {
         screen.innerHTML =
           '<h2>' + module.title + '</h2>' +
           module.worked +
-          '<div class="mastery">' + module.masteryText + ' Current streak: ' + state.streak + '</div>' +
-          '<button onclick="showPractice()">Continue</button>';
+          '<div class="mastery" role="status" aria-live="polite">' + module.masteryText + ' Current streak: ' + state.streak + '</div>' +
+          '<button onclick="showPractice()" aria-label="Continue to practice questions">Continue</button>';
       } else {
         renderPracticeQuestion(module);
       }
@@ -582,8 +667,14 @@
     }
 
     function renderPracticeQuestion(module) {
+      if (!screen) return;
       if (!state.currentQuestion) {
-        state.currentQuestion = module.questions[Math.floor(Math.random() * module.questions.length)];
+        var questions = module.questions || [];
+        if (questions.length === 0) {
+          console.error('No questions in module');
+          return;
+        }
+        state.currentQuestion = questions[Math.floor(Math.random() * questions.length)];
         state.tryCount = 0;
       }
 
@@ -592,43 +683,55 @@
       screen.innerHTML =
         '<h2>' + module.title + '</h2>' +
         '<p><strong>' + q.prompt + '</strong></p>' +
-        '<div id="choices"></div>' +
-        '<div id="feedback"></div>' +
-        '<div class="mastery">' + module.masteryText + ' Current streak: ' + state.streak + '</div>';
+        '<div id="choices" role="group" aria-label="Answer choices"></div>' +
+        '<div id="feedback" role="alert" aria-live="assertive"></div>' +
+        '<div class="mastery" role="status" aria-live="polite">' + module.masteryText + ' Current streak: ' + state.streak + '</div>';
 
-      var choicesDiv = document.getElementById('choices');
+      var choicesDiv = safeGetElement('choices');
+      if (!choicesDiv) return;
 
       q.choices.forEach(function(choice, i) {
         var btn = document.createElement('button');
         btn.className = 'choice';
         btn.textContent = choice;
-        btn.onclick = function() {
-          handleAnswer(i);
+        btn.setAttribute('aria-label', 'Option ' + (i + 1) + ': ' + choice);
+        btn.onclick = function() { handleAnswer(i); };
+        btn.onkeydown = function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleAnswer(i);
+          }
         };
         choicesDiv.appendChild(btn);
       });
     }
 
     function disableChoices() {
-      document.querySelectorAll('.choice').forEach(function(btn) {
+      safeQuery('.choice').forEach(function(btn) {
         btn.disabled = true;
       });
     }
 
     function handleAnswer(index) {
+      if (!modules || !modules[state.step] || !state.currentQuestion) {
+        console.error('HandleAnswer failed: invalid state');
+        return;
+      }
       var module = modules[state.step];
       var q = state.currentQuestion;
-      var feedback = document.getElementById('feedback');
+      var feedback = safeGetElement('feedback');
+      if (!feedback) return;
 
       if (index === q.answer) {
         state.score++;
         state.streak++;
         feedback.className = 'feedback good';
+        feedback.setAttribute('role', 'alert');
         feedback.innerHTML =
           'Correct. ' + q.explain + '<br><br>' +
           (state.streak >= 3
-            ? '<button onclick="advanceModule()">Pass Lesson</button>'
-            : '<button onclick="nextQuestion()">Next Similar Problem</button>');
+            ? '<button onclick="advanceModule()" aria-label="Pass lesson and advance to next module">Pass Lesson</button>'
+            : '<button onclick="nextQuestion()" aria-label="Continue to next practice question">Next Similar Problem</button>');
         disableChoices();
       } else {
         state.streak = 0;
@@ -636,15 +739,17 @@
 
         if (state.tryCount === 1) {
           feedback.className = 'feedback bad';
+          feedback.setAttribute('role', 'alert');
           feedback.innerHTML =
             'Not quite. ' + explainDifference(q.choices[q.answer], q.choices[index]) +
             '<br><br>Try again before the answer is revealed.';
         } else {
           feedback.className = 'feedback bad';
+          feedback.setAttribute('role', 'alert');
           feedback.innerHTML =
             'Not quite. The correct answer is <code class="call">' + q.choices[q.answer] + '</code>.<br><br>' +
             q.explain +
-            '<br><br><button onclick="nextQuestion()">Try Another Similar Problem</button>';
+            '<br><br><button onclick="nextQuestion()" aria-label="Try another similar problem">Try Another Similar Problem</button>';
           disableChoices();
         }
       }
@@ -657,6 +762,10 @@
     }
 
     function advanceModule() {
+      if (!modules || state.step >= modules.length) {
+        console.error('Invalid module progression');
+        return;
+      }
       state.step++;
       state.phase = 'teach';
       state.streak = 0;
@@ -666,17 +775,27 @@
     }
 
     function startTraining() {
-      state.step = 0;
-      state.phase = 'teach';
-      state.score = 0;
-      state.streak = 0;
-      state.tryCount = 0;
-      state.currentQuestion = null;
-      render();
+      try {
+        if (!modules || modules.length === 0) {
+          console.error('No modules available');
+          return;
+        }
+        state.step = 0;
+        state.phase = 'teach';
+        state.score = 0;
+        state.streak = 0;
+        state.tryCount = 0;
+        state.currentQuestion = null;
+        render();
+      } catch (e) {
+        console.error('Start training failed: ' + e.message);
+      }
     }
 
     function shuffle(arr) {
+      if (!arr || arr.length === 0) return [];
       var copy = arr.slice();
+      // Fisher-Yates shuffle algorithm
       for (var i = copy.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
         var temp = copy[i];
@@ -687,59 +806,126 @@
     }
 
     function makeDraggable(text, id) {
+      if (!text || !id) {
+        console.warn('makeDraggable: missing text or id');
+        return null;
+      }
       var div = document.createElement('div');
       div.className = 'draggable';
       div.draggable = true;
+      div.tabIndex = 0;
       div.id = id;
       div.setAttribute('data-value', text);
+      div.setAttribute('role', 'button');
+      div.setAttribute('aria-label', 'Draggable item: ' + text);
       div.textContent = text;
       return div;
     }
 
     function makeSlot(n) {
+      if (!n || n < 1) {
+        console.warn('makeSlot: invalid position');
+        return null;
+      }
       var div = document.createElement('div');
       div.className = 'slot';
+      div.tabIndex = 0;
+      div.setAttribute('role', 'region');
+      div.setAttribute('aria-label', 'Drop zone position ' + n);
       div.innerHTML = '<div class="slotlabel">Position ' + n + '</div>';
       return div;
     }
 
     function enableDnD() {
-      document.querySelectorAll('.draggable').forEach(function(el) {
+      var draggedElement = null;
+
+      function startDrag(el) {
+        draggedElement = el;
+        el.classList.add('dragging');
+        if (el.dataTransfer) el.dataTransfer.effectAllowed = 'move';
+      }
+
+      function stopDrag(el) {
+        if (el === draggedElement) draggedElement = null;
+        el.classList.remove('dragging');
+      }
+
+      safeQuery('.draggable').forEach(function(el) {
         el.addEventListener('dragstart', function(e) {
-          e.dataTransfer.setData('text/plain', this.id);
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.id);
+          }
+          startDrag(this);
         });
+
+        el.addEventListener('dragend', function(e) {
+          stopDrag(this);
+        });
+
+        // Touch support
+        el.addEventListener('touchstart', function(e) {
+          startDrag(this);
+          draggedElement = this;
+        }, false);
+
+        el.addEventListener('touchend', function(e) {
+          stopDrag(this);
+          draggedElement = null;
+        }, false);
       });
 
-      document.querySelectorAll('.slot').forEach(function(target) {
+      safeQuery('.slot').forEach(function(target) {
         target.addEventListener('dragover', function(e) {
           e.preventDefault();
+          this.classList.add('drag-over');
+        });
+
+        target.addEventListener('dragleave', function(e) {
+          this.classList.remove('drag-over');
         });
 
         target.addEventListener('drop', function(e) {
           e.preventDefault();
+          this.classList.remove('drag-over');
+          if (!e.dataTransfer) return;
           var id = e.dataTransfer.getData('text/plain');
-          var el = document.getElementById(id);
+          var el = safeGetElement(id);
           if (!el) return;
-
+          var bank = safeGetElement('bank');
           var existing = this.querySelector('.draggable');
-          if (existing) document.getElementById('bank').appendChild(existing);
+          if (existing && bank) bank.appendChild(existing);
           this.appendChild(el);
+        });
+
+        // Touch support for slots
+        target.addEventListener('touchover', function(e) {
+          this.classList.add('drag-over');
+        });
+
+        target.addEventListener('touchleave', function(e) {
+          this.classList.remove('drag-over');
         });
       });
 
-      document.getElementById('bank').addEventListener('dragover', function(e) {
-        e.preventDefault();
-      });
+      var bank = safeGetElement('bank');
+      if (bank) {
+        bank.addEventListener('dragover', function(e) {
+          e.preventDefault();
+        });
 
-      document.getElementById('bank').addEventListener('drop', function(e) {
-        e.preventDefault();
-        var id = e.dataTransfer.getData('text/plain');
-        var el = document.getElementById(id);
-        if (el) this.appendChild(el);
-      });
+        bank.addEventListener('drop', function(e) {
+          e.preventDefault();
+          if (!e.dataTransfer) return;
+          var id = e.dataTransfer.getData('text/plain');
+          var el = safeGetElement(id);
+          if (el) this.appendChild(el);
+        });
+      }
     }
 
     function renderDrag() {
+      if (!screen) return;
       var items = [
         'M 3 .C4 1993 SER.VI V.69A',
         'M 2.3 .U6 R4 V.66',
@@ -753,20 +939,24 @@
 
       screen.innerHTML =
         '<h2>Final Activity</h2>' +
-        '<p>Drag each call number into the slots from first to last.</p>' +
+        '<p>Drag each call number into the slots from first to last. Keyboard: Use Tab to focus, Enter to select.</p>' +
         '<h3>Call Number Bank</h3>' +
-        '<div class="sortbank" id="bank"></div>' +
+        '<div class="sortbank" id="bank" role="region" aria-label="Draggable call numbers"></div>' +
         '<h3>Order Slots</h3>' +
-        '<div class="sortslots" id="slots"></div>' +
-        '<div id="dragFeedback"></div>' +
+        '<div class="sortslots" id="slots" role="region" aria-label="Drop zones for ordering"></div>' +
+        '<div id="dragFeedback" role="alert" aria-live="assertive"></div>' +
         '<div style="margin-top:14px;">' +
-          '<button id="checkDrag">Check Order</button> ' +
-          '<button id="resetDrag" class="secondary">Reset</button>' +
+          '<button id="checkDrag" aria-label="Check if the order is correct">Check Order</button> ' +
+          '<button id="resetDrag" class="secondary" aria-label="Reset all items to the bank">Reset</button>' +
         '</div>';
 
-      var bank = document.getElementById('bank');
-      var slots = document.getElementById('slots');
-      var dragFeedback = document.getElementById('dragFeedback');
+      var bank = safeGetElement('bank');
+      var slots = safeGetElement('slots');
+      var dragFeedback = safeGetElement('dragFeedback');
+      var checkBtn = safeGetElement('checkDrag');
+      var resetBtn = safeGetElement('resetDrag');
+
+      if (!bank || !slots) return;
 
       shuffled.forEach(function(item, i) {
         bank.appendChild(makeDraggable(item, 'item-' + i));
@@ -778,51 +968,62 @@
 
       enableDnD();
 
-      document.getElementById('resetDrag').onclick = function() {
-        renderDrag();
-      };
+      if (resetBtn) {
+        resetBtn.onclick = function() { renderDrag(); };
+      }
 
-      document.getElementById('checkDrag').onclick = function() {
-        var chosen = [];
-        slots.querySelectorAll('.slot').forEach(function(slot) {
-          var item = slot.querySelector('.draggable');
-          if (item) chosen.push(item.getAttribute('data-value'));
-        });
+      if (checkBtn) {
+        checkBtn.onclick = function() {
+          var chosen = [];
+          safeQuery('.slot').forEach(function(slot) {
+            var item = slot.querySelector('.draggable');
+            if (item) chosen.push(item.getAttribute('data-value'));
+          });
 
-        if (chosen.length !== items.length) {
-          dragFeedback.className = 'feedback warn';
-          dragFeedback.textContent = 'Please place every call number into a slot before checking the order.';
-          return;
-        }
-
-        var ok = true;
-        for (var i = 0; i < chosen.length; i++) {
-          if (chosen[i] !== correct[i]) {
-            ok = false;
-            break;
+          if (chosen.length !== items.length) {
+            if (dragFeedback) {
+              dragFeedback.className = 'feedback warn';
+              dragFeedback.textContent = 'Please place every call number into a slot before checking the order.';
+            }
+            return;
           }
-        }
 
-        if (ok) state.score++;
+          var ok = true;
+          for (var i = 0; i < chosen.length; i++) {
+            if (chosen[i] !== correct[i]) {
+              ok = false;
+              break;
+            }
+          }
 
-        dragFeedback.className = ok ? 'feedback good' : 'feedback bad';
-        dragFeedback.innerHTML = ok
-          ? 'Correct. You placed the scores in the right order.<br><br><button onclick="finishTraining()">Finish</button>'
-          : 'Not quite. The correct order is:<br>' + correct.map(function(x) { return '<code class="call">' + x + '</code>'; }).join(' ') + '<br><br><button onclick="finishTraining()">Continue</button>';
-      };
+          if (ok) state.score++;
+
+          if (dragFeedback) {
+            dragFeedback.className = ok ? 'feedback good' : 'feedback bad';
+            dragFeedback.innerHTML = ok
+              ? 'Correct. You placed the call numbers in the right order.<br><br><button onclick="finishTraining()" aria-label="Finish training">Finish</button>'
+              : 'Not quite. The correct order is:<br>' + correct.map(function(x) { return '<code class="call">' + x + '</code>'; }).join(' ') + '<br><br><button onclick="finishTraining()" aria-label="Continue anyway">Continue</button>';
+          }
+        };
+      }
     }
 
     function finishTraining() {
+      if (!modules || state.step >= modules.length - 1) {
+        console.error('Cannot advance past final module');
+        return;
+      }
       state.step++;
       render();
     }
 
     function renderDone() {
+      if (!screen) return;
       screen.innerHTML =
         '<h2>Training Complete</h2>' +
         '<p>You finished the current prototype.</p>' +
-        '<div class="feedback good">Score: ' + state.score + '</div>' +
-        '<button onclick="startTraining()">Restart</button>';
+        '<div class="feedback good" role="status">Score: ' + state.score + '</div>' +
+        '<button onclick="startTraining()" aria-label="Restart the training from the beginning">Restart</button>';
     }
   </script>
 </body>
