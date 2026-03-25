@@ -124,6 +124,16 @@
       transition: width .2s ease;
     }
 
+    .mastery {
+      margin: 0 0 14px 0;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: .96rem;
+      color: var(--muted);
+    }
+
     button {
       border: none;
       border-radius: 12px;
@@ -236,6 +246,21 @@
       min-width: 56px;
     }
 
+    .hint-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 14px 0;
+    }
+
+    .why-box {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(0,0,0,.08);
+      font-weight: 500;
+    }
+
     .sortbank, .sortslots {
       display: flex;
       flex-wrap: wrap;
@@ -275,10 +300,30 @@
       letter-spacing: .04em;
     }
 
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: .96rem;
+    }
+
+    .token-table th,
+    .token-table td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .token-table th {
+      background: #f8fafc;
+    }
+
     @media (max-width: 800px) {
       .compare-grid {
         grid-template-columns: 1fr;
       }
+
       .compare-arrow {
         min-height: 40px;
       }
@@ -294,9 +339,9 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="version">Version 5.1</div>
+      <div class="version">Version 6.0</div>
       <h1>Shelf It Right</h1>
-      <p>This version leans harder into teaching. It gives worked examples, repeated practice, error-specific feedback, a cumulative checkpoint, and a final sorting activity using realistic music-score call numbers.</p>
+      <p>This version shifts from a quick demo toward mastery-based training. Each lesson teaches, shows a worked example, gives guided practice, then keeps serving similar problems until the learner passes.</p>
 
       <div class="info-box">
         <strong>What This Covers</strong>
@@ -306,9 +351,9 @@
       </div>
 
       <div class="info-box">
-        <strong>How This Version Is Different</strong>
+        <strong>How This Version Teaches</strong>
         <div>
-          Each concept teaches first, then walks through a worked example, then gives multiple practice questions, then checks cumulative understanding before the final drag-and-drop exercise.
+          Each lesson now includes a worked example, guided practice, a mastery target, error-specific feedback, and repeated similar problems until the learner passes that skill.
         </div>
       </div>
 
@@ -345,7 +390,10 @@
       substep: 0,
       score: 0,
       totalScored: 0,
-      tryCount: 0
+      tryCount: 0,
+      lessonCorrect: 0,
+      lessonAttempts: 0,
+      currentQuestion: null
     };
 
     function romanToInt(r) {
@@ -466,10 +514,6 @@
       return compareStrings(a || '', b || '');
     }
 
-    function getVal(obj, key) {
-      return obj && obj[key] !== undefined ? obj[key] : null;
-    }
-
     function compareLine4(a, b) {
       var x = a.line4;
       var y = b.line4;
@@ -510,37 +554,62 @@
       return '.' + c.letters + c.num + c.suffix;
     }
 
-    function explainDifference(aRaw, bRaw) {
-      var a = parseCallNumber(aRaw);
-      var b = parseCallNumber(bRaw);
+    function explainDifference(correctRaw, chosenRaw) {
+      var a = parseCallNumber(correctRaw);
+      var b = parseCallNumber(chosenRaw);
 
       if (a.classLetters !== b.classLetters) {
         return 'Start with the class. The class does not match, so class decides the order first.';
       }
 
       if (a.whole !== b.whole) {
-        return 'Start with the class number. ' + a.whole + ' comes before ' + b.whole + '.';
+        return 'You should stop at the class number here. ' + a.whole + ' comes before ' + b.whole + '.';
       }
 
       if (compareCutter(a.firstCutter, b.firstCutter) !== 0) {
-        return 'The class number matches, so compare the first cutter. ' + formatCutter(a.firstCutter) + ' comes before ' + formatCutter(b.firstCutter) + '.';
+        return 'The class number matches, so the first cutter decides it. ' + formatCutter(a.firstCutter) + ' comes before ' + formatCutter(b.firstCutter) + '.';
       }
 
       if ((a.laterWork || '') !== (b.laterWork || '')) {
-        return 'The earlier parts match, so compare the later work-like element next.';
+        return 'The earlier parts match, so the later work-like element decides it here.';
       }
 
       if (a.year !== b.year) {
-        return 'The earlier parts match, so compare the year. ' + a.year + ' comes before ' + b.year + '.';
+        return 'The earlier parts match, so the year decides it. ' + a.year + ' comes before ' + b.year + '.';
       }
 
-      return 'The earlier parts match, so compare the later-line details such as series, band, volume, part, fascicle, section, or structured work mark.';
+      return 'The earlier parts match, so you have to compare the later-line details such as series, band, volume, part, fascicle, section, or structured work mark.';
     }
 
     function inferErrorReason(questionObj, chosenIndex) {
       var chosen = questionObj.choices[chosenIndex];
       var correct = questionObj.choices[questionObj.answer];
       return explainDifference(correct, chosen);
+    }
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getLessonMasteryText(module) {
+      return 'Lesson progress: ' + state.lessonCorrect + ' correct out of ' + state.lessonAttempts + ' attempts. Pass target: ' + module.mastery.passText + '.';
+    }
+
+    function lessonPassed(module) {
+      if (module.mastery.type === 'streak') {
+        return state.lessonCorrect >= module.mastery.target;
+      }
+      if (module.mastery.type === 'ratio') {
+        return state.lessonAttempts >= module.mastery.minAttempts && state.lessonCorrect >= module.mastery.target;
+      }
+      return false;
+    }
+
+    function resetLessonMastery() {
+      state.lessonCorrect = 0;
+      state.lessonAttempts = 0;
+      state.tryCount = 0;
+      state.currentQuestion = null;
     }
 
     var rulesText = `Local practice used in this prototype
@@ -621,7 +690,20 @@
           winner: 'left',
           explanation: 'Start with the class number. 2.3 comes before 3. Stop there. Do not look at cutters yet.'
         },
-        practice: [
+        guided: [
+          {
+            prompt: 'Guided practice: which one comes first?',
+            hint: 'Do not look at the cutter yet. Let the class number decide it.',
+            choices: [
+              'M 452 .H42 H.III:E2',
+              'M 3 .B103 2005 SER.8 V.2',
+              'M 2 .G39 1966 BD.23'
+            ],
+            answer: 2,
+            correctExplain: 'Start with the class number. 2 comes before 3, and 3 comes before 452.'
+          }
+        ],
+        pool: [
           {
             prompt: 'Which call number should shelve first?',
             choices: [
@@ -641,8 +723,19 @@
             ],
             answer: 1,
             correctExplain: 'Start with the class number. 2 comes before 3.'
+          },
+          {
+            prompt: 'Which call number should shelve first?',
+            choices: [
+              'M 452 .H42 H.III:E2',
+              'M 2 .G39 1966 BD.23',
+              'M 2.3 .U6 R4 V.66'
+            ],
+            answer: 1,
+            correctExplain: 'Start with the class number. 2 comes before 2.3, and both come before 452.'
           }
-        ]
+        ],
+        mastery: { type: 'streak', target: 3, passText: '3 correct in a row' }
       },
       {
         label: 'Module 2',
@@ -664,7 +757,20 @@
           winner: 'left',
           explanation: 'The class number matches, so compare the first cutter. B comes before C.'
         },
-        practice: [
+        guided: [
+          {
+            prompt: 'Guided practice: which one comes first?',
+            hint: 'All of these are M 3. The class number is done. Use the first cutter only.',
+            choices: [
+              'M 3 .O35 1994 SER.II FASC.3',
+              'M 3 .H26 SER.2 BD.8 2008',
+              'M 3 .S36 ABT.5 REIHE B BD.26 T.2'
+            ],
+            answer: 1,
+            correctExplain: 'All three are M 3, so compare the first cutter. H comes before O and S.'
+          }
+        ],
+        pool: [
           {
             prompt: 'Which call number comes first within M 3?',
             choices: [
@@ -684,8 +790,29 @@
             ],
             answer: 1,
             correctExplain: 'All three are M 3, so compare the first cutter. H comes before O and S.'
+          },
+          {
+            prompt: 'Which call number comes first within M 3?',
+            choices: [
+              'M 3 .B88R BD.20 PTS.1-6',
+              'M 3 .C4 1993 SER.VI V.69A',
+              'M 3 .H26 SER.2 BD.8 2008'
+            ],
+            answer: 0,
+            correctExplain: 'All three are M 3, so compare the first cutter. B comes before C and H.'
+          },
+          {
+            prompt: 'Which call number comes first within M 3?',
+            choices: [
+              'M 3 .B103 2005 SER.8 V.2',
+              'M 3 .B1133 SER.I BD.32 PT.1',
+              'M 3 .B88R BD.20 PTS.1-6'
+            ],
+            answer: 0,
+            correctExplain: 'All three are M 3. In this prototype, .B103 comes before .B1133, and both come before .B88R.'
           }
-        ]
+        ],
+        mastery: { type: 'ratio', target: 4, minAttempts: 5, passText: '4 correct out of 5' }
       },
       {
         label: 'Module 3',
@@ -702,7 +829,20 @@
           winner: 'left',
           explanation: 'The class number and first cutter match, so compare the year. 1994 comes before 2001.'
         },
-        practice: [
+        guided: [
+          {
+            prompt: 'Guided practice: which one comes first?',
+            hint: 'The first cutter matches. Do not go back to it. Look at what comes next.',
+            choices: [
+              'M 2.3 .U6 R4 V.66',
+              'M 2.3 .U6 R7 V.66',
+              'M 3 .B103 2005 SER.8 V.2'
+            ],
+            answer: 0,
+            correctExplain: 'The class number and first cutter match for the first two. In this prototype, compare the later work-like element next. R4 comes before R7.'
+          }
+        ],
+        pool: [
           {
             prompt: 'Which one should shelve first?',
             choices: [
@@ -722,8 +862,19 @@
             ],
             answer: 0,
             correctExplain: 'The class number and first cutter match for the first two. In this prototype, compare the later work-like element next. R4 comes before R7.'
+          },
+          {
+            prompt: 'Which call number comes first?',
+            choices: [
+              'M 3 .O35 2005 SER.II FASC.3',
+              'M 3 .O35 1998 SER.II FASC.3',
+              'M 3 .O35 2010 SER.II FASC.3'
+            ],
+            answer: 1,
+            correctExplain: 'The class number and first cutter match, so the year decides it. 1998 comes first.'
           }
-        ]
+        ],
+        mastery: { type: 'ratio', target: 4, minAttempts: 5, passText: '4 correct out of 5' }
       },
       {
         label: 'Module 4',
@@ -739,7 +890,20 @@
           winner: 'left',
           explanation: 'The earlier parts match, so compare the later-line detail. SER.I comes before SER.VI.'
         },
-        practice: [
+        guided: [
+          {
+            prompt: 'Guided practice: which one comes first?',
+            hint: 'The class number and cutter match. The series is what matters here.',
+            choices: [
+              'M 3 .B1133 SER.I BD.32 PT.1',
+              'M 3 .B1133 SER.II BD.32 PT.1',
+              'M 3 .B1133 SER.VI BD.32 PT.1'
+            ],
+            answer: 0,
+            correctExplain: 'The class number and cutter match. Compare the series. SER.I comes before SER.II and SER.VI.'
+          }
+        ],
+        pool: [
           {
             prompt: 'Which call number comes first?',
             choices: [
@@ -759,8 +923,19 @@
             ],
             answer: 0,
             correctExplain: 'The earlier parts match, so compare the later-line details. BD.20 comes before BD.26. If BD matched, the part range would be read by its starting value.'
+          },
+          {
+            prompt: 'Which call number comes first?',
+            choices: [
+              'M 452 .H42 H.I:E2',
+              'M 452 .H42 H.II:E2',
+              'M 452 .H42 H.III:E2'
+            ],
+            answer: 0,
+            correctExplain: 'The earlier parts match. Roman numerals are converted to numbers. I comes before II, which comes before III.'
           }
-        ]
+        ],
+        mastery: { type: 'ratio', target: 4, minAttempts: 5, passText: '4 correct out of 5' }
       },
       {
         label: 'Cumulative Checkpoint',
@@ -779,31 +954,17 @@
     state.totalScored = 0;
     for (var m = 0; m < modules.length; m++) {
       if (!modules[m].type) {
-        state.totalScored += modules[m].practice.length;
+        state.totalScored += modules[m].mastery.minAttempts || modules[m].mastery.target;
       }
     }
     state.totalScored += 2;
 
-    function setProgress() {
-      bar.style.width = ((state.step) / (modules.length - 1) * 100) + '%';
-    }
-
-    function nextStep() {
-      state.substep++;
-      render();
-    }
-
-    function nextModule() {
-      state.step++;
-      state.substep = 0;
-      render();
-    }
-
-    function disableChoices() {
-      var buttons = document.querySelectorAll('.choice');
-      for (var i = 0; i < buttons.length; i++) {
-        buttons[i].disabled = true;
-      }
+    function renderTeach(module) {
+      screen.innerHTML =
+        '<h2>' + module.title + '</h2>' +
+        module.teach +
+        '<div class="mastery">' + getLessonMasteryText(module) + '</div>' +
+        '<button onclick="nextStep()">Continue</button>';
     }
 
     function renderWorkedExample(module) {
@@ -824,19 +985,46 @@
           '</div>' +
         '</div>' +
         '<div class="feedback good">' + ex.explanation + '</div>' +
+        '<div class="mastery">' + getLessonMasteryText(module) + '</div>' +
         '<button onclick="nextStep()">Continue</button>';
     }
 
-    function renderPractice(module, questionIndex) {
+    function renderGuided(module) {
       state.tryCount = 0;
-      var q = module.practice[questionIndex];
+      var q = module.guided[0];
+      state.currentQuestion = q;
 
       screen.innerHTML =
-        '<h2>Practice</h2>' +
+        '<h2>Guided Practice</h2>' +
+        '<p>' + q.prompt + '</p>' +
+        '<div class="hint-box"><strong>Hint:</strong> ' + q.hint + '</div>' +
+        '<div id="choices"></div>' +
+        '<div id="feedback"></div>' +
+        '<div class="mastery">' + getLessonMasteryText(module) + '</div>';
+
+      renderChoices(q, true);
+    }
+
+    function renderIndependent(module) {
+      if (!state.currentQuestion || state.currentQuestion.locked) {
+        state.currentQuestion = pickRandom(module.pool);
+        state.currentQuestion.locked = true;
+        state.tryCount = 0;
+      }
+
+      var q = state.currentQuestion;
+
+      screen.innerHTML =
+        '<h2>Independent Practice</h2>' +
         '<p>' + q.prompt + '</p>' +
         '<div id="choices"></div>' +
-        '<div id="feedback"></div>';
+        '<div id="feedback"></div>' +
+        '<div class="mastery">' + getLessonMasteryText(module) + '</div>';
 
+      renderChoices(q, false);
+    }
+
+    function renderChoices(q, guided) {
       var choices = document.getElementById('choices');
       var feedback = document.getElementById('feedback');
 
@@ -847,29 +1035,60 @@
           btn.textContent = q.choices[choiceIndex];
           btn.onclick = function() {
             var correct = choiceIndex === q.answer;
+
             if (correct) {
               state.score++;
+              state.lessonCorrect++;
+              state.lessonAttempts++;
+
               feedback.className = 'feedback good';
               feedback.innerHTML =
                 'Correct. ' + q.correctExplain +
-                '<br><br><button onclick="nextStep()">Continue</button>';
+                '<div class="why-box"><strong>Why:</strong> ' + explainDifference(q.choices[q.answer], q.choices[(q.answer + 1) % q.choices.length]) + '</div>';
+
               disableChoices();
+
+              if (guided) {
+                feedback.innerHTML += '<br><button onclick="nextStep()">Continue</button>';
+              } else {
+                state.currentQuestion = null;
+                if (lessonPassed(modules[state.step])) {
+                  feedback.innerHTML += '<br><br><button onclick="nextModule()">Pass Lesson</button>';
+                } else {
+                  feedback.innerHTML += '<br><br><button onclick="render()">Next Similar Problem</button>';
+                }
+              }
             } else {
               state.tryCount++;
               var reason = inferErrorReason(q, choiceIndex);
+
               if (state.tryCount === 1) {
                 feedback.className = 'feedback bad';
                 feedback.innerHTML =
                   'Not quite. ' + reason +
-                  '<br><br>Try again before the answer is revealed.';
+                  '<div class="why-box"><strong>What happened:</strong> You used the wrong layer to decide the order, or you stopped one step too soon.</div>' +
+                  '<br>Try again before the answer is revealed.';
               } else {
+                state.lessonAttempts++;
                 feedback.className = 'feedback bad';
                 feedback.innerHTML =
                   'Not quite. The correct answer is:' +
                   '<br><br><code class="call">' + q.choices[q.answer] + '</code>' +
                   '<br><br>' + q.correctExplain +
-                  '<br><br><button onclick="nextStep()">Continue</button>';
+                  '<div class="why-box"><strong>Why that answer is right:</strong> ' + explainDifference(q.choices[q.answer], q.choices[choiceIndex]) + '</div>';
+
                 disableChoices();
+
+                if (guided) {
+                  feedback.innerHTML += '<br><br><button onclick="nextStep()">Continue</button>';
+                } else {
+                  state.currentQuestion = null;
+                  if (lessonPassed(modules[state.step])) {
+                    feedback.innerHTML += '<br><br><button onclick="nextModule()">Pass Lesson</button>';
+                  } else {
+                    feedback.innerHTML += '<br><br><button onclick="render()">Try Another Similar Problem</button>';
+                  }
+                }
               }
             }
           };
@@ -878,23 +1097,11 @@
       }
     }
 
-    function renderTeach(module) {
-      screen.innerHTML =
-        '<h2>' + module.title + '</h2>' +
-        module.teach +
-        '<button onclick="nextStep()">Continue</button>';
-    }
-
     function renderModule(module) {
-      var practiceStart = 2;
-      var practiceCount = module.practice.length;
-
       if (state.substep === 0) return renderTeach(module);
       if (state.substep === 1) return renderWorkedExample(module);
-      if (state.substep >= practiceStart && state.substep < practiceStart + practiceCount) {
-        return renderPractice(module, state.substep - practiceStart);
-      }
-      return nextModule();
+      if (state.substep === 2) return renderGuided(module);
+      return renderIndependent(module);
     }
 
     function renderCumulative() {
@@ -942,6 +1149,7 @@
           btn.innerHTML = options[optionIndex].map(function(x){ return '<code class="call">' + x + '</code>'; }).join(' &rarr; ');
           btn.onclick = function() {
             var correct = optionIndex === correctIndex;
+
             if (correct) {
               state.score++;
               feedback.className = 'feedback good';
@@ -1116,7 +1324,15 @@
         '<p>You completed the current training sequence.</p>' +
         '<div class="feedback good">Score: ' + state.score + ' / ' + state.totalScored + '</div>' +
         '<p class="small">Completion score: ' + percent + '%</p>' +
-        '<p style="margin-top:16px;">This version is stronger as a learning module, but the exact sorting behavior still needs to be checked against local Music Library practice before it is treated as final.</p>' +
+        '<table class="token-table">' +
+          '<tr><th>What This Version Adds</th><th>What It Means</th></tr>' +
+          '<tr><td>Worked examples</td><td>Each concept is demonstrated before the learner is tested.</td></tr>' +
+          '<tr><td>Guided practice</td><td>The learner gets hints before going fully independent.</td></tr>' +
+          '<tr><td>Repeated similar problems</td><td>Lessons keep serving the same kind of problem until the learner passes.</td></tr>' +
+          '<tr><td>Error-specific feedback</td><td>Wrong answers point back to the exact layer that was missed.</td></tr>' +
+          '<tr><td>Mastery targets</td><td>Lessons do not unlock just because the learner reached the end of the screen flow.</td></tr>' +
+        '</table>' +
+        '<p style="margin-top:16px;">This version is much closer to a true learning module, but the exact sorting behavior still needs to be checked against local Music Library practice before it is treated as final.</p>' +
         '<div class="row">' +
           '<div class="col"><button onclick="startTraining()">Restart</button></div>' +
           '<div class="col"><button class="secondary" onclick="toggleRules()">Review Rules</button></div>' +
@@ -1140,6 +1356,21 @@
       state.substep = 0;
       state.score = 0;
       state.tryCount = 0;
+      state.lessonCorrect = 0;
+      state.lessonAttempts = 0;
+      state.currentQuestion = null;
+      render();
+    }
+
+    function nextStep() {
+      state.substep++;
+      render();
+    }
+
+    function nextModule() {
+      state.step++;
+      state.substep = 0;
+      resetLessonMastery();
       render();
     }
   </script>
