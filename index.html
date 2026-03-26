@@ -429,7 +429,7 @@
 <body>
   <div class="wrap">
     <div class="card no-print">
-      <div class="version">Version 9.0 - Dynamic Generation Engine</div>
+      <div class="version">Version 10.0 - Fact-Checked Dynamics</div>
       <h1>Shelf It Right</h1>
       <p>Library training for identifying work IDs and correctly shelving music scores.</p>
 
@@ -457,6 +457,7 @@
         <div>
           <p><strong>Whole number</strong><br>The number after the class.<br>Examples: <code class="call">M 2</code>, <code class="call">M 2.3</code>, <code class="call">M 3</code></p>
           <p><strong>First cutter</strong><br>The first letter-number group after the class number.<br>Examples: <code class="call">.B103</code>, <code class="call">.C4</code>, <code class="call">.S36</code></p>
+          <p><strong>Work ID</strong><br>Thematic catalogs (like BWV) or Opus numbers. These often come right after the cutter.<br>Example: <code class="call">BWV 846</code> in <code class="call">M 22 .B3 BWV 846</code></p>
           <p><strong>Later work element</strong><br>A short work-style code that comes after the first cutter in some labels.<br>Example: <code class="call">R4</code> in <code class="call">M 2.3 .U6 R4 V.66</code></p>
           <p><strong>Year</strong><br>The publication year.<br>Example: <code class="call">1994</code></p>
           <p><strong>Later-line details</strong><br>Extra details that appear after the main call number parts.<br>Examples: <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code>, <code class="call">FASC.3</code>, <code class="call">H.III:E2</code></p>
@@ -475,17 +476,17 @@
     <div id="referenceCard" class="card hidden">
       <span class="chip">Quick Reference</span>
       <h2>Music Catalogs &amp; Work IDs</h2>
-      <p class="small">Use these to confirm the exact piece a patron wants. They are not part of the shelving call number.</p>
+      <p class="small">Use these to confirm the exact piece a patron wants. For prolific composers, these are often added directly to the call number to keep works in order.</p>
 
       <div class="reference-grid">
-        <div class="reference-box"><strong>BWV</strong>Bach work ID.<div class="example">Example: BWV 1007</div></div>
-        <div class="reference-box"><strong>K / KV</strong>Mozart work ID.<div class="example">Example: KV 620</div></div>
-        <div class="reference-box"><strong>D.</strong>Schubert work ID.<div class="example">Example: D. 328</div></div>
-        <div class="reference-box"><strong>Hob.</strong>Haydn work ID, often with genre section.<div class="example">Example: Hob. I:104</div></div>
-        <div class="reference-box"><strong>RV</strong>Vivaldi work ID.<div class="example">Example: RV 31</div></div>
-        <div class="reference-box"><strong>HWV</strong>Handel work ID.<div class="example">Example: HWV Anh. B</div></div>
-        <div class="reference-box"><strong>Sz</strong>Bartók work ID.<div class="example">Example: Sz 56</div></div>
-        <div class="reference-box"><strong>B.</strong>Dvořák work ID.<div class="example">Example: B178</div></div>
+        <div class="reference-box"><strong>BWV</strong>Bach work ID.<div class="example">Shelves as: BWV 1007</div></div>
+        <div class="reference-box"><strong>K / KV</strong>Mozart work ID.<div class="example">Shelves as: KV 620</div></div>
+        <div class="reference-box"><strong>D.</strong>Schubert work ID.<div class="example">Shelves as: D. 328</div></div>
+        <div class="reference-box"><strong>Hob.</strong>Haydn work ID, often with genre section.<div class="example">Shelves as: Hob. I:104</div></div>
+        <div class="reference-box"><strong>RV</strong>Vivaldi work ID.<div class="example">Shelves as: RV 31</div></div>
+        <div class="reference-box"><strong>HWV</strong>Handel work ID.<div class="example">Shelves as: HWV Anh. B</div></div>
+        <div class="reference-box"><strong>Sz</strong>Bartók work ID.<div class="example">Shelves as: Sz 56</div></div>
+        <div class="reference-box"><strong>B.</strong>Dvořák work ID.<div class="example">Shelves as: B178</div></div>
       </div>
 
       <div class="table-wrap">
@@ -567,46 +568,45 @@
       var referenceBtn = safeGetElement('referenceBtn');
       var closeReferenceBtn = safeGetElement('closeReferenceBtn');
 
-      var rulesText = `Local practice used in this prototype\n\n1. Start with the class and the whole number.\n   Examples:\n   M 2 comes before M 2.3\n   M 2.3 comes before M 3\n   M 3 comes before M 452\n\n2. If the whole number matches, compare the first cutter.\n   Examples within M 3:\n   .B103 comes before .C4\n   .C4 comes before .H26\n   .H26 comes before .O35\n   .O35 comes before .S36\n\n3. If the earlier parts match, compare later work elements, year, and later-line details.\n\n4. Roman numerals matter in later-line details.\n   Example:\n   SER.I comes before SER.II, which comes before SER.VI\n\n5. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
+      var rulesText = `Local practice used in this prototype\n\n1. Start with the class and the whole number.\n   Examples:\n   M 2 comes before M 2.3\n   M 2.3 comes before M 3\n\n2. If the whole number matches, compare the first cutter.\n   Examples within M 3:\n   .B103 comes before .C4\n   .C4 comes before .H26\n\n3. If the cutter matches, look for a Work ID (Opus, BWV, K, Hob.). Sort these numerically.\n   Example:\n   M 22 .B3 BWV 846 comes before M 22 .B3 BWV 847\n\n4. Next, compare later work elements, year, and later-line details.\n\n5. Roman numerals matter in later-line details.\n   Example:\n   SER.I comes before SER.II, which comes before SER.VI\n\n6. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
 
       var moduleXQuestions = [
         {
           id: 'x1',
-          prompt: 'You see “KV 620” on a case spine. What kind of number is it?',
+          prompt: 'You are shelving two Mozart sonatas: "M 22 .M89 K 331" and "M 22 .M89 K 545". How do you order them?',
           choices: [
-            'A call number used for shelving',
-            'A composer work ID number used to identify a specific piece',
-            'A plate number for the publisher’s printing',
-            'A rehearsal mark inside the score'
+            'K 545 comes first because 5 is bigger than 3.',
+            'K 331 comes first because 331 is numerically smaller than 545.',
+            'Ignore the K number and sort by the publication year instead.',
+            'Sort them alphabetically by the title of the piece.'
           ],
           answer: 1,
-          explain: 'KV/K numbers are work IDs. They help confirm the exact piece. They are not part of the shelving call number.',
+          explain: 'When the class, whole number, and cutter match, you sort numerically by the thematic catalog number (K 331 comes before K 545).',
           _done: false
         },
         {
           id: 'x2',
-          prompt: 'Which one is a general designation, not a composer-specific catalog?',
+          prompt: 'In the call number "M 1001 .H39 Hob.I:94", what does the "Hob." tell you?',
           choices: [
-            'BWV',
-            'RV',
-            'WoO',
-            'Hob.'
+            'It is a general code for "Works without opus number".',
+            'It is Haydn\'s specific thematic catalog identifier, used to sort his works.',
+            'It indicates this is a miniature study score.',
+            'It is the publisher\'s plate number.'
           ],
-          answer: 2,
-          explain: 'WoO means works without opus number. It is a general designation rather than a single composer-specific catalog prefix.',
+          answer: 1,
+          explain: 'Hob. stands for the Hoboken catalog, which is the standard thematic index used to identify and shelf Joseph Haydn\'s compositions.',
           _done: false
         },
         {
           id: 'x3',
-          prompt: 'A patron says, “I need the second movement of this symphony.” Which label helps you point to the spot?',
+          prompt: 'Which call number comes first on the shelf?',
           choices: [
-            'movt.',
-            'ISMN',
-            'BWV',
-            'plate no.'
+            'M 1045 .B4 op. 15',
+            'M 1045 .B4 op. 2',
+            'M 1045 .B4 op. 115'
           ],
-          answer: 0,
-          explain: 'Movement labels tell you where inside the piece you are.',
+          answer: 1,
+          explain: 'Opus numbers are sorted numerically. op. 2 is the smallest number, so it shelves first!',
           _done: false
         }
       ];
@@ -923,22 +923,21 @@
         if (state.phase === 'teach') {
           screen.innerHTML =
             '<h2>Module X: Music Catalogs &amp; Work IDs</h2>' +
-            '<div class="insight-card"><strong>The Golden Rule:</strong> Work IDs are the ultimate "fingerprint" of a piece of music. They help you confirm you have the exact right piece for a patron, but <strong>they are never used in the call number for shelving.</strong></div>' +
-            '<p>Imagine someone asks for "Bach\'s Prelude in C Major". Bach wrote dozens of them! How do you know you are handing them the right book? You check the Work ID.</p>' +
-            '<p>Scholars created special catalog systems for major composers. For example, Bach uses <strong>BWV</strong>, Mozart uses <strong>KV</strong> (or K), and Haydn uses <strong>Hob.</strong></p>' +
+            '<div class="insight-card"><strong>The Golden Rule:</strong> Thematic catalogs (like BWV, KV) and Opus numbers are critical for shelving music. For prolific composers, these IDs are added directly into the call number right after the composer\'s cutter to keep their works in order!</div>' +
+            '<p>Scholars created special catalog systems for major composers. Instead of alphabetizing hundreds of Bach pieces by title, the Library of Congress groups them by their Work ID.</p>' +
             '<div class="compare-box">' +
-              '<div class="compare-label">Composer-Specific vs. General Labels</div>' +
-              '<p>While <strong>BWV</strong> points specifically to Bach, other labels are general. For example, <strong>WoO</strong> stands for "Works without opus number" and is a general designation used across many different composers.</p>' +
-              '<p>You will also see labels that point to a specific spot <em>inside</em> a piece (like <strong>movt.</strong> for movement), or printing details (like <strong>plate no.</strong>).</p>' +
+              '<div class="compare-label">Work IDs in Call Numbers</div>' +
+              '<p>A real call number for Bach looks like this: <code class="call">M 22 .B3 BWV 846</code></p>' +
+              '<p>You sort the Class (M), the Whole Number (22), the Cutter (.B3), and <strong>then</strong> you sort numerically by the Work ID (BWV 846 comes before BWV 847).</p>' +
             '</div>' +
-            '<p>Here are a few common composer catalogs you will see on score covers:</p>' +
+            '<p>Here are the most common composer catalogs you will see right on the spine:</p>' +
             '<div class="reference-grid">' +
-              '<div class="reference-box"><strong>BWV</strong>Bach<div class="example">Example: BWV 1007</div></div>' +
-              '<div class="reference-box"><strong>K / KV</strong>Mozart<div class="example">Example: KV 620</div></div>' +
-              '<div class="reference-box"><strong>Hob.</strong>Haydn<div class="example">Example: Hob. I:104</div></div>' +
-              '<div class="reference-box"><strong>RV</strong>Vivaldi<div class="example">Example: RV 31</div></div>' +
+              '<div class="reference-box"><strong>BWV</strong>Bach<div class="example">Shelves as: BWV 1007</div></div>' +
+              '<div class="reference-box"><strong>K / KV</strong>Mozart<div class="example">Shelves as: K 620</div></div>' +
+              '<div class="reference-box"><strong>Hob.</strong>Haydn<div class="example">Shelves as: Hob. I:104</div></div>' +
+              '<div class="reference-box"><strong>op.</strong>Various (Opus)<div class="example">Shelves as: op. 47</div></div>' +
             '</div>' +
-            '<div class="mastery">Pass target: Answer all 3 questions correctly to prove you understand work IDs before moving on to shelf-reading.</div>' +
+            '<div class="mastery">Pass target: Answer all 3 questions correctly to prove you understand Work IDs before moving on to shelf-reading.</div>' +
             '<div class="inline-actions">' +
               '<button type="button" onclick="window.startModuleXQuiz()">Start Practice</button>' +
               '<button type="button" class="secondary" onclick="window.toggleReference(true)">Open Full Quick Reference</button>' +
