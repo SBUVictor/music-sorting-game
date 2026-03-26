@@ -2,98 +2,271 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SBU Library Training</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SBU Music Library | Master Shelving Certification</title>
   <style>
-    body { font-family: sans-serif; background: #f4f4f4; padding: 40px; color: #333; }
-    .card { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid #ddd; }
-    .pill { border: 2px solid #990000; color: #990000; padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; display: inline-block; }
-    .lesson { background: #F8F2C5; border-left: 5px solid #990000; padding: 15px; margin: 20px 0; }
-    button { background: #990000; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 16px; }
-    .choice { background: white; color: #333; border: 1px solid #ccc; text-align: left; margin-bottom: 10px; }
-    .choice:hover { background: #F8F2C5; }
-    .hidden { display: none; }
-    .fb { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 5px; }
-    .correct { background: #e7f3ef; color: #104247; }
+    :root { --sbu-red: #990000; --cream: #F8F2C5; --black: #000; --gray: #ddd; --white: #ffffff; }
+    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #edeff2; padding: 40px; color: #333; line-height: 1.6; }
+    .container { background: var(--white); max-width: 950px; margin: 0 auto; padding: 50px; border-radius: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.12); border: 1px solid var(--gray); }
+    .pill { display: inline-block; padding: 6px 18px; border: 2px solid var(--sbu-red); color: var(--sbu-red); border-radius: 50px; font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 1px; }
+    .progress-wrapper { height: 12px; background: #e0e0e0; border-radius: 20px; margin-bottom: 40px; overflow: hidden; border: 1px solid #ccc; }
+    #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #cc0000, #990000); transition: width 0.5s ease; }
+    h1 { font-size: 2.5rem; margin-top: 0; color: var(--black); border-bottom: 4px solid var(--sbu-red); display: inline-block; padding-bottom: 10px; }
+    h2 { color: var(--sbu-red); margin-top: 0; }
+    .lesson-content { background: var(--cream); border-left: 8px solid var(--sbu-red); padding: 30px; margin: 30px 0; border-radius: 0 15px 15px 0; font-size: 1.15rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .instruction { font-style: italic; color: #666; margin-bottom: 20px; display: block; }
+    button.primary-btn { background: var(--sbu-red); color: white; border: none; padding: 20px 40px; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s; width: 100%; display: block; box-shadow: 0 4px 0 #660000; }
+    button.primary-btn:hover { background: #700; transform: translateY(-2px); box-shadow: 0 6px 0 #550000; }
+    button.primary-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #550000; }
+    .choice-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px; }
+    .option-btn { background: var(--white); border: 2px solid var(--gray); padding: 25px; border-radius: 15px; text-align: left; font-size: 1.25rem; font-family: 'Courier New', Courier, monospace; font-weight: bold; cursor: pointer; transition: 0.2s; color: #222; }
+    .option-btn:hover { border-color: var(--sbu-red); background: var(--cream); }
+    .feedback-area { margin-top: 30px; padding: 25px; border-radius: 15px; font-size: 1.2rem; font-weight: bold; display: none; }
+    .correct-box { background: #dcfce7; color: #166534; border: 2px solid #166534; display: block; }
+    .incorrect-box { background: #fee2e2; color: #991b1b; border: 2px solid #991b1b; display: block; }
+    .drag-box { background: #f9fafb; border: 3px dashed #cbd5e1; padding: 25px; border-radius: 20px; margin-top: 20px; }
+    .drag-item { background: var(--white); border: 2px solid #94a3b8; padding: 20px; margin-bottom: 12px; border-radius: 12px; cursor: grab; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .drag-item:active { cursor: grabbing; }
+    .dragging { opacity: 0.4; transform: scale(0.98); }
+    .hidden { display: none !important; }
+    code { color: var(--sbu-red); background: rgba(153,0,0,0.1); padding: 2px 6px; border-radius: 4px; }
   </style>
 </head>
 <body>
 
-<div class="card">
-  <div id="p1">
-    <div class="pill">SBU Music Library</div>
-    <h1>Shelving Training</h1>
-    <p>This tutorial covers the physical rules for organizing music scores on the shelf.</p>
-    <button onclick="go(1, 2)">Start Step 1</button>
-  </div>
+<div class="container" id="training-shell">
 
-  <div id="p2" class="hidden">
-    <div class="pill">Step 1: Numbers</div>
-    <h2>Whole Numbers</h2>
-    <p>The second line of a call number is a whole number.</p>
-    <div class="lesson">Rule: Sort mathematically. <b>14.5</b> comes before <b>15</b>.</div>
-    <button onclick="go(2, 3)">Practice</button>
-  </div>
-
-  <div id="p3" class="hidden">
-    <div class="pill">Step 1: Practice</div>
-    <h3>Which call number goes first?</h3>
-    <button class="choice" onclick="ans(3, 'M 14.5 .S4')">M 14.5 .S4</button>
-    <button class="choice" onclick="alert('Try again. 14.5 is smaller than 15.')">M 15 .A2</button>
-    <div id="f3"></div>
-  </div>
-
-  <div id="p4" class="hidden">
-    <div class="pill">Step 2: Decimals</div>
-    <h2>The Cutter Line</h2>
-    <p>The Letter + Number line is a decimal.</p>
-    <div class="lesson">Rule: <b>.C36</b> comes before <b>.C4</b> (because .4 is .40).</div>
-    <button onclick="go(4, 5)">Practice</button>
-  </div>
-
-  <div id="p5" class="hidden">
-    <div class="pill">Step 2: Practice</div>
-    <h3>Which Cutter is filed first?</h3>
-    <button class="choice" onclick="ans(5, '.C36')">.C36</button>
-    <button class="choice" onclick="alert('Remember: Cutters are decimals. .36 is smaller than .40.')">.C4</button>
-    <div id="f5"></div>
-  </div>
-
-  <div id="p6" class="hidden">
-    <div class="pill">Step 3: Catalogs</div>
-    <h2>Thematic Catalogs</h2>
-    <p>These labels help identify specific pieces.</p>
-    <div class="lesson">
-      <b>KV:</b> Mozart<br>
-      <b>BWV:</b> Bach<br>
-      <b>WoO:</b> General label for "Works without opus".
+  <div id="scr-intro">
+    <div class="pill">SBU Libraries</div>
+    <h1>Music Shelving Master Certification</h1>
+    <p>This program ensures our staff maintains the highest level of precision in the Music Collection. You will be tested on Whole Number sequencing, Decimal Cutter logic, and complex sub-unit ordering.</p>
+    <div class="lesson-content">
+      <b>Certification Requirements:</b>
+      <ul>
+        <li>Mastery of Line 2 (Whole Numbers)</li>
+        <li>Precision in Line 3 (Decimal Cutters)</li>
+        <li>Correct sorting of Years, Fascicles, and Series</li>
+        <li>Knowledge of Thematic Catalog Designations</li>
+      </ul>
     </div>
-    <button onclick="go(6, 7)">Practice</button>
+    <button class="primary-btn" onclick="show('scr-m1-l')">Begin Certification</button>
   </div>
 
-  <div id="p7" class="hidden">
-    <div class="pill">Step 3: Practice</div>
-    <h3>Which label is a general designation used for many different composers?</h3>
-    <button class="choice" onclick="alert('KV is specific to Mozart.')">KV (Mozart)</button>
-    <button class="choice" onclick="ans(7, 'WoO')">WoO (Works without opus)</button>
-    <button class="choice" onclick="alert('BWV is specific to Bach.')">BWV (Bach)</button>
-    <div id="f7"></div>
+  <div id="scr-m1-l" class="hidden">
+    <div class="pill">Module 1: The Foundation</div>
+    <h2>Line 2: Whole Number Sequencing</h2>
+    <p>The first point of sorting after the Class (M, ML, MT) is the whole number.</p>
+    <div class="lesson-content">
+      <b>The Mathematical Principle:</b>
+      Call numbers are sorted by their full numerical value. 
+      <br><br>
+      Example: <code>M 14.5</code> represents a value smaller than <code>M 15</code>. On the shelf, 14.5 must sit to the LEFT of 15.
+    </div>
+    <button class="primary-btn" onclick="show('scr-m1-q1')">Begin Module 1 Practice</button>
   </div>
 
-  <div id="p8" class="hidden">
-    <h1>Training Complete</h1>
-    <p>You have mastered the numerical, decimal, and catalog labeling rules.</p>
-    <button onclick="location.reload()">Restart Session</button>
+  <div id="scr-m1-q1" class="hidden">
+    <div class="pill">Module 1 Practice (1/2)</div>
+    <h3>Which call number comes first on the shelf?</h3>
+    <span class="instruction">Select the correct label:</span>
+    <div class="choice-grid">
+      <button class="option-btn" onclick="validate('m1q1', true, 'M 14.5 .S4')">M 14.5 .S4</button>
+      <button class="option-btn" onclick="validate('m1q1', false, 'M 15 .A2')">M 15 .A2</button>
+    </div>
+    <div id="fb-m1q1" class="feedback-area"></div>
   </div>
+
+  <div id="scr-m1-q2" class="hidden">
+    <div class="pill">Module 1 Practice (2/2)</div>
+    <h3>Identify the correct sequence:</h3>
+    <div class="choice-grid">
+      <button class="option-btn" onclick="validate('m1q2', false, 'M 1001 comes before M 99.8')">M 1001 comes before M 99.8</button>
+      <button class="option-btn" onclick="validate('m1q2', true, 'M 99.8 comes before M 1001')">M 99.8 comes before M 1001</button>
+    </div>
+    <div id="fb-m1q2" class="feedback-area"></div>
+  </div>
+
+  <div id="scr-m2-l" class="hidden">
+    <div class="pill">Module 2: Decimal Precision</div>
+    <h2>Line 3: The Cutter Line</h2>
+    <p>The alphanumeric line (e.g., .C36) is the most frequent source of shelving errors.</p>
+    <div class="lesson-content">
+      <b>The Decimal Rule:</b>
+      The number following the letter is <u>always</u> a decimal. 
+      <br><br>
+      Think of <code>.C4</code> as <code>.400</code> and <code>.C36</code> as <code>.360</code>. 
+      Because .36 is smaller than .40, <b>.C36 files before .C4</b>.
+    </div>
+    <button class="primary-btn" onclick="show('scr-m2-q1')">Begin Module 2 Practice</button>
+  </div>
+
+  <div id="scr-m2-q1" class="hidden">
+    <div class="pill">Module 2 Practice (1/2)</div>
+    <h3>Which of these Cutters is filed first?</h3>
+    <div class="choice-grid">
+      <button class="option-btn" onclick="validate('m2q1', false, '.B4')">.B4</button>
+      <button class="option-btn" onclick="validate('m2q1', true, '.B36')">.B36</button>
+    </div>
+    <div id="fb-m2q1" class="feedback-area"></div>
+  </div>
+
+  <div id="scr-m2-q2" class="hidden">
+    <div class="pill">Module 2 Practice (2/2)</div>
+    <h3>Where does <code>.A72</code> sit in relation to <code>.A8</code>?</h3>
+    <div class="choice-grid">
+      <button class="option-btn" onclick="validate('m2q2', true, 'Before .A8')">Before .A8</button>
+      <button class="option-btn" onclick="validate('m2q2', false, 'After .A8')">After .A8</button>
+    </div>
+    <div id="fb-m2q2" class="feedback-area"></div>
+  </div>
+
+  <div id="scr-m3-l" class="hidden">
+    <div class="pill">Module 3: Complex Sorting</div>
+    <h2>Years, Fascicles, and Series</h2>
+    <p>When the main call number is identical, we sort by sub-units.</p>
+    <div class="lesson-content">
+      <b>The Order of Operations:</b>
+      <ol>
+        <li><b>Year:</b> 1998 comes before 2005.</li>
+        <li><b>Alphabetical:</b> <u>F</u>ASC. (Fascicle) comes before <u>S</u>ER. (Series).</li>
+        <li><b>Numerical:</b> <u>SER. I</u> comes before <u>SER. VI</u>.</li>
+      </ol>
+    </div>
+    <button class="primary-btn" onclick="show('scr-m3-q1')">Begin Module 3 Practice</button>
+  </div>
+
+  <div id="scr-m3-q1" class="hidden">
+    <div class="pill">Module 3 Practice</div>
+    <h3>Which volume is placed first on the shelf?</h3>
+    <div class="choice-grid">
+      <button class="option-btn" onclick="validate('m3q1', true, '2005 FASC. 3')">2005 FASC. 3</button>
+      <button class="option-btn" onclick="validate('m3q1', false, '2005 SER. 1')">2005 SER. 1</button>
+    </div>
+    <div id="fb-m3q1" class="feedback-area"></div>
+  </div>
+
+  <div id="scr-m4-l" class="hidden">
+    <div class="pill">Module 4: Special Designations</div>
+    <h2>Thematic Catalog Numbers</h2>
+    <p>Many composers have their own specialized catalog designations.</p>
+    <div class="lesson-content">
+      <b>Key Catalog Labels:</b>
+      <ul>
+        <li><b>KV:</b> Mozart (Koechel)</li>
+        <li><b>BWV:</b> Bach</li>
+        <li><b>Hob.:</b> Haydn</li>
+        <li><b>WoO:</b> <i>Werke ohne Opuszahl</i> (Works without opus). This is a <b>General Label</b> used across many composers for unnumbered works.</li>
+      </ul>
+    </div>
+    <button class="primary-btn" onclick="show('scr-m4-q1')">Begin Module 4 Practice</button>
+  </div>
+
+  <div id="scr-m4-q1" class="hidden">
+    <div class="pill">Module 4 Practice</div>
+    <h3>Which of these is a general designation used for many different composers?</h3>
+    <div class="choice-grid">
+      <button class="option-btn" onclick="validate('m4q1', false, 'KV')">KV</button>
+      <button class="option-btn" onclick="validate('m4q1', true, 'WoO')">WoO</button>
+      <button class="option-btn" onclick="validate('m4q1', false, 'BWV')">BWV</button>
+    </div>
+    <div id="fb-m4q1" class="feedback-area"></div>
+  </div>
+
+  <div id="scr-final" class="hidden">
+    <div class="pill">Final Examination</div>
+    <h2>Shelf Sort Challenge</h2>
+    <p>Demonstrate your mastery. Drag the following call numbers into the correct vertical shelf order (Top to Bottom).</p>
+    
+    <div class="drag-box" id="master-shelf">
+      <div class="drag-item" draggable="true" data-pos="0">☰ &nbsp; M 2 .G39 1966</div>
+      <div class="drag-item" draggable="true" data-pos="1">☰ &nbsp; M 2.3 .U6 R4</div>
+      <div class="drag-item" draggable="true" data-pos="2">☰ &nbsp; M 3 .B103 2005</div>
+      <div class="drag-item" draggable="true" data-pos="3">☰ &nbsp; M 3 .C4 1993</div>
+    </div>
+    
+    <button class="primary-btn" onclick="checkFinalShelf()">Submit Shelf for Inspection</button>
+    <div id="fb-final" class="feedback-area"></div>
+  </div>
+
+  <div id="scr-success" class="hidden">
+    <div style="text-align: center;">
+      <h1 style="border: none; color: #166534;">Certification Granted</h1>
+      <p style="font-size: 1.3rem;">You have successfully completed the SBU Music Library Shelving Training.</p>
+      <button class="primary-btn" style="width: auto; padding: 20px 60px;" onclick="location.reload()">Restart Training</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
-  function go(from, to) {
-    document.getElementById('p' + from).classList.add('hidden');
-    document.getElementById('p' + to).classList.remove('hidden');
+  // NAVIGATION
+  function show(id) {
+    document.querySelectorAll('#training-shell > div').forEach(d => d.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
     window.scrollTo(0,0);
+    updateProgress(id);
+    if(id === 'scr-final') initDragLogic();
   }
-  function ans(page, txt) {
-    document.getElementById('f' + page).innerHTML = '<div class="fb correct">Correct! ' + txt + ' is the right answer.</div><button onclick="go(' + page + ',' + (page + 1) + ')">Next Module</button>';
+
+  function updateProgress(id) {
+    let p = 0;
+    if(id.includes('m1')) p = 20;
+    else if(id.includes('m2')) p = 40;
+    else if(id.includes('m3')) p = 60;
+    else if(id.includes('m4')) p = 80;
+    else if(id.includes('final')) p = 95;
+    document.getElementById('progress-bar').style.width = p + '%';
+  }
+
+  // QUIZ ENGINE
+  function validate(qKey, isCorrect, text) {
+    const fb = document.getElementById('fb-' + qKey);
+    const flow = {
+      'm1q1': 'scr-m1-q2', 'm1q2': 'scr-m2-l',
+      'm2q1': 'scr-m2-q2', 'm2q2': 'scr-m3-l',
+      'm3q1': 'scr-m4-l',  'm4q1': 'scr-final'
+    };
+
+    if(isCorrect) {
+      fb.className = 'feedback-area correct-box';
+      fb.innerHTML = `Correct! ${text} is filed first. <br><button class="primary-btn" style="margin-top:15px; background:#166534" onclick="show('${flow[qKey]}')">Next Step</button>`;
+    } else {
+      fb.className = 'feedback-area incorrect-box';
+      fb.innerHTML = `Incorrect. Please review the rule in the lesson box and try again.`;
+    }
+  }
+
+  // DRAG AND DROP
+  function initDragLogic() {
+    const shelf = document.getElementById('master-shelf');
+    shelf.addEventListener('dragover', e => {
+      e.preventDefault();
+      const dragging = document.querySelector('.dragging');
+      const afterEl = [...shelf.querySelectorAll('.drag-item:not(.dragging)')].find(c => {
+        return e.clientY <= c.getBoundingClientRect().top + c.getBoundingClientRect().height / 2;
+      });
+      if (afterEl == null) shelf.appendChild(dragging);
+      else shelf.insertBefore(dragging, afterEl);
+    });
+
+    document.querySelectorAll('.drag-item').forEach(item => {
+      item.addEventListener('dragstart', () => item.classList.add('dragging'));
+      item.addEventListener('dragend', () => item.classList.remove('dragging'));
+    });
+  }
+
+  function checkFinalShelf() {
+    const items = [...document.querySelectorAll('.drag-item')];
+    const isWin = items.every((el, i) => parseInt(el.dataset.pos) === i);
+    const fb = document.getElementById('fb-final');
+    
+    if(isWin) {
+      fb.className = 'feedback-area correct-box';
+      fb.innerHTML = `Excellent work. The collection is in order.<br><button class="primary-btn" style="margin-top:15px; background:#166534" onclick="show('scr-success')">Finalize Certification</button>`;
+    } else {
+      fb.className = 'feedback-area incorrect-box';
+      fb.innerHTML = `Shelf order incorrect. Check the Whole Numbers (M 2 vs M 3) and decimal logic.`;
+    }
   }
 </script>
 
