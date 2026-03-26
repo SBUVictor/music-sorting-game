@@ -3,209 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SBU Music Library | Staff Certification</title>
+    <title>SBU Music Library | Staff Certification v4.0</title>
     <style>
-        :root { --sbu-red: #990000; --cream: #F8F2C5; --dark: #1a1a1a; }
-        body { font-family: -apple-system, sans-serif; background: #edeff2; padding: 20px; color: #333; }
-        .container { background: #fff; max-width: 700px; margin: 0 auto; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #d1d5db; }
-        .progress-bar { height: 8px; background: #e5e7eb; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
-        #fill { height: 100%; width: 0%; background: var(--sbu-red); transition: 0.4s; }
-        .stats { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold; color: #666; margin-bottom: 10px; text-transform: uppercase; }
-        h2 { font-size: 1.5rem; margin: 0 0 20px 0; color: var(--dark); }
-        .opt { display: block; width: 100%; padding: 18px; margin-bottom: 12px; border: 2px solid #e5e7eb; border-radius: 10px; background: #fff; font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: bold; text-align: left; cursor: pointer; transition: 0.2s; }
-        .opt:hover { border-color: var(--sbu-red); background: var(--cream); }
-        .feedback { padding: 20px; border-radius: 10px; margin-top: 15px; font-weight: bold; display: none; }
-        .correct { background: #dcfce7; color: #166534; border: 1px solid #22c55e; }
-        .wrong { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
-        .btn-next { background: var(--sbu-red); color: #fff; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .shelf-box { background: #f3f4f6; padding: 15px; border-radius: 10px; min-height: 100px; border: 2px dashed #9ca3af; }
-        .book { background: #fff; border: 2px solid #333; padding: 12px; margin-bottom: 8px; cursor: grab; font-family: monospace; font-weight: bold; border-radius: 5px; }
-        .dragging { opacity: 0.5; background: var(--cream); }
+        :root { --sbu-red: #990000; --cream: #F8F2C5; --black: #121212; --gray: #64748b; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; padding: 20px; color: #1e293b; line-height: 1.5; }
+        .app-container { background: #fff; max-width: 800px; margin: 20px auto; padding: 40px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
+        
+        /* Progress & Meta */
+        .meta-bar { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--gray); letter-spacing: 0.05em; }
+        .progress-bg { height: 8px; background: #e2e8f0; border-radius: 10px; margin-bottom: 40px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: var(--sbu-red); transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        /* Question UI */
+        h2 { font-size: 1.75rem; font-weight: 800; margin-bottom: 25px; color: var(--black); }
+        .option-btn { display: block; width: 100%; padding: 22px; margin-bottom: 14px; border: 2px solid #e2e8f0; border-radius: 12px; background: #fff; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 1.25rem; font-weight: 700; text-align: left; cursor: pointer; transition: all 0.2s ease; position: relative; }
+        .option-btn:hover { border-color: var(--sbu-red); background: #fffaf0; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .option-btn:active { transform: translateY(0); }
+        
+        /* Feedback States */
+        .feedback { padding: 24px; border-radius: 12px; margin-top: 25px; font-weight: 700; display: none; border-left: 8px solid; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .correct { background: #f0fdf4; color: #166534; border-color: #22c55e; }
+        .wrong { background: #fef2f2; color: #991b1b; border-color: #ef4444; }
+        
+        /* Buttons */
+        .action-btn { background: var(--sbu-red); color: white; border: none; padding: 20px; width: 100%; border-radius: 10px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 20px; transition: background 0.2s; box-shadow: 0 4px 0 #600; }
+        .action-btn:hover { background: #800000; }
+        .action-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        /* Shelf Sort */
+        .shelf-zone { background: #f8fafc; padding: 25px; border-radius: 15px; border: 3px dashed #cbd5e1; min-height: 250px; margin-top: 20px; }
+        .book-spine { background: white; border: 2px solid var(--black); padding: 18px; margin-bottom: 12px; border-radius: 8px; cursor: grab; font-family: monospace; font-weight: 900; font-size: 1.2rem; box-shadow: 4px 4px 0 rgba(0,0,0,0.05); user-select: none; }
+        .dragging { opacity: 0.5; transform: scale(0.95); }
+
         .hidden { display: none !important; }
+        input[type="text"] { width: 100%; padding: 18px; font-size: 1.2rem; border: 2px solid #cbd5e1; border-radius: 10px; margin-bottom: 25px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="stats"><span id="module-name">Module 1</span> <span id="counter">Q 1/3</span></div>
-    <div class="progress-bar"><div id="fill"></div></div>
-
-    <div id="quiz-ui">
-        <h2 id="q-text">Loading...</h2>
-        <div id="options-box"></div>
-        <div id="feedback-box" class="feedback"></div>
+<div class="app-container">
+    <div id="setup-screen">
+        <h1 style="color:var(--sbu-red); font-weight:900; margin-bottom:10px;">Music Library Certification</h1>
+        <p style="margin-bottom:30px; color:var(--gray);">Automated Staff Assessment v4.0. All results are logged to the central database.</p>
+        <label style="font-weight:700; display:block; margin-bottom:8px;">STAFF NAME</label>
+        <input type="text" id="staff-name" placeholder="Enter Full Name..." autofocus>
+        <button class="action-btn" onclick="startExam()">BEGIN CERTIFICATION</button>
     </div>
 
-    <div id="shelf-ui" class="hidden">
-        <h2>Final Master Sort</h2>
-        <p style="font-size: 0.9rem; margin-bottom: 15px;">Drag to sort the shelf in correct LC sequence:</p>
-        <div id="shelf-area" class="shelf-box"></div>
-        <button class="btn-next" onclick="verifyShelf()" style="margin-top:20px">Submit Final Order</button>
-        <div id="shelf-feedback" class="feedback"></div>
+    <div id="exam-ui" class="hidden">
+        <div class="meta-bar">
+            <span id="module-title">Initializing...</span>
+            <span>Accuracy: <span id="score-val" style="color:var(--sbu-red)">0</span>/20</span>
+        </div>
+        <div class="progress-bg"><div id="progress-fill"></div></div>
+        
+        <div id="quiz-area">
+            <h2 id="question-text">Loading logic...</h2>
+            <div id="options-container"></div>
+            <div id="feedback-box" class="feedback"></div>
+        </div>
+
+        <div id="shelf-area" class="hidden">
+            <h2>Phase 5: Master Shelf Sort</h2>
+            <p style="color:var(--gray); font-weight:600;">Drag the items into precise Library of Congress call number order.</p>
+            <div id="drag-container" class="shelf-zone"></div>
+            <button class="action-btn" onclick="validateShelf()">SUBMIT FINAL SORT</button>
+            <div id="shelf-feedback" class="feedback"></div>
+        </div>
     </div>
 
-    <div id="win-ui" class="hidden" style="text-align:center">
-        <h1 style="color:var(--sbu-red)">CERTIFICATION COMPLETE</h1>
-        <p>User has mastered the Music Library Shelving standards.</p>
-        <button class="btn-next" onclick="location.reload()" style="width:auto; padding: 15px 40px;">Restart Assessment</button>
+    <div id="final-screen" class="hidden" style="text-align:center; padding:40px 0;">
+        <div style="font-size: 5rem; margin-bottom:10px;">✅</div>
+        <h1 style="color:var(--sbu-red); font-weight:900; font-size: 2.5rem;">CERTIFIED</h1>
+        <div id="final-report" style="font-size: 1.3rem; margin: 30px 0; color:#334155;"></div>
+        <div style="background:#f1f5f9; padding:15px; border-radius:8px; display:inline-block; font-size:0.9rem; color:var(--gray); font-weight:600;">
+            Data Transmitted to SBU Music Library Database
+        </div>
+        <button class="action-btn" onclick="location.reload()" style="max-width:300px; margin-top:40px;">Restart Session</button>
     </div>
 </div>
 
 <script>
-    const data = {
-        m1: [ // Whole Numbers
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJs68-jZRxnopKZEOgxGKTxoWWUrMo9mB5BZpMEy7VyenLxJLN7kjsSKblzjLIqh942w/exec";
+
+    const POOL = {
+        m1: [ // LINE 2 WHOLE NUMBERS
             { q: "Sort Line 2 (Whole Numbers):", o: ["M 14.5 .S4", "M 15 .A2"], a: 0 },
-            { q: "Sort Line 2:", o: ["M 202 .C3", "M 25 .C3"], a: 1 },
-            { q: "Decimals in Line 2:", o: ["M 1.7 .R3", "M 1.75 .R3"], a: 0 },
-            { q: "Large Value Transition:", o: ["M 999 .B8", "M 1001 .B8"], a: 0 },
-            { q: "Small Ensemble Values:", o: ["M 312 .C5", "M 322 .C5"], a: 0 },
-            { q: "Sequence Whole Numbers:", o: ["M 1503 .W3", "M 1500 .W3"], a: 1 },
-            { q: "Vocal Score Value:", o: ["M 1508 .S8", "M 1503 .S8"], a: 1 },
-            { q: "Chamber Music Sort:", o: ["M 452", "M 412"], a: 1 }
+            { q: "Line 2 Priority:", o: ["M 202 .C3", "M 25 .C3"], a: 1 },
+            { q: "Line 2 Decimals:", o: ["M 1.7 .R3", "M 1.75 .R3"], a: 0 },
+            { q: "Ascending Whole Numbers:", o: ["M 1503 .W3", "M 1500 .W3"], a: 1 },
+            { q: "Vocal Score Sequence:", o: ["M 1508 .S8", "M 1503 .S8"], a: 1 },
+            { q: "Ensemble Sizes:", o: ["M 312 .C5", "M 322 .C5"], a: 0 },
+            { q: "Chamber Music Sequence:", o: ["M 452", "M 412"], a: 1 },
+            { q: "Transition Check:", o: ["M 999 .B8", "M 1001 .B8"], a: 0 }
         ],
-        m2: [ // Cutters (Decimals)
-            { q: "Decimal Cutter Trap:", o: [".C36", ".C4"], a: 0 },
-            { q: "Alpha-Numeric Sort:", o: [".B127", ".B2"], a: 0 },
-            { q: "Zero-Placeholder:", o: [".B09", ".B1"], a: 0 },
-            { q: "Cutter Sequence:", o: [".A81", ".A9"], a: 0 },
+        m2: [ // CUTTERS
+            { q: "Decimal Cutter (.36 vs .4):", o: [".C36", ".C4"], a: 0 },
+            { q: "Alpha-Cutter Sort:", o: [".B127", ".B2"], a: 0 },
+            { q: "Zero-Placeholder Rule:", o: [".B09", ".B1"], a: 0 },
+            { q: "Cutter String Density:", o: [".A81", ".A9"], a: 0 },
             { q: "Double Cutter Priority:", o: [".M3 S6", ".M32 S1"], a: 0 },
-            { q: "First Cutter Matches:", o: [".W44 C2", ".W442 C8"], a: 0 },
-            { q: "Long Cutter String:", o: [".S347", ".S35"], a: 0 },
-            { q: "Cutter Value Check:", o: [".R64", ".R6"], a: 1 }
+            { q: "Deep Decimal Sort:", o: [".W44 C2", ".W442 C8"], a: 0 },
+            { q: "Cutter Length Comparison:", o: [".S347", ".S35"], a: 0 },
+            { q: "Cutter vs Whole Line:", o: [".R64", ".R6"], a: 1 }
         ],
-        m3: [ // The Gap & Sub-units
-            { q: "Apply 'Nothing Before Something':", o: ["M 3 .B8", "M 3 .B8 1996"], a: 0 },
-            { q: "Chronological Sort:", o: ["M 452 .S3 1950", "M 452 .S3 2001"], a: 0 },
-            { q: "Sub-unit Alpha Priority:", o: ["FASC. 2", "SER. 1"], a: 0 },
-            { q: "Volume vs. Year Priority:", o: ["1992", "v. 1"], a: 1 },
-            { q: "Suffix Priority:", o: ["(Score)", "parts"], a: 0 },
-            { q: "Roman Numeral Hierarchy:", o: ["Ser. I", "Ser. IV"], a: 0 },
-            { q: "Gap Rule Check:", o: ["M 25 .C44", "M 25 .C44 2012"], a: 0 },
-            { q: "Part vs volume:", o: ["v. 2", "pt. 1"], a: 1 }
+        m3: [ // GAP RULE & SUB-UNITS
+            { q: "The Gap Rule (Nothing Before Something):", o: ["M 3 .B8", "M 3 .B8 1996"], a: 0 },
+            { q: "Chronological Sequence:", o: ["M 452 .S3 1950", "M 452 .S3 2001"], a: 0 },
+            { q: "Sub-unit Hierarchy:", o: ["1992", "v. 1"], a: 1 },
+            { q: "Format Suffix Priority:", o: ["(Score Only)", "parts"], a: 0 },
+            { q: "Roman Numeral Sort:", o: ["Ser. I", "Ser. IV"], a: 0 },
+            { q: "Empty Value vs. Year:", o: ["M 25 .C44", "M 25 .C44 2012"], a: 0 },
+            { q: "Volume vs Part:", o: ["v. 2", "pt. 1"], a: 1 },
+            { q: "Fascicle Priority:", o: ["FASC. 2", "SER. 1"], a: 0 }
         ],
-        m4: [ // Thematic Numbers
-            { q: "Mozart (KV):", o: ["KV 450", "KV 450a"], a: 0 },
+        m4: [ // THEMATIC NUMBERS
+            { q: "Mozart Thematic (KV):", o: ["KV 450", "KV 450a"], a: 0 },
             { q: "Bach (BWV):", o: ["BWV 1001", "BWV 1001.2"], a: 0 },
-            { q: "General 'WoO' Sort:", o: ["WoO 1", "WoO 10"], a: 0 },
+            { q: "Beethoven (WoO):", o: ["WoO 1", "WoO 10"], a: 0 },
             { q: "Schubert (D. Numbers):", o: ["D. 99", "D. 500"], a: 0 },
             { q: "Haydn (Hob. Numbers):", o: ["Hob. I:1", "Hob. I:10"], a: 0 },
-            { q: "Opus vs. WoO labels:", o: ["Op. 10", "WoO 1"], a: 0 },
-            { q: "Beethoven Op. Sort:", o: ["Op. 18 no. 1", "Op. 18 no. 6"], a: 0 },
-            { q: "Thematic Alpha Suffix:", o: ["BWV 101", "BWV 101a"], a: 0 }
+            { q: "Opus vs WoO Priority:", o: ["Op. 10", "WoO 1"], a: 0 },
+            { q: "Number-Letter Suffix:", o: ["Op. 18 no. 1", "Op. 18 no. 1a"], a: 0 },
+            { q: "Complex Thematic String:", o: ["BWV 101", "BWV 101.4"], a: 0 }
         ]
     };
 
-    let currentMod = 'm1';
-    let qIndex = 0;
-    let questionsThisMod = [];
+    let state = {
+        name: "", curMod: "m1", qIdx: 0, 
+        correctCount: 0, activePool: [], 
+        history: [], isFirstTry: true 
+    };
 
-    function initMod(mKey) {
-        currentMod = mKey;
-        qIndex = 0;
-        // Shuffle and pick 3
-        questionsThisMod = data[mKey].sort(() => 0.5 - Math.random()).slice(0, 3);
+    function startExam() {
+        state.name = document.getElementById('staff-name').value.trim();
+        if(!state.name) return alert("Identification Required.");
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('exam-ui').classList.remove('hidden');
+        loadModule("m1");
+    }
+
+    function loadModule(mKey) {
+        state.curMod = mKey;
+        state.qIdx = 0;
+        // The Slicer Engine: 5 random samples from each 8-question set
+        state.activePool = [...POOL[mKey]].sort(() => 0.5 - Math.random()).slice(0, 5);
         renderQuestion();
     }
 
     function renderQuestion() {
-        const q = questionsThisMod[qIndex];
-        const names = {m1:"Whole Numbers", m2:"Decimal Cutters", m3:"Gap & Sub-units", m4:"Thematic Numbers"};
-        document.getElementById('module-name').innerText = names[currentMod];
-        document.getElementById('counter').innerText = `Q ${qIndex + 1}/3`;
-        document.getElementById('q-text').innerText = q.q;
+        const q = state.activePool[state.qIdx];
+        const titles = {m1:"Module 1: Class Lines", m2:"Module 2: Decimal Cutters", m3:"Module 3: Gap Rule", m4:"Module 4: Thematics"};
+        document.getElementById('module-title').innerText = titles[state.curMod];
+        document.getElementById('question-text').innerText = q.q;
         
-        const box = document.getElementById('options-box');
-        box.innerHTML = '';
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
         q.o.forEach((txt, i) => {
-            const b = document.createElement('button');
-            b.className = 'opt';
-            b.innerText = txt;
-            b.onclick = () => handleAnswer(i, q.a);
-            box.appendChild(b);
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = txt;
+            btn.onclick = () => checkAnswer(i, q.a, q.q);
+            container.appendChild(btn);
         });
         document.getElementById('feedback-box').style.display = 'none';
+        state.isFirstTry = true;
         updateProgress();
     }
 
-    function handleAnswer(choice, correct) {
+    function checkAnswer(choice, correct, qText) {
         const fb = document.getElementById('feedback-box');
         fb.style.display = 'block';
         if(choice === correct) {
+            if(state.isFirstTry) state.correctCount++;
+            document.getElementById('score-val').innerText = state.correctCount;
             fb.className = 'feedback correct';
-            fb.innerHTML = 'CORRECT. <button class="btn-next" onclick="advance()">Next Question</button>';
+            fb.innerHTML = `CORRECT <button class="action-btn" onclick="advance()" style="margin-top:15px; padding:10px;">CONTINUE →</button>`;
         } else {
+            if(state.isFirstTry) state.history.push(qText);
+            state.isFirstTry = false;
             fb.className = 'feedback wrong';
-            fb.innerText = 'INCORRECT. Review the LC rules for this section.';
+            fb.innerText = "INCORRECT LOGIC. Re-evaluate the string hierarchy.";
         }
     }
 
     function advance() {
-        qIndex++;
-        if(qIndex < 3) {
-            renderQuestion();
-        } else {
+        state.qIdx++;
+        if(state.qIdx < 5) renderQuestion();
+        else {
             const flow = {m1:'m2', m2:'m3', m3:'m4', m4:'shelf'};
-            const next = flow[currentMod];
-            if(next === 'shelf') showShelf();
-            else initMod(next);
+            const next = flow[state.curMod];
+            if(next === 'shelf') initShelf();
+            else loadModule(next);
         }
     }
 
     function updateProgress() {
         const mods = ['m1','m2','m3','m4','shelf'];
-        const base = mods.indexOf(currentMod) * 20;
-        const sub = (qIndex / 3) * 20;
-        document.getElementById('fill').style.width = (base + sub) + '%';
+        const p = ((mods.indexOf(state.curMod) * 5 + state.qIdx) / 25) * 100;
+        document.getElementById('progress-fill').style.width = p + '%';
     }
 
-    function showShelf() {
-        document.getElementById('quiz-ui').classList.add('hidden');
-        document.getElementById('shelf-ui').classList.remove('hidden');
-        const area = document.getElementById('shelf-area');
+    function initShelf() {
+        state.curMod = 'shelf';
+        document.getElementById('quiz-area').classList.add('hidden');
+        document.getElementById('shelf-area').classList.remove('hidden');
+        const container = document.getElementById('drag-container');
         const items = [
             {id:0, t:"M 2 .B4 1990"}, {id:1, t:"M 2 .B42 1980"}, 
             {id:2, t:"M 2.1 .A2"}, {id:3, t:"M 3 .W6"}, {id:4, t:"M 3 .W6 2010"}
-        ];
-        items.sort(() => 0.5 - Math.random());
-        area.innerHTML = '';
+        ].sort(() => 0.5 - Math.random());
+        
+        container.innerHTML = '';
         items.forEach(item => {
-            const d = document.createElement('div');
-            d.className = 'book';
-            d.draggable = true;
-            d.innerText = item.t;
-            d.dataset.id = item.id;
-            d.addEventListener('dragstart', () => d.classList.add('dragging'));
-            d.addEventListener('dragend', () => d.classList.remove('dragging'));
-            area.appendChild(d);
+            const div = document.createElement('div');
+            div.className = 'book-spine';
+            div.draggable = true;
+            div.innerText = item.t;
+            div.dataset.id = item.id;
+            div.addEventListener('dragstart', () => div.classList.add('dragging'));
+            div.addEventListener('dragend', () => div.classList.remove('dragging'));
+            container.appendChild(div);
         });
 
-        area.addEventListener('dragover', e => {
+        container.addEventListener('dragover', e => {
             e.preventDefault();
-            const drag = document.querySelector('.dragging');
-            const target = [...area.querySelectorAll('.book:not(.dragging)')].find(c => {
-                return e.clientY <= c.getBoundingClientRect().top + c.getBoundingClientRect().height / 2;
+            const dragging = document.querySelector('.dragging');
+            const target = [...container.querySelectorAll('.book-spine:not(.dragging)')].find(c => {
+                return e.clientY <= c.getBoundingClientRect().top + c.getBoundingClientRect().height/2;
             });
-            area.insertBefore(drag, target);
+            container.insertBefore(dragging, target);
         });
-        updateProgress();
     }
 
-    function verifyShelf() {
-        const order = [...document.querySelectorAll('.book')].map(b => parseInt(b.dataset.id));
-        const win = order.every((v, i) => v === i);
-        if(win) {
-            document.getElementById('shelf-ui').classList.add('hidden');
-            document.getElementById('win-ui').classList.remove('hidden');
-            document.getElementById('fill').style.width = '100%';
-        } else {
+    function validateShelf() {
+        const order = [...document.querySelectorAll('.book-spine')].map(b => parseInt(b.dataset.id));
+        if(order.every((v, i) => v === i)) finalize();
+        else {
             const fb = document.getElementById('shelf-feedback');
-            fb.style.display = 'block';
-            fb.className = 'feedback wrong';
-            fb.innerText = 'INCORRECT ORDER. Check M2 vs M2.1 and the Gap Rule.';
+            fb.style.display = 'block'; fb.className = 'feedback wrong';
+            fb.innerText = "SHELF INCORRECT. Re-sort based on decimal priority.";
         }
     }
 
-    initMod('m1');
+    async function finalize() {
+        document.getElementById('exam-ui').classList.add('hidden');
+        document.getElementById('final-screen').classList.remove('hidden');
+        const pct = Math.round((state.correctCount / 20) * 100);
+        document.getElementById('final-report').innerHTML = `
+            <strong>Staff Member:</strong> ${state.name}<br>
+            <strong>Final Score:</strong> ${pct}%<br>
+            <strong>Logic Errors:</strong> ${state.history.length}
+        `;
+
+        const payload = {
+            name: state.name,
+            score: pct,
+            correct: state.correctCount,
+            errors: state.history.join(' | '),
+            timestamp: new Date().toLocaleString()
+        };
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            });
+        } catch (e) { console.log("Network error", e); }
+    }
 </script>
 </body>
 </html>
