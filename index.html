@@ -22,15 +22,15 @@
   <div id="p1">
     <div class="pill">SBU Music Library</div>
     <h1>Shelving Training</h1>
-    <p>We will start with the most basic rules of counting on the shelf.</p>
+    <p>This tutorial covers the physical rules for organizing music scores on the shelf.</p>
     <button onclick="go(1, 2)">Start Step 1</button>
   </div>
 
   <div id="p2" class="hidden">
     <div class="pill">Step 1: Numbers</div>
     <h2>Whole Numbers</h2>
-    <p>Line 2 is a whole number. Sort them mathematically.</p>
-    <div class="lesson">Rule: <b>14.5</b> comes before <b>15</b>.</div>
+    <p>The second line of a call number is a whole number.</p>
+    <div class="lesson">Rule: Sort mathematically. <b>14.5</b> comes before <b>15</b>.</div>
     <button onclick="go(2, 3)">Practice</button>
   </div>
 
@@ -54,14 +54,35 @@
     <div class="pill">Step 2: Practice</div>
     <h3>Which Cutter is filed first?</h3>
     <button class="choice" onclick="ans(5, '.C36')">.C36</button>
-    <button class="choice" onclick="alert('Remember: .4 is like .40, so .36 comes first.')">.C4</button>
+    <button class="choice" onclick="alert('Remember: Cutters are decimals. .36 is smaller than .40.')">.C4</button>
     <div id="f5"></div>
   </div>
 
   <div id="p6" class="hidden">
-    <h1>Success</h1>
-    <p>You have mastered the basics of numerical and decimal shelving.</p>
-    <button onclick="location.reload()">Restart</button>
+    <div class="pill">Step 3: Catalogs</div>
+    <h2>Thematic Catalogs</h2>
+    <p>These labels help identify specific pieces.</p>
+    <div class="lesson">
+      <b>KV:</b> Mozart<br>
+      <b>BWV:</b> Bach<br>
+      <b>WoO:</b> General label for "Works without opus".
+    </div>
+    <button onclick="go(6, 7)">Practice</button>
+  </div>
+
+  <div id="p7" class="hidden">
+    <div class="pill">Step 3: Practice</div>
+    <h3>Which label is a general designation used for many different composers?</h3>
+    <button class="choice" onclick="alert('KV is specific to Mozart.')">KV (Mozart)</button>
+    <button class="choice" onclick="ans(7, 'WoO')">WoO (Works without opus)</button>
+    <button class="choice" onclick="alert('BWV is specific to Bach.')">BWV (Bach)</button>
+    <div id="f7"></div>
+  </div>
+
+  <div id="p8" class="hidden">
+    <h1>Training Complete</h1>
+    <p>You have mastered the numerical, decimal, and catalog labeling rules.</p>
+    <button onclick="location.reload()">Restart Session</button>
   </div>
 </div>
 
@@ -69,9 +90,10 @@
   function go(from, to) {
     document.getElementById('p' + from).classList.add('hidden');
     document.getElementById('p' + to).classList.remove('hidden');
+    window.scrollTo(0,0);
   }
   function ans(page, txt) {
-    document.getElementById('f' + page).innerHTML = '<div class="fb correct">Correct! ' + txt + ' is first.</div><button onclick="go(' + page + ',' + (page + 1) + ')">Next Step</button>';
+    document.getElementById('f' + page).innerHTML = '<div class="fb correct">Correct! ' + txt + ' is the right answer.</div><button onclick="go(' + page + ',' + (page + 1) + ')">Next Module</button>';
   }
 </script>
 
