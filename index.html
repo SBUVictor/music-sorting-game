@@ -31,7 +31,7 @@
       --muted: var(--sbu-dark-gray);
       --line: var(--sbu-light-gray);
       
-      /* Accents (80% Red, 20% Non-Red secondary per guidelines) */
+      /* Accents */
       --accent: var(--sbu-red);
       --accent-hover: var(--sbu-dark-red);
       
@@ -523,7 +523,8 @@
   </div>
 
   <script>
-    var APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUoY2_eFLWVWyw5JX7Vv15ZdbDYYkYceQ_fpn0sZPGb3gpCtsrPfe3i_iItmv3ZFdiPA/exec';
+    // --- CONNECTED URL ---
+    var APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybCw6Ww_F3Gh8-V_ADRtbPPNoPfoJHPqNW3uTccjNNt2lCojagjNF50yH6QZQLpEnZwA/exec';
 
     function safeGetElement(id) {
       var el = document.getElementById(id);
@@ -1078,9 +1079,9 @@
                        '<button style="margin-top:14px" onclick="render()">Continue</button>';
       } else {
         state.streak = 0;
-        q._done = true; // Mark the current failed question as done so we cycle past it
+        q._done = true; 
         
-        // Use the generator to push a brand new question onto the stack
+        // Push a brand new question onto the stack using the generator
         if (item.generator && state.rng) {
             item.questions.push(item.generator(state.rng));
         }
@@ -1205,7 +1206,6 @@
         fb.innerHTML = '<div class="feedback bad">Not quite right. Double-check your whole numbers first, then cutters, then dates and details.</div>';
       }
     }
-
 
     // --- Done / Score Submission ---
     function renderDone() {
