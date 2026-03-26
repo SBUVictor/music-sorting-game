@@ -2,129 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SBU Music Library Training</title>
+  <title>SBU Library Training</title>
   <style>
-    :root { --sbu-red: #990000; --cream: #F8F2C5; --gray: #ddd; }
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f4f4f4; padding: 20px; color: #333; line-height: 1.6; }
-    .card { background: white; max-width: 700px; margin: 0 auto; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--gray); }
-    .pill { display: inline-block; padding: 5px 15px; border: 2px solid var(--sbu-red); color: var(--sbu-red); border-radius: 50px; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; }
-    .lesson-box { background: var(--cream); border-left: 6px solid var(--sbu-red); padding: 20px; margin: 20px 0; border-radius: 8px; }
-    button { background: var(--sbu-red); color: white; border: none; padding: 16px 32px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    .choice-btn { display: block; width: 100%; text-align: left; background: white; border: 1px solid var(--gray); margin-bottom: 12px; padding: 20px; border-radius: 12px; font-size: 1.1rem; cursor: pointer; color: #333; }
-    .choice-btn:hover { background: var(--cream); border-color: var(--sbu-red); }
-    .feedback { padding: 20px; border-radius: 12px; margin-top: 20px; font-weight: bold; border: 1px solid transparent; }
-    .correct { background: #e7f3ef; color: #104247; border-color: #104247; }
-    .incorrect { background: #fff1f1; color: #b91c1c; border-color: #f87171; }
-    .hidden { display: none !important; }
+    body { font-family: sans-serif; background: #f4f4f4; padding: 40px; color: #333; }
+    .card { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+    .pill { border: 2px solid #990000; color: #990000; padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; display: inline-block; }
+    .lesson { background: #F8F2C5; border-left: 5px solid #990000; padding: 15px; margin: 20px 0; }
+    button { background: #990000; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 16px; }
+    .choice { background: white; color: #333; border: 1px solid #ccc; text-align: left; margin-bottom: 10px; }
+    .choice:hover { background: #F8F2C5; }
+    .hidden { display: none; }
+    .fb { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 5px; }
+    .correct { background: #e7f3ef; color: #104247; }
   </style>
 </head>
 <body>
 
-<div class="card" id="app-card">
-  <div id="screen-start">
-    <div class="pill">Staff Training</div>
-    <h1>Shelving Music Scores</h1>
-    <p>Follow the modules in order to learn the SBU shelving system.</p>
-    <button onclick="showScreen('screen-m1-lesson')">Begin Step 1</button>
+<div class="card">
+  <div id="p1">
+    <div class="pill">SBU Music Library</div>
+    <h1>Shelving Training</h1>
+    <p>We will start with the most basic rules of counting on the shelf.</p>
+    <button onclick="go(1, 2)">Start Step 1</button>
   </div>
 
-  <div id="screen-m1-lesson" class="hidden">
+  <div id="p2" class="hidden">
     <div class="pill">Step 1: Numbers</div>
     <h2>Whole Numbers</h2>
     <p>Line 2 is a whole number. Sort them mathematically.</p>
-    <div class="lesson-box">
-      <b>The Rule:</b> <code>14.5</code> comes before <code>15</code>.
-    </div>
-    <button onclick="showScreen('screen-m1-quiz')">Start Practice</button>
+    <div class="lesson">Rule: <b>14.5</b> comes before <b>15</b>.</div>
+    <button onclick="go(2, 3)">Practice</button>
   </div>
 
-  <div id="screen-m1-quiz" class="hidden">
+  <div id="p3" class="hidden">
     <div class="pill">Step 1: Practice</div>
-    <h3>Which call number goes first on the shelf?</h3>
-    <button class="choice-btn" onclick="checkM1(true)">M 14.5 .S4</button>
-    <button class="choice-btn" onclick="checkM1(false)">M 15 .A2</button>
-    <div id="fb-m1"></div>
+    <h3>Which call number goes first?</h3>
+    <button class="choice" onclick="ans(3, 'M 14.5 .S4')">M 14.5 .S4</button>
+    <button class="choice" onclick="alert('Try again. 14.5 is smaller than 15.')">M 15 .A2</button>
+    <div id="f3"></div>
   </div>
 
-  <div id="screen-m2-lesson" class="hidden">
-    <div class="pill">Step 2: Cutters</div>
-    <h2>Decimal Logic</h2>
-    <p>The Cutter (Letter + Number) is always a decimal.</p>
-    <div class="lesson-box">
-      <b>The Rule:</b> <code>.C36</code> comes before <code>.C4</code> (.4 is .40).
-    </div>
-    <button onclick="showScreen('screen-m2-quiz')">Start Practice</button>
+  <div id="p4" class="hidden">
+    <div class="pill">Step 2: Decimals</div>
+    <h2>The Cutter Line</h2>
+    <p>The Letter + Number line is a decimal.</p>
+    <div class="lesson">Rule: <b>.C36</b> comes before <b>.C4</b> (because .4 is .40).</div>
+    <button onclick="go(4, 5)">Practice</button>
   </div>
 
-  <div id="screen-m2-quiz" class="hidden">
+  <div id="p5" class="hidden">
     <div class="pill">Step 2: Practice</div>
     <h3>Which Cutter is filed first?</h3>
-    <button class="choice-btn" onclick="checkM2(true)">.C36</button>
-    <button class="choice-btn" onclick="checkM2(false)">.C4</button>
-    <div id="fb-m2"></div>
+    <button class="choice" onclick="ans(5, '.C36')">.C36</button>
+    <button class="choice" onclick="alert('Remember: .4 is like .40, so .36 comes first.')">.C4</button>
+    <div id="f5"></div>
   </div>
 
-  <div id="screen-m3-lesson" class="hidden">
-    <div class="pill">Step 3: Catalogs</div>
-    <h2>Thematic Catalogs & Work IDs</h2>
-    <p>Work IDs confirm the piece but are <b>never</b> used for shelving.</p>
-    <div class="lesson-box">
-      <b>KV:</b> Mozart<br>
-      <b>BWV:</b> Bach<br>
-      <b>WoO:</b> General label for "Works without opus".
-    </div>
-    <button onclick="showScreen('screen-m3-quiz')">Start Practice</button>
-  </div>
-
-  <div id="screen-m3-quiz" class="hidden">
-    <div class="pill">Step 3: Practice</div>
-    <h3>Which label is a general designation used for many different composers?</h3>
-    <button class="choice-btn" onclick="checkM3(false)">KV (Mozart)</button>
-    <button class="choice-btn" onclick="checkM3(true)">WoO (Works without opus)</button>
-    <button class="choice-btn" onclick="checkM3(false)">BWV (Bach)</button>
-    <div id="fb-m3"></div>
-  </div>
-
-  <div id="screen-finish" class="hidden">
-    <h2>Training Complete</h2>
-    <p>You have finished the basic shelving certification.</p>
+  <div id="p6" class="hidden">
+    <h1>Success</h1>
+    <p>You have mastered the basics of numerical and decimal shelving.</p>
     <button onclick="location.reload()">Restart</button>
   </div>
 </div>
 
 <script>
-  function showScreen(id) {
-    document.querySelectorAll('#app-card > div').forEach(div => div.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-    window.scrollTo(0,0);
+  function go(from, to) {
+    document.getElementById('p' + from).classList.add('hidden');
+    document.getElementById('p' + to).classList.remove('hidden');
   }
-
-  function checkM1(isCorrect) {
-    const fb = document.getElementById('fb-m1');
-    if(isCorrect) {
-      fb.innerHTML = '<div class="feedback correct">Correct! 14.5 is numerically smaller than 15.</div><br><button onclick="showScreen(\'screen-m2-lesson\')">Next Module</button>';
-    } else {
-      fb.innerHTML = '<div class="feedback incorrect">Not quite. Remember that 14.5 comes before 15.</div>';
-    }
-  }
-
-  function checkM2(isCorrect) {
-    const fb = document.getElementById('fb-m2');
-    if(isCorrect) {
-      fb.innerHTML = '<div class="feedback correct">Correct! .36 is smaller than .40.</div><br><button onclick="showScreen(\'screen-m3-lesson\')">Next Module</button>';
-    } else {
-      fb.innerHTML = '<div class="feedback incorrect">Incorrect. Cutters are decimals! .C4 is .40.</div>';
-    }
-  }
-
-  function checkM3(isCorrect) {
-    const fb = document.getElementById('fb-m3');
-    if(isCorrect) {
-      fb.innerHTML = '<div class="feedback correct">Correct! WoO is a general label.</div><br><button onclick="showScreen(\'screen-finish\')">Finish Training</button>';
-    } else {
-      fb.innerHTML = '<div class="feedback incorrect">Try again. Look for the label used for many composers.</div>';
-    }
+  function ans(page, txt) {
+    document.getElementById('f' + page).innerHTML = '<div class="fb correct">Correct! ' + txt + ' is first.</div><button onclick="go(' + page + ',' + (page + 1) + ')">Next Step</button>';
   }
 </script>
 
