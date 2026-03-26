@@ -429,12 +429,13 @@
 <body>
   <div class="wrap">
     <div class="card no-print">
-      <div class="version">Version 10.0 - Fact-Checked Dynamics</div>
+      <div class="version">Version 11.0 - Logical Sequencing & Practice Mode</div>
       <h1>Shelf It Right</h1>
       <p>Library training for identifying work IDs and correctly shelving music scores.</p>
 
       <div class="info-box">
-        <strong>Student Information</strong>
+        <strong>Student Information (Optional for Practice)</strong>
+        <p class="small" style="margin-bottom: 12px; color: var(--sbu-black);">If you are doing this for <strong>official training</strong>, please enter your details so your score is recorded. If you just want to play and test your skills, you can leave these blank and choose <strong>Practice Mode</strong> below (your score will not be recorded).</p>
         <div class="form-grid">
           <div class="field">
             <label for="realName">Real Name</label>
@@ -453,19 +454,19 @@
       </div>
 
       <div class="info-box">
-        <strong>Key Terms</strong>
+        <strong>Key Terms (Top to Bottom of Label)</strong>
         <div>
           <p><strong>Whole number</strong><br>The number after the class.<br>Examples: <code class="call">M 2</code>, <code class="call">M 2.3</code>, <code class="call">M 3</code></p>
           <p><strong>First cutter</strong><br>The first letter-number group after the class number.<br>Examples: <code class="call">.B103</code>, <code class="call">.C4</code>, <code class="call">.S36</code></p>
           <p><strong>Work ID</strong><br>Thematic catalogs (like BWV) or Opus numbers. These often come right after the cutter.<br>Example: <code class="call">BWV 846</code> in <code class="call">M 22 .B3 BWV 846</code></p>
-          <p><strong>Later work element</strong><br>A short work-style code that comes after the first cutter in some labels.<br>Example: <code class="call">R4</code> in <code class="call">M 2.3 .U6 R4 V.66</code></p>
           <p><strong>Year</strong><br>The publication year.<br>Example: <code class="call">1994</code></p>
-          <p><strong>Later-line details</strong><br>Extra details that appear after the main call number parts.<br>Examples: <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code>, <code class="call">FASC.3</code>, <code class="call">H.III:E2</code></p>
+          <p><strong>Later-line details</strong><br>Extra details that appear after the main call number parts.<br>Examples: <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code></p>
         </div>
       </div>
 
       <div class="inline-actions">
-        <button id="startBtn" type="button">Start Training</button>
+        <button id="startBtn" type="button">Start Official Training</button>
+        <button id="practiceBtn" type="button" class="secondary" style="border-color: var(--sbu-dark-gray); color: var(--sbu-dark-gray);">Practice Mode (No Score Kept)</button>
         <button id="rulesBtn" type="button" class="secondary">Show Sorting Rules</button>
         <button id="referenceBtn" type="button" class="secondary">Show Work ID Quick Reference</button>
       </div>
@@ -517,7 +518,7 @@
 
     <div id="app" class="hidden">
       <div class="card">
-        <div id="stageLabel" class="pill">Module X</div>
+        <div id="stageLabel" class="pill">Module</div>
         <div class="progress"><div id="bar"></div></div>
         <div id="screen"></div>
       </div>
@@ -564,13 +565,14 @@
       var preferredNameInput = safeGetElement('preferredName');
       var emailInput = safeGetElement('sbuEmail');
       var startBtn = safeGetElement('startBtn');
+      var practiceBtn = safeGetElement('practiceBtn');
       var rulesBtn = safeGetElement('rulesBtn');
       var referenceBtn = safeGetElement('referenceBtn');
       var closeReferenceBtn = safeGetElement('closeReferenceBtn');
 
       var rulesText = `Local practice used in this prototype\n\n1. Start with the class and the whole number.\n   Examples:\n   M 2 comes before M 2.3\n   M 2.3 comes before M 3\n\n2. If the whole number matches, compare the first cutter.\n   Examples within M 3:\n   .B103 comes before .C4\n   .C4 comes before .H26\n\n3. If the cutter matches, look for a Work ID (Opus, BWV, K, Hob.). Sort these numerically.\n   Example:\n   M 22 .B3 BWV 846 comes before M 22 .B3 BWV 847\n\n4. Next, compare later work elements, year, and later-line details.\n\n5. Roman numerals matter in later-line details.\n   Example:\n   SER.I comes before SER.II, which comes before SER.VI\n\n6. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
 
-      var moduleXQuestions = [
+      var workIdQuestions = [
         {
           id: 'x1',
           prompt: 'You are shelving two Mozart sonatas: "M 22 .M89 K 331" and "M 22 .M89 K 545". How do you order them?',
@@ -719,7 +721,7 @@
         };
       }
 
-      function generateMod3(rng) {
+      function generateMod4(rng) {
         var cClass = getLockedItem(pools.classes, rng);
         var cWhole = getLockedItem(pools.wholes, rng);
         var cCutt = getLockedItem(pools.cutters, rng);
@@ -742,7 +744,7 @@
 
         var shuffled = shuffleChoices(choices, correctString, rng);
         return {
-          id: 'dyn_m3_' + Math.floor(rng() * 10000),
+          id: 'dyn_m4_' + Math.floor(rng() * 10000),
           prompt: 'Which call number comes first?',
           choices: shuffled.options,
           answer: shuffled.answerIndex,
@@ -753,9 +755,6 @@
 
       function buildDynamicModules(rng) {
         return [
-          {
-            key: 'moduleX', label: 'Module X', type: 'moduleX', title: 'Music Catalogs & Work IDs'
-          },
           {
             key: 'module1', label: 'Module 1', title: 'Whole Number',
             generator: generateMod1,
@@ -769,19 +768,22 @@
             key: 'module2', label: 'Module 2', title: 'First Cutter',
             generator: generateMod2,
             masteryText: 'Pass target: 3 correct in a row. A wrong answer generates a fresh question.',
-            insight: 'Opus tip: “op.” does not always mean chronological order.',
-            teach: '<p>Only look at the cutter if the class and whole numbers are absolutely identical.</p><p>The cutter starts with a letter, so sort alphabetically first (<strong>.B</strong> comes before <strong>.C</strong>). The numbers that follow the letter help narrow it down further, but your first step is always alphabetical.</p>',
+            insight: 'Alpha-Numeric: Cutters always sort alphabetically first, then numerically.',
+            teach: '<p>Only look at the cutter if the class and whole numbers are absolutely identical.</p><p>The cutter starts with a letter, so sort alphabetically first (<strong>.B</strong> comes before <strong>.C</strong>). The numbers that follow the letter help narrow it down further.</p>',
             worked: '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .B103 2005</code> vs <code class="call">M 3 .C4 1993</code></p><p>The <strong>M 3</strong> matches perfectly on both. Next, look at the cutter. <strong>.B103</strong> comes before <strong>.C4</strong> because the letter B comes before C alphabetically.</p></div>',
             questions: [generateMod2(rng), generateMod2(rng), generateMod2(rng)]
           },
           {
-            key: 'module3', label: 'Module 3', title: 'Year And Later Details',
-            generator: generateMod3,
+            key: 'module3', label: 'Module 3', type: 'workIds', title: 'Music Catalogs & Work IDs'
+          },
+          {
+            key: 'module4', label: 'Module 4', title: 'Year And Later Details',
+            generator: generateMod4,
             masteryText: 'Pass target: 3 correct in a row. A wrong answer generates a fresh question.',
-            insight: 'Edition tip: If two scores look alike, check identifiers like plate numbers or ISMN.',
-            teach: '<p>When the class, whole number, and cutter are all exactly the same, you have to look at the end of the call number to break the tie.</p><p>Sort years chronologically (older years come first). If you see Roman numerals (like SER.I and SER.II), evaluate them in numerical order.</p>',
+            insight: 'Tie breakers: Only look at years and later details when the whole number, cutter, and work IDs match.',
+            teach: '<p>When everything else at the top of the label is identical, you look to the end of the call number to break the tie.</p><p>Sort years chronologically (older years come first). If you see Roman numerals (like SER.I and SER.II), evaluate them in numerical order.</p>',
             worked: '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .O35 1994</code> vs <code class="call">M 3 .O35 2001</code></p><p>Everything matches until the year. <strong>1994</strong> is older than <strong>2001</strong>, so it shelves first.</p></div>',
-            questions: [generateMod3(rng), generateMod3(rng), generateMod3(rng)]
+            questions: [generateMod4(rng), generateMod4(rng), generateMod4(rng)]
           },
           { key: 'finalActivity', label: 'Final Activity', type: 'drag' },
           { key: 'done', label: 'Complete', type: 'done' }
@@ -789,6 +791,7 @@
       }
 
       var state = {
+        isOfficial: true,
         seed: null,
         rng: null,
         sessionStartedAt: null,
@@ -800,18 +803,18 @@
         dragItems: null,
         student: { realName: '', preferredName: '', sbuEmail: '' },
         metrics: {
-          modulePassed: { module1: false, module2: false, module3: false, finalActivity: false },
+          modulePassed: { module1: false, module2: false, module4: false, finalActivity: false },
         },
-        moduleX: { passed: false, completed: false }
+        workIds: { passed: false, completed: false }
       };
 
       function resetMetrics() {
         state.metrics = {
-          modulePassed: { module1: false, module2: false, module3: false, finalActivity: false }
+          modulePassed: { module1: false, module2: false, module4: false, finalActivity: false }
         };
-        state.moduleX = { passed: false, completed: false };
+        state.workIds = { passed: false, completed: false };
         state.dragItems = null;
-        moduleXQuestions.forEach(function(q) { q._done = false; });
+        workIdQuestions.forEach(function(q) { q._done = false; });
       }
 
       function syncStudentInfo() {
@@ -822,8 +825,8 @@
 
       function validateStudentInfo() {
         syncStudentInfo();
-        if (!state.student.realName) return 'Please enter the student’s real name.';
-        if (!state.student.preferredName) return 'Please enter the student’s preferred name.';
+        if (!state.student.realName) return 'Please enter your real name for official training.';
+        if (!state.student.preferredName) return 'Please enter your preferred name.';
         if (!isValidSbuEmail(state.student.sbuEmail)) return 'Please enter a valid SBU email ending in @stonybrook.edu.';
         return '';
       }
@@ -868,11 +871,20 @@
         bar.style.width = ((state.step) / (modules.length - 1)) * 100 + '%';
       }
 
-      window.startTraining = function() {
-        var validationMessage = validateStudentInfo();
-        if (validationMessage) {
-          showIntakeMessage(validationMessage, 'warn');
-          return;
+      window.beginSession = function(isOfficialMode) {
+        state.isOfficial = isOfficialMode;
+        
+        if (state.isOfficial) {
+          var validationMessage = validateStudentInfo();
+          if (validationMessage) {
+            showIntakeMessage(validationMessage, 'warn');
+            return;
+          }
+        } else {
+          // Practice Mode - fill with dummy data to avoid errors, but skip sending it later
+          state.student.realName = 'Guest Practice';
+          state.student.preferredName = 'Guest User';
+          state.student.sbuEmail = 'guest@stonybrook.edu';
         }
 
         showIntakeMessage('', '');
@@ -902,8 +914,8 @@
         var item = modules[state.step];
         updateProgress();
 
-        if (item.type === 'moduleX') {
-          renderModuleX();
+        if (item.type === 'workIds') {
+          renderWorkIdsModule();
           return;
         }
         if (item.type === 'drag') {
@@ -918,17 +930,16 @@
         renderModule(item);
       };
 
-      // --- Module X Functions ---
-      function renderModuleX() {
+      // --- Module 3 (Work IDs) Functions ---
+      function renderWorkIdsModule() {
         if (state.phase === 'teach') {
           screen.innerHTML =
-            '<h2>Module X: Music Catalogs &amp; Work IDs</h2>' +
-            '<div class="insight-card"><strong>The Golden Rule:</strong> Thematic catalogs (like BWV, KV) and Opus numbers are critical for shelving music. For prolific composers, these IDs are added directly into the call number right after the composer\'s cutter to keep their works in order!</div>' +
-            '<p>Scholars created special catalog systems for major composers. Instead of alphabetizing hundreds of Bach pieces by title, the Library of Congress groups them by their Work ID.</p>' +
+            '<h2>Module 3: Music Catalogs &amp; Work IDs</h2>' +
+            '<div class="insight-card"><strong>The Golden Rule:</strong> Now that you know how to sort by whole number and cutter, look for thematic catalogs (like BWV, KV) and Opus numbers. They are added directly into the call number right after the cutter to keep a composer\'s works in order!</div>' +
             '<div class="compare-box">' +
               '<div class="compare-label">Work IDs in Call Numbers</div>' +
               '<p>A real call number for Bach looks like this: <code class="call">M 22 .B3 BWV 846</code></p>' +
-              '<p>You sort the Class (M), the Whole Number (22), the Cutter (.B3), and <strong>then</strong> you sort numerically by the Work ID (BWV 846 comes before BWV 847).</p>' +
+              '<p>You verify the Class (M), the Whole Number (22), and the Cutter (.B3). <strong>Then</strong> you sort numerically by the Work ID (BWV 846 comes before BWV 847).</p>' +
             '</div>' +
             '<p>Here are the most common composer catalogs you will see right on the spine:</p>' +
             '<div class="reference-grid">' +
@@ -937,36 +948,35 @@
               '<div class="reference-box"><strong>Hob.</strong>Haydn<div class="example">Shelves as: Hob. I:104</div></div>' +
               '<div class="reference-box"><strong>op.</strong>Various (Opus)<div class="example">Shelves as: op. 47</div></div>' +
             '</div>' +
-            '<div class="mastery">Pass target: Answer all 3 questions correctly to prove you understand Work IDs before moving on to shelf-reading.</div>' +
+            '<div class="mastery">Pass target: Answer all 3 questions correctly to prove you understand Work IDs before moving on to dates and later details.</div>' +
             '<div class="inline-actions">' +
-              '<button type="button" onclick="window.startModuleXQuiz()">Start Practice</button>' +
+              '<button type="button" onclick="window.startWorkIdsQuiz()">Start Practice</button>' +
               '<button type="button" class="secondary" onclick="window.toggleReference(true)">Open Full Quick Reference</button>' +
             '</div>';
           return;
         }
-        window.renderModuleXQuestion();
+        window.renderWorkIdsQuestion();
       }
 
-      window.startModuleXQuiz = function() {
+      window.startWorkIdsQuiz = function() {
         state.phase = 'practice';
         state.currentQuestion = null;
-        window.renderModuleXQuestion();
+        window.renderWorkIdsQuestion();
       };
 
-      window.renderModuleXQuestion = function() {
-        var unanswered = moduleXQuestions.filter(function(q) {
+      window.renderWorkIdsQuestion = function() {
+        var unanswered = workIdQuestions.filter(function(q) {
           return !q._done;
         });
 
         if (unanswered.length === 0) {
-          state.moduleX.completed = true;
-          state.moduleX.passed = true;
+          state.workIds.completed = true;
+          state.workIds.passed = true;
           screen.innerHTML =
-            '<h2>Module X Complete</h2>' +
-            '<div class="feedback good">You completed the required work-ID questions.</div>' +
-            '<p>Good. Now move into the shelf-reading modules.</p>' +
+            '<h2>Module 3 Complete</h2>' +
+            '<div class="feedback good">You successfully sorted using thematic catalogs.</div>' +
             '<div class="inline-actions">' +
-              '<button type="button" onclick="window.advanceFromModuleX()">Continue to Module 1</button>' +
+              '<button type="button" onclick="window.advanceFromWorkIds()">Continue to Module 4</button>' +
               '<button type="button" class="secondary" onclick="window.toggleReference(true)">Open Quick Reference</button>' +
             '</div>';
           return;
@@ -976,24 +986,24 @@
         var q = state.currentQuestion;
 
         var choicesHtml = q.choices.map(function(c, i) {
-          return '<button class="choice" onclick="window.checkModuleX(' + i + ')">' + escapeHtml(c) + '</button>';
+          return '<button class="choice" onclick="window.checkWorkIdAnswer(' + i + ')">' + escapeHtml(c) + '</button>';
         }).join('');
 
         screen.innerHTML = 
-          '<h3>Question ' + (moduleXQuestions.length - unanswered.length + 1) + ' of ' + moduleXQuestions.length + '</h3>' +
+          '<h3>Question ' + (workIdQuestions.length - unanswered.length + 1) + ' of ' + workIdQuestions.length + '</h3>' +
           '<p><strong>' + escapeHtml(q.prompt) + '</strong></p>' +
           '<div id="choices">' + choicesHtml + '</div>' +
           '<div id="qFeedback"></div>';
       };
 
-      window.checkModuleX = function(index) {
+      window.checkWorkIdAnswer = function(index) {
         var q = state.currentQuestion;
         var fb = document.getElementById('qFeedback');
         
         if (index === q.answer) {
           q._done = true;
           fb.innerHTML = '<div class="feedback good">Correct! ' + escapeHtml(q.explain) + '</div>' +
-                         '<button style="margin-top:14px" onclick="window.renderModuleXQuestion()">Next Question</button>';
+                         '<button style="margin-top:14px" onclick="window.renderWorkIdsQuestion()">Next Question</button>';
           
           var btns = document.querySelectorAll('.choice');
           for(var i=0; i<btns.length; i++) { btns[i].disabled = true; }
@@ -1002,7 +1012,7 @@
         }
       };
 
-      window.advanceFromModuleX = function() {
+      window.advanceFromWorkIds = function() {
         state.step++;
         state.phase = 'teach';
         window.render();
@@ -1029,7 +1039,7 @@
         var item = modules[state.step];
         item.questions.forEach(function(q) { q._done = false; });
         window.render();
-      };
+      }
 
       function renderModuleQuestion(item) {
         var unanswered = item.questions.filter(function(q) { return !q._done; });
@@ -1199,15 +1209,28 @@
       // --- Done / Score Submission ---
       function renderDone() {
         state.sessionCompletedAt = nowIso();
-        screen.innerHTML = 
+        
+        var doneHtml = 
           '<h2>Training Complete!</h2>' +
           '<div class="summary-grid">' +
-            '<div class="summary-box"><div class="label">Name</div><div class="value">' + escapeHtml(state.student.preferredName || state.student.realName) + '</div></div>' +
-            '<div class="summary-box"><div class="label">Status</div><div class="value" style="color:var(--good)">Passed</div></div>' +
-          '</div>' +
-          '<p>Your results are ready to be submitted to the scoreboard.</p>' +
-          '<button type="button" id="submitBtn" onclick="window.submitScore()">Submit Results</button>' +
-          '<div id="submitFeedback" style="margin-top:14px"></div>';
+            '<div class="summary-box"><div class="label">Name</div><div class="value">' + escapeHtml(state.student.preferredName) + '</div></div>' +
+            '<div class="summary-box"><div class="label">Status</div><div class="value" style="color:var(--good)">Passed All Modules</div></div>' +
+          '</div>';
+
+        if (state.isOfficial) {
+          doneHtml += 
+            '<p>Your results are ready to be submitted to the scoreboard.</p>' +
+            '<button type="button" id="submitBtn" onclick="window.submitScore()">Submit Results</button>' +
+            '<div id="submitFeedback" style="margin-top:14px"></div>';
+        } else {
+          doneHtml += 
+            '<div class="info-box">' +
+              '<strong>Practice Mode Complete</strong>' +
+              '<p class="small" style="margin-bottom:0;">Because you played in Practice Mode, your score will not be submitted to the library sheet. You can refresh the page if you would like to complete it for official training credit!</p>' +
+            '</div>';
+        }
+
+        screen.innerHTML = doneHtml;
       }
 
       window.submitScore = function() {
@@ -1222,17 +1245,17 @@
           preferredName: state.student.preferredName,
           sbuEmail: state.student.sbuEmail,
           
-          module1Completed: state.moduleX.completed,
-          module1Passed: state.moduleX.passed,
+          module1Completed: state.metrics.modulePassed.module1,
+          module1Passed: state.metrics.modulePassed.module1,
           
-          module2Completed: state.metrics.modulePassed.module1,
-          module2Passed: state.metrics.modulePassed.module1,
+          module2Completed: state.metrics.modulePassed.module2,
+          module2Passed: state.metrics.modulePassed.module2,
           
-          module3Completed: state.metrics.modulePassed.module2,
-          module3Passed: state.metrics.modulePassed.module2,
+          module3Completed: state.workIds.passed,
+          module3Passed: state.workIds.passed,
           
-          module4Completed: state.metrics.modulePassed.module3,
-          module4Passed: state.metrics.modulePassed.module3,
+          module4Completed: state.metrics.modulePassed.module4,
+          module4Passed: state.metrics.modulePassed.module4,
           
           totalModulesCompleted: 4, 
           totalModulesPassed: 4, 
@@ -1266,7 +1289,8 @@
       };
 
       // --- Initialization ---
-      if(startBtn) startBtn.addEventListener('click', window.startTraining);
+      if(startBtn) startBtn.addEventListener('click', function() { window.beginSession(true); });
+      if(practiceBtn) practiceBtn.addEventListener('click', function() { window.beginSession(false); });
       if(rulesBtn) rulesBtn.addEventListener('click', window.toggleRules);
       if(referenceBtn) referenceBtn.addEventListener('click', function() { window.toggleReference(true); });
       if(closeReferenceBtn) closeReferenceBtn.addEventListener('click', function() { window.toggleReference(false); });
