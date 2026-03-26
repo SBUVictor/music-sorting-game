@@ -3,286 +3,179 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shelf It Right | SBU Music Library Training</title>
+  <title>Shelf It Right | SBU Music Library</title>
   <style>
     :root {
       --sbu-red: #990000; --sbu-black: #000000; --sbu-dark-red: #6B000D;
-      --sbu-gray: #4B4B4B; --sbu-cream: #F8F2C5; --sbu-light-gray: #BEBEBE;
-      --sbu-celery: #BCCF9D; --sbu-forest: #104247; --bg: #fdfdfd;
+      --sbu-cream: #F8F2C5; --sbu-light-gray: #BEBEBE; --sbu-celery: #BCCF9D;
+      --sbu-forest: #104247; --bg: #fdfdfd; --card: #ffffff;
     }
-    body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--sbu-black); line-height: 1.6; }
-    .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-    
-    /* UI Components */
-    .card { background: #fff; border: 1px solid var(--sbu-light-gray); border-radius: 24px; padding: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 25px; position: relative; overflow: hidden; }
-    .pill { display: inline-block; padding: 6px 16px; border-radius: 50px; border: 2px solid var(--sbu-red); color: var(--sbu-red); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
-    
-    .progress-container { width: 100%; height: 12px; background: #eee; border-radius: 20px; margin: 20px 0 30px; overflow: hidden; }
-    #progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--sbu-red), var(--sbu-bright-red)); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-    
-    h1 { font-size: 3rem; font-weight: 900; margin: 0 0 15px; letter-spacing: -1px; }
+    body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--sbu-black); }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+    .card { background: var(--card); border: 1px solid var(--sbu-light-gray); border-radius: 24px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 25px; }
+    .pill { display: inline-block; padding: 6px 16px; border-radius: 50px; border: 2px solid var(--sbu-red); color: var(--sbu-red); font-weight: 800; font-size: 13px; text-transform: uppercase; margin-bottom: 20px; }
+    .progress-bar { width: 100%; height: 12px; background: #eee; border-radius: 20px; margin-bottom: 30px; overflow: hidden; }
+    #progress-fill { height: 100%; width: 0%; background: var(--sbu-red); transition: width 0.5s ease; }
+    h1 { font-size: 3rem; margin: 0 0 20px; font-weight: 900; }
     h2 { color: var(--sbu-red); font-size: 2rem; margin-top: 0; }
-    
-    .instruction-box { background: var(--sbu-cream); padding: 25px; border-radius: 16px; border-left: 8px solid var(--sbu-red); margin: 25px 0; }
-    
-    /* Buttons */
-    button { background: var(--sbu-red); color: white; border: none; padding: 16px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 18px; transition: all 0.2s ease; }
-    button:hover { background: var(--sbu-dark-red); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(153,0,0,0.3); }
-    button:active { transform: translateY(0); }
-    
-    button.choice { display: block; width: 100%; text-align: left; background: #fff; color: var(--sbu-black); border: 2px solid #eee; margin-bottom: 12px; padding: 20px; font-size: 1.1rem; }
-    button.choice:hover { border-color: var(--sbu-red); background: var(--sbu-cream); }
-
-    /* Feedback States */
-    .feedback { padding: 20px; border-radius: 15px; margin-top: 25px; font-weight: 700; animation: slideIn 0.3s ease; }
-    .good { background: var(--sbu-celery); color: var(--sbu-forest); border: 2px solid var(--sbu-forest); }
-    .bad { background: #fff1f1; color: #cc0000; border: 2px solid #cc0000; }
-    
-    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Drag and Drop Interface */
-    .drag-zone { display: flex; flex-direction: column; gap: 12px; margin: 30px 0; }
-    .drag-item { padding: 20px; background: #fff; border: 2px solid #ddd; border-radius: 15px; cursor: grab; display: flex; align-items: center; font-family: 'Courier New', monospace; font-weight: 700; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .drag-item:active { cursor: grabbing; }
-    .drag-item.dragging { opacity: 0.4; border: 2px dashed var(--sbu-red); background: var(--sbu-cream); }
-    .handle { margin-right: 20px; color: #ccc; font-size: 1.5rem; }
-
-    code.call-tag { background: #f4f4f4; padding: 4px 10px; border-radius: 8px; font-family: 'Courier New', monospace; font-weight: 900; color: #333; border: 1px solid #ddd; }
-    .ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0; }
-    .ref-card { padding: 20px; border: 1px solid #ddd; border-radius: 15px; background: white; text-align: center; }
-    .ref-card b { display: block; font-size: 1.4rem; color: var(--sbu-red); margin-bottom: 5px; }
-    
+    .insight { background: var(--sbu-cream); padding: 25px; border-radius: 16px; border-left: 8px solid var(--sbu-red); margin-bottom: 30px; }
+    button { background: var(--sbu-red); color: white; border: none; padding: 18px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 18px; transition: 0.2s; }
+    button:hover { background: var(--sbu-dark-red); transform: translateY(-2px); }
+    button.choice { display: block; width: 100%; text-align: left; background: white; color: black; border: 2px solid #eee; margin-bottom: 15px; padding: 20px; font-size: 1.1rem; }
+    button.choice:hover { background: var(--sbu-cream); border-color: var(--sbu-red); }
+    .feedback { padding: 20px; border-radius: 15px; margin-top: 25px; font-weight: bold; border: 2px solid transparent; }
+    .good { background: var(--sbu-celery); color: var(--sbu-forest); border-color: var(--sbu-forest); }
+    .bad { background: #fff1f1; color: #b91c1c; border-color: #f87171; }
+    code.call { background: #f4f4f4; padding: 4px 10px; border-radius: 8px; font-family: 'Courier New', monospace; font-weight: 900; }
     .hidden { display: none !important; }
+    .ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
+    .ref-item { border: 1px solid var(--sbu-light-gray); padding: 20px; border-radius: 15px; background: white; text-align: center; }
+    .ref-item b { display: block; font-size: 1.5rem; color: var(--sbu-red); margin-bottom: 5px; }
+    .drag-zone { display: flex; flex-direction: column; gap: 12px; margin: 30px 0; }
+    .drag-item { padding: 20px; background: white; border: 2px solid #ddd; border-radius: 15px; cursor: grab; display: flex; align-items: center; font-weight: bold; font-size: 1.2rem; }
+    .drag-item.dragging { opacity: 0.5; border-color: var(--sbu-red); }
   </style>
 </head>
 <body>
-
-<div class="container">
-  <div id="start-screen" class="card">
-    <div class="pill">Stony Brook University</div>
-    <h1>Shelf It Right</h1>
-    <p>Welcome to the Music Library student assistant training. This application will teach you how to identify musical works and shelve them correctly using Library of Congress classification.</p>
-    
-    <div class="instruction-box">
-      <strong>Prerequisite:</strong> Per training guidelines, you must complete <b>Module X: Music Catalogs</b> before moving into shelf-reading practice.
+  <div class="wrap">
+    <div id="landing" class="card">
+      <div class="pill">Module X Initialized</div>
+      <h1>Shelf It Right</h1>
+      <p>Student Assistant Training: From Work Identification to Shelf Mastery.</p>
+      <button onclick="startApp()">Begin Official Training</button>
     </div>
-    
-    <button onclick="initApp()">Begin Training</button>
-  </div>
 
-  <div id="app-container" class="hidden">
-    <div class="card">
-      <div id="mod-tag" class="pill">Loading...</div>
-      <div class="progress-container"><div id="progress-fill"></div></div>
-      <div id="content-area"></div>
-    </div>
-  </div>
-</div>
-
-<script>
-  // APP STATE
-  const state = {
-    currentMod: 0,
-    phase: 'teaching', // 'teaching' or 'quiz'
-    streak: 0,
-    totalMods: 0
-  };
-
-  // MODULE DATA
-  const moduleData = [
-    {
-      title: "Module X: Music Catalogs",
-      type: "quiz",
-      teachContent: `
-        <h2>Identification "Fingerprints"</h2>
-        <p>Before you shelve a book, you must know what it is. Music Catalogs (Work IDs) are the ultimate fingerprint of a piece.</p>
-        <div class="instruction-box">
-          <b>The Golden Rule:</b> These labels are <u>not</u> part of the shelving call number. They help you confirm you are handing the patron the exact right piece.
-        </div>
-        <div class="ref-grid">
-          <div class="ref-card"><b>BWV</b> Bach</div>
-          <div class="ref-card"><b>KV</b> Mozart</div>
-          <div class="ref-card"><b>D.</b> Schubert</div>
-          <div class="ref-card"><b>Hob.</b> Haydn</div>
-        </div>
-      `,
-      questions: [
-        { q: "Which catalog belongs to Mozart?", options: ["BWV", "KV", "Hob."], correct: 1, explanation: "Correct! Mozart uses KV (or K)." },
-        { q: "Which of these is a GENERAL designation used across many composers?", options: ["RV", "BWV", "WoO"], correct: 2, explanation: "Correct! WoO stands for 'Works without opus'." },
-        { q: "True or False: The Work ID (like BWV 1007) is part of the shelving call number.", options: ["True", "False"], correct: 1, explanation: "Correct! They are not part of the call number used for shelving." }
-      ]
-    },
-    {
-      title: "Module 1: Whole Numbers",
-      type: "quiz",
-      teachContent: `
-        <h2>Shelving Rule 1: Whole Numbers</h2>
-        <p>Call numbers are read line-by-line. Start with the Class (M) and the <b>Whole Number</b>.</p>
-        <div class="instruction-box">
-          Example: <code class="call-tag">M 2</code> comes before <code class="call-tag">M 3</code>. <br>
-          Decimals: <code class="call-tag">M 2.3</code> comes before <code class="call-tag">M 3</code>.
-        </div>
-      `,
-      questions: [
-        { q: "Which call number comes first?", options: ["M 3 .C4 2001", "M 2 .B103 1994"], correct: 1, explanation: "Correct! Whole number 2 comes before 3." },
-        { q: "Which call number comes first?", options: ["M 14.5 .S4", "M 15 .A2"], correct: 0, explanation: "Correct! 14.5 is smaller than 15." }
-      ]
-    },
-    {
-      title: "Module 2: The First Cutter",
-      type: "quiz",
-      teachContent: `
-        <h2>Shelving Rule 2: First Cutters</h2>
-        <p>If the whole numbers match, move to the <b>Cutter</b> (Letter + Number).</p>
-        <div class="instruction-box">
-          <b>Rule:</b> Letters are alphabetical; Numbers are read as decimals.
-        </div>
-      `,
-      questions: [
-        { q: "Which call number comes first?", options: ["M 45 .C4 1988", "M 45 .S36 1988"], correct: 0, explanation: "Correct! .C comes before .S alphabetically." },
-        { q: "Which comes first?", options: ["M 3 .B103", "M 3 .B21"], correct: 0, explanation: "Correct! In cutters, .B103 (103) is smaller than .B21 (210)." }
-      ]
-    },
-    {
-      title: "Final Assessment",
-      type: "drag",
-      teachContent: `
-        <h2>Final Exam: Shelf Reading</h2>
-        <p>Now, apply everything you've learned. Arrange these items in the correct order as they would appear on the shelf.</p>
-      `,
-      items: [
-        { id: "a", text: "M 2 .G39 1966 BD.23", rank: 0 },
-        { id: "b", text: "M 2.3 .U6 R4 V.66", rank: 1 },
-        { id: "c", text: "M 3 .B103 2005 SER.8", rank: 2 },
-        { id: "d", text: "M 3 .C4 1993 SER.VI", rank: 3 }
-      ]
-    }
-  ];
-
-  function initApp() {
-    document.getElementById('start-screen').classList.add('hidden');
-    document.getElementById('app-container').classList.remove('hidden');
-    state.totalMods = moduleData.length;
-    render();
-  }
-
-  function render() {
-    const mod = moduleData[state.currentMod];
-    const content = document.getElementById('content-area');
-    const fill = document.getElementById('progress-fill');
-    
-    document.getElementById('mod-tag').textContent = mod.title;
-    fill.style.width = ((state.currentMod / state.totalMods) * 100) + "%";
-
-    if (state.phase === 'teaching') {
-      content.innerHTML = mod.teachContent + `<button onclick="startQuiz()">Start Practice</button>`;
-    } else {
-      if (mod.type === 'quiz') renderQuiz(mod);
-      else renderDrag(mod);
-    }
-  }
-
-  function startQuiz() {
-    state.phase = 'quiz';
-    state.streak = 0;
-    render();
-  }
-
-  function renderQuiz(mod) {
-    const q = mod.questions[state.streak];
-    const content = document.getElementById('content-area');
-    content.innerHTML = `
-      <h3>Question ${state.streak + 1} of ${mod.questions.length}</h3>
-      <p style="font-size: 1.3rem; font-weight: 700;">${q.q}</p>
-      <div id="options">
-        ${q.options.map((opt, i) => `<button class="choice" onclick="checkAnswer(${i})">${opt}</button>`).join('')}
+    <div id="app" class="hidden">
+      <div class="card">
+        <div id="mod-label" class="pill">Module</div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <div id="screen"></div>
       </div>
-      <div id="feedback-slot"></div>
-    `;
-  }
+    </div>
+  </div>
 
-  function checkAnswer(idx) {
-    const mod = moduleData[state.currentMod];
-    const q = mod.questions[state.streak];
-    const slot = document.getElementById('feedback-slot');
-    const btns = document.querySelectorAll('.choice');
-    
-    btns.forEach(b => b.disabled = true);
+  <script>
+    let state = { step: 0, phase: 'teach', streak: 0 };
 
-    if (idx === q.correct) {
-      slot.innerHTML = `<div class="feedback good">${q.explanation}</div>`;
-      state.streak++;
-      const btnText = state.streak >= mod.questions.length ? "Finish Module" : "Continue";
-      const nextFn = state.streak >= mod.questions.length ? "nextModule()" : "render()";
-      slot.innerHTML += `<button style="margin-top:15px" onclick="${nextFn}">${btnText}</button>`;
-    } else {
-      slot.innerHTML = `<div class="feedback bad">Not quite. Review the rule and try again.</div>`;
-      slot.innerHTML += `<button style="margin-top:15px; background: #666" onclick="startQuiz()">Restart Module</button>`;
-    }
-  }
+    const modules = [
+      {
+        title: "Module X: Music Catalogs",
+        type: "quiz",
+        teach: `<h2>Thematic Catalogs & Work IDs</h2>
+                <div class="insight"><strong>The Golden Rule:</strong> Work IDs are "fingerprints" to confirm the exact piece. They are <u>never</u> used for shelving.</div>
+                <div class="ref-grid">
+                  <div class="ref-item"><b>BWV</b> Bach</div>
+                  <div class="ref-item"><b>KV (or K)</b> Mozart</div>
+                  <div class="ref-item"><b>Hob.</b> Haydn</div>
+                  <div class="ref-item"><b>RV</b> Vivaldi</div>
+                </div>`,
+        questions: [
+          { q: "Which thematic catalog is used specifically for Wolfgang Amadeus Mozart?", c: ["BWV", "KV (or K)", "Hob.", "RV"], a: 1, e: "Correct! Mozart uses KV." },
+          { q: "Which one is a general designation, not a composer-specific catalog?", c: ["BWV", "RV", "WoO", "Hob."], a: 2, e: "Correct! WoO stands for 'Works without opus number'." }
+        ]
+      },
+      {
+        title: "Module 1: Whole Numbers",
+        type: "quiz",
+        teach: `<h2>Whole Numbers First</h2>
+                <p>Shelving starts with the Class (M) and the <b>Whole Number</b>.</p>
+                <div class="insight">Example: <code class="call">M 2</code> comes before <code class="call">M 3</code>. Numbers with decimals like <code class="call">M 14.5</code> come before <code class="call">M 15</code>.</div>`,
+        questions: [
+          { q: "Which call number comes first?", c: ["M 14.5 .S4", "M 15 .A2"], a: 0, e: "Correct! 14.5 is smaller than 15." }
+        ]
+      },
+      {
+        title: "Module 2: First Cutter",
+        type: "quiz",
+        teach: `<h2>The First Cutter</h2>
+                <p>If whole numbers match, look at the Cutter. Letters are alphabetical; numbers are decimals.</p>`,
+        questions: [
+          { q: "Which call number comes first?", c: ["M 45 .C4 1988", "M 45 .S36 1988", "M 45 .H26 1988"], a: 0, e: "Correct! .C comes before .S alphabetically." }
+        ]
+      },
+      {
+        title: "Final Assessment",
+        type: "drag",
+        teach: `<h2>Final Performance Check</h2>
+                <p>Drag the items into the correct shelf order (Top to Bottom).</p>`,
+        items: [
+          { id: "a", text: "M 2 .G39 1966 BD.23", r: 0 },
+          { id: "b", text: "M 2.3 .U6 R4 V.66", r: 1 },
+          { id: "c", text: "M 3 .B103 2005 SER.8", r: 2 },
+          { id: "d", text: "M 3 .C4 1993 SER.VI", r: 3 }
+        ]
+      }
+    ];
 
-  // DRAG AND DROP LOGIC
-  function renderDrag(mod) {
-    const content = document.getElementById('content-area');
-    content.innerHTML = `
-      <h3>Arrange from Top to Bottom</h3>
-      <div class="drag-zone" id="sortable"></div>
-      <button onclick="checkDrag()">Verify Shelf Order</button>
-      <div id="feedback-slot"></div>
-    `;
-    
-    const zone = document.getElementById('sortable');
-    const shuffled = [...mod.items].sort(() => Math.random() - 0.5);
-    
-    shuffled.forEach(item => {
-      const el = document.createElement('div');
-      el.className = 'drag-item';
-      el.draggable = true;
-      el.dataset.rank = item.rank;
-      el.innerHTML = `<span class="handle">☰</span> <code class="call-tag">${item.text}</code>`;
-      
-      el.addEventListener('dragstart', () => el.classList.add('dragging'));
-      el.addEventListener('dragend', () => el.classList.remove('dragging'));
-      zone.appendChild(el);
-    });
-
-    zone.addEventListener('dragover', e => {
-      e.preventDefault();
-      const dragging = document.querySelector('.dragging');
-      const siblings = [...zone.querySelectorAll('.drag-item:not(.dragging)')];
-      let nextSibling = siblings.find(sib => e.clientY <= sib.getBoundingClientRect().top + sib.getBoundingClientRect().height / 2);
-      zone.insertBefore(dragging, nextSibling);
-    });
-  }
-
-  function checkDrag() {
-    const currentOrder = [...document.querySelectorAll('.drag-item')];
-    const isCorrect = currentOrder.every((el, i) => parseInt(el.dataset.rank) === i);
-    const slot = document.getElementById('feedback-slot');
-
-    if (isCorrect) {
-      slot.innerHTML = `<div class="feedback good">Perfect! You have mastered shelf reading.</div>
-                        <button style="margin-top:15px" onclick="nextModule()">Complete Training</button>`;
-    } else {
-      slot.innerHTML = `<div class="feedback bad">The order is incorrect. Check the whole numbers first, then the cutters.</div>`;
-    }
-  }
-
-  function nextModule() {
-    state.currentMod++;
-    state.phase = 'teaching';
-    if (state.currentMod < moduleData.length) {
+    function startApp() {
+      document.getElementById('landing').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
       render();
-    } else {
-      document.getElementById('content-area').innerHTML = `
-        <h2 style="font-size: 3rem">🎉 Certified!</h2>
-        <p>You have successfully completed the Stony Brook Music Library Shelf Reading Training.</p>
-        <button onclick="location.reload()">Restart Training</button>
-      `;
-      document.getElementById('progress-fill').style.width = "100%";
     }
-  }
-</script>
 
+    function render() {
+      if (state.step >= modules.length) { renderEnd(); return; }
+      const mod = modules[state.step];
+      document.getElementById('mod-label').textContent = mod.title;
+      document.getElementById('progress-fill').style.width = (state.step / modules.length * 100) + "%";
+      const scr = document.getElementById('screen');
+
+      if (state.phase === 'teach') {
+        scr.innerHTML = mod.teach + `<button onclick="state.phase='quiz';render()">Start Module Questions</button>`;
+      } else if (mod.type === 'quiz') {
+        const q = mod.questions[state.streak];
+        scr.innerHTML = `<h3>Question ${state.streak + 1} of ${mod.questions.length}</h3><p style="font-size:1.2rem"><b>${q.q}</b></p>` +
+          q.c.map((opt, i) => `<button class="choice" onclick="checkAns(${i})">${opt}</button>`).join('') + `<div id="fb"></div>`;
+      } else {
+        renderDrag(mod);
+      }
+    }
+
+    window.checkAns = function(i) {
+      const q = modules[state.step].questions[state.streak];
+      const div = document.getElementById('fb');
+      if (i === q.a) {
+        state.streak++;
+        div.innerHTML = `<div class="feedback good">${q.e}</div>` + 
+          (state.streak >= modules[state.step].questions.length ? `<button onclick="nextMod()">Next Module</button>` : `<button onclick="render()">Continue</button>`);
+      } else {
+        div.innerHTML = `<div class="feedback bad">Incorrect. Let's restart this module.</div><button onclick="state.streak=0;state.phase='teach';render()">Review Rule</button>`;
+      }
+    };
+
+    function renderDrag(mod) {
+      const scr = document.getElementById('screen');
+      scr.innerHTML = `<h3>Arrange Shelf Order</h3><div class="drag-zone" id="dz"></div><button onclick="checkDrag()">Verify Order</button><div id="fb"></div>`;
+      const dz = document.getElementById('dz');
+      [...mod.items].sort(() => Math.random() - 0.5).forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'drag-item'; el.draggable = true; el.dataset.r = item.r;
+        el.innerHTML = `☰ &nbsp; <code class="call">${item.text}</code>`;
+        el.addEventListener('dragstart', () => el.classList.add('dragging'));
+        el.addEventListener('dragend', () => el.classList.remove('dragging'));
+        dz.appendChild(el);
+      });
+      dz.addEventListener('dragover', e => {
+        e.preventDefault();
+        const drag = document.querySelector('.dragging');
+        const next = [...dz.querySelectorAll('.drag-item:not(.dragging)')].find(s => e.clientY <= s.getBoundingClientRect().top + s.getBoundingClientRect().height / 2);
+        dz.insertBefore(drag, next);
+      });
+    }
+
+    window.checkDrag = function() {
+      const items = [...document.querySelectorAll('.drag-item')];
+      const win = items.every((el, i) => parseInt(el.dataset.r) === i);
+      const fb = document.getElementById('fb');
+      if (win) { fb.innerHTML = `<div class="feedback good">Perfect! Assessment Passed.</div><button onclick="nextMod()">Finish</button>`; }
+      else { fb.innerHTML = `<div class="feedback bad">Order incorrect. Remember: Whole Numbers > Cutters > Years.</div>`; }
+    };
+
+    window.nextMod = function() { state.step++; state.phase = 'teach'; state.streak = 0; render(); };
+    function renderEnd() { 
+        document.getElementById('progress-fill').style.width = "100%";
+        document.getElementById('screen').innerHTML = `<h2>Training Complete</h2><p>You have mastered the SBU Music Library shelving standards.</p><button onclick="location.reload()">Restart Training</button>`; 
+    }
+  </script>
 </body>
 </html>
