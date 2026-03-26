@@ -3,1213 +3,286 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shelf It Right - Stony Brook University</title>
+  <title>Shelf It Right | SBU Music Library Training</title>
   <style>
     :root {
-      /* Primary Colors */
-      --sbu-black: #000000;
-      --sbu-red: #990000;
-      
-      /* Secondary Colors */
-      --sbu-dark-red: #6B000D;
-      --sbu-navy: #002244;
-      --sbu-bright-red: #D52027;
-      --sbu-royal: #00549A;
-      --sbu-dark-gray: #4B4B4B;
-      --sbu-turquoise: #1791AD;
-      --sbu-medium-gray: #828282;
-      --sbu-pear: #F1EA86;
-      --sbu-light-gray: #BEBEBE;
-      --sbu-celery: #BCCF9D;
-      --sbu-forest: #104247;
-      --sbu-cream: #F8F2C5;
-
-      /* UI Theme Mapping */
-      --bg: #fdfdfd; 
-      --card: #ffffff;
-      --ink: var(--sbu-black);
-      --muted: var(--sbu-dark-gray);
-      --line: var(--sbu-light-gray);
-      
-      /* Accents */
-      --accent: var(--sbu-red);
-      --accent-hover: var(--sbu-dark-red);
-      
-      /* Semantic Feedback Colors */
-      --good: var(--sbu-forest);
-      --good-bg: var(--sbu-celery);
-      --bad: var(--sbu-bright-red);
-      --bad-bg: #ffffff; 
-      --warn: var(--sbu-navy);
-      --warn-bg: var(--sbu-pear);
-      
-      --chip: var(--sbu-cream);
+      --sbu-red: #990000; --sbu-black: #000000; --sbu-dark-red: #6B000D;
+      --sbu-gray: #4B4B4B; --sbu-cream: #F8F2C5; --sbu-light-gray: #BEBEBE;
+      --sbu-celery: #BCCF9D; --sbu-forest: #104247; --bg: #fdfdfd;
     }
+    body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--sbu-black); line-height: 1.6; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+    
+    /* UI Components */
+    .card { background: #fff; border: 1px solid var(--sbu-light-gray); border-radius: 24px; padding: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 25px; position: relative; overflow: hidden; }
+    .pill { display: inline-block; padding: 6px 16px; border-radius: 50px; border: 2px solid var(--sbu-red); color: var(--sbu-red); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+    
+    .progress-container { width: 100%; height: 12px; background: #eee; border-radius: 20px; margin: 20px 0 30px; overflow: hidden; }
+    #progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--sbu-red), var(--sbu-bright-red)); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    
+    h1 { font-size: 3rem; font-weight: 900; margin: 0 0 15px; letter-spacing: -1px; }
+    h2 { color: var(--sbu-red); font-size: 2rem; margin-top: 0; }
+    
+    .instruction-box { background: var(--sbu-cream); padding: 25px; border-radius: 16px; border-left: 8px solid var(--sbu-red); margin: 25px 0; }
+    
+    /* Buttons */
+    button { background: var(--sbu-red); color: white; border: none; padding: 16px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 18px; transition: all 0.2s ease; }
+    button:hover { background: var(--sbu-dark-red); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(153,0,0,0.3); }
+    button:active { transform: translateY(0); }
+    
+    button.choice { display: block; width: 100%; text-align: left; background: #fff; color: var(--sbu-black); border: 2px solid #eee; margin-bottom: 12px; padding: 20px; font-size: 1.1rem; }
+    button.choice:hover { border-color: var(--sbu-red); background: var(--sbu-cream); }
 
-    * { box-sizing: border-box; }
+    /* Feedback States */
+    .feedback { padding: 20px; border-radius: 15px; margin-top: 25px; font-weight: 700; animation: slideIn 0.3s ease; }
+    .good { background: var(--sbu-celery); color: var(--sbu-forest); border: 2px solid var(--sbu-forest); }
+    .bad { background: #fff1f1; color: #cc0000; border: 2px solid #cc0000; }
+    
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.55;
-    }
+    /* Drag and Drop Interface */
+    .drag-zone { display: flex; flex-direction: column; gap: 12px; margin: 30px 0; }
+    .drag-item { padding: 20px; background: #fff; border: 2px solid #ddd; border-radius: 15px; cursor: grab; display: flex; align-items: center; font-family: 'Courier New', monospace; font-weight: 700; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .drag-item:active { cursor: grabbing; }
+    .drag-item.dragging { opacity: 0.4; border: 2px dashed var(--sbu-red); background: var(--sbu-cream); }
+    .handle { margin-right: 20px; color: #ccc; font-size: 1.5rem; }
 
-    .wrap {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 18px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.05);
-    }
-
-    h1, h2, h3 { margin-top: 0; color: var(--sbu-black); }
-    h1 { font-size: 2.7rem; line-height: 1.1; margin-bottom: 12px; }
-    h2 { font-size: 1.65rem; margin-bottom: 10px; }
-    h3 { font-size: 1.08rem; margin-bottom: 8px; }
-    p { margin: 0 0 14px 0; font-size: 1.02rem; }
-
-    .version {
-      color: var(--accent);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .info-box {
-      background: var(--sbu-cream);
-      border: 1px solid var(--sbu-light-gray);
-      border-radius: 16px;
-      padding: 16px 18px;
-      margin: 14px 0;
-    }
-
-    .info-box strong {
-      display: block;
-      color: var(--accent);
-      margin-bottom: 5px;
-      font-size: 1.02rem;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #ffffff;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .03em;
-      margin-bottom: 10px;
-    }
-
-    .chip {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--chip);
-      border: 1px solid var(--sbu-light-gray);
-      font-size: 12px;
-      color: var(--accent);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .progress {
-      width: 100%;
-      height: 10px;
-      background: var(--line);
-      border-radius: 999px;
-      overflow: hidden;
-      margin: 10px 0 18px;
-    }
-
-    .progress > div {
-      height: 100%;
-      width: 0%;
-      background: var(--accent);
-      transition: width .2s ease;
-    }
-
-    .mastery,
-    .lesson-note,
-    .insight-card {
-      margin: 0 0 14px 0;
-      padding: 12px 14px;
-      background: #ffffff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      font-size: .96rem;
-      color: var(--muted);
-    }
-
-    .insight-card {
-      border-left: 4px solid var(--accent);
-      color: var(--ink);
-    }
-
-    .reference-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-      margin-bottom: 14px;
-    }
-
-    .reference-box {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-      background: #fff;
-    }
-
-    .reference-box strong {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--accent);
-    }
-
-    .reference-box .example {
-      color: var(--muted);
-      font-size: .94rem;
-      margin-top: 4px;
-    }
-
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      background: var(--accent);
-      color: #fff;
-      transition: background-color 0.2s;
-    }
-
-    button:hover:not(:disabled) { background: var(--accent-hover); }
-
-    button.secondary {
-      background: #fff;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-    }
-
-    button.secondary:hover { background: var(--sbu-cream); }
-
-    button.choice {
-      display: block;
-      width: 100%;
-      text-align: left;
-      margin: 10px 0;
-      padding: 14px 16px;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      font-weight: 600;
-    }
-
-    button.choice:hover:not(:disabled) {
-      border-color: var(--accent);
-      background: var(--sbu-cream);
-    }
-
-    button:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-
-    .feedback {
-      padding: 12px 14px;
-      border-radius: 12px;
-      margin-top: 14px;
-      font-weight: 600;
-    }
-
-    .good { background: var(--good-bg); color: var(--good); border: 1px solid var(--good); }
-    .bad  { background: var(--bad-bg); color: var(--bad); border: 1px solid var(--bad); }
-    .warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); }
-
+    code.call-tag { background: #f4f4f4; padding: 4px 10px; border-radius: 8px; font-family: 'Courier New', monospace; font-weight: 900; color: #333; border: 1px solid #ddd; }
+    .ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0; }
+    .ref-card { padding: 20px; border: 1px solid #ddd; border-radius: 15px; background: white; text-align: center; }
+    .ref-card b { display: block; font-size: 1.4rem; color: var(--sbu-red); margin-bottom: 5px; }
+    
     .hidden { display: none !important; }
-
-    .small {
-      color: var(--muted);
-      font-size: .96rem;
-    }
-
-    code.call {
-      display: inline-block;
-      background: var(--line);
-      color: var(--sbu-black);
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: .96rem;
-      margin: 3px 4px 3px 0;
-      vertical-align: middle;
-      font-weight: bold;
-    }
-
-    .rules pre {
-      white-space: pre-wrap;
-      background: #ffffff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
-      font-size: .97rem;
-      line-height: 1.6;
-    }
-
-    .compare-box {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      background: #fff;
-      margin: 12px 0;
-    }
-
-    .compare-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--muted);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-      margin: 14px 0 18px;
-    }
-
-    .field label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: var(--sbu-black);
-    }
-
-    .field input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      font-size: 1rem;
-      background: #fff;
-      color: var(--sbu-black);
-    }
-
-    .field input:focus {
-      outline: 3px solid var(--accent);
-      outline-offset: 2px;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin: 16px 0;
-    }
-
-    .summary-box {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      background: #fff;
-    }
-
-    .summary-box .label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      color: var(--muted);
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .summary-box .value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      word-break: break-word;
-    }
-
-    .inline-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    /* Drag and Drop Styles */
-    .draggable-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin: 16px 0;
-    }
-    .draggable-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 16px;
-      background: #fff;
-      border: 2px solid var(--line);
-      border-radius: 12px;
-      cursor: grab;
-      user-select: none;
-      transition: border-color 0.2s, background-color 0.2s;
-    }
-    .draggable-item:active {
-      cursor: grabbing;
-    }
-    .draggable-item.dragging {
-      opacity: 0.5;
-      background: var(--sbu-cream);
-      border-color: var(--accent);
-    }
-    .draggable-item.drag-over {
-      border-color: var(--sbu-royal);
-      background: var(--bg);
-      border-style: dashed;
-    }
-    .drag-handle {
-      color: var(--muted);
-      margin-right: 14px;
-      font-size: 1.4rem;
-      line-height: 1;
-      cursor: grab;
-    }
-
-    @media print {
-      .no-print { display: none !important; }
-      body { background: #fff; }
-      .wrap { max-width: none; padding: 0; }
-      .card { box-shadow: none; border: none; padding: 0;}
-    }
-
-    @media (max-width: 700px) {
-      .wrap { padding: 14px; }
-      .card { padding: 18px; }
-      h1 { font-size: 2.1rem; }
-    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card no-print">
-      <div class="version">Version 12.0 - Simple to Hard Progression</div>
-      <h1>Shelf It Right</h1>
-      <p>Library training for reading call numbers and identifying music scores.</p>
 
-      <div class="info-box">
-        <strong>Student Information (Optional for Practice)</strong>
-        <p class="small" style="margin-bottom: 12px; color: var(--sbu-black);">If you are doing this for <strong>official training</strong>, please enter your details so your score is recorded. If you just want to play and test your skills, you can leave these blank and choose <strong>Practice Mode</strong> below (your score will not be recorded).</p>
-        <div class="form-grid">
-          <div class="field">
-            <label for="realName">Real Name</label>
-            <input id="realName" type="text" autocomplete="name" placeholder="Enter full name" />
-          </div>
-          <div class="field">
-            <label for="preferredName">Preferred Name</label>
-            <input id="preferredName" type="text" placeholder="Enter preferred name" />
-          </div>
-          <div class="field">
-            <label for="sbuEmail">SBU Email</label>
-            <input id="sbuEmail" type="email" autocomplete="email" placeholder="name@stonybrook.edu" />
-          </div>
-        </div>
-        <div id="intakeFeedback"></div>
-      </div>
-
-      <div class="info-box">
-        <strong>Key Call Number Terms (Top to Bottom)</strong>
-        <div>
-          <p><strong>Whole number</strong><br>The number after the class.<br>Examples: <code class="call">M 2</code>, <code class="call">M 2.3</code>, <code class="call">M 3</code></p>
-          <p><strong>First cutter</strong><br>The first letter-number group after the class number.<br>Examples: <code class="call">.B103</code>, <code class="call">.C4</code>, <code class="call">.S36</code></p>
-          <p><strong>Year</strong><br>The publication year.<br>Example: <code class="call">1994</code></p>
-          <p><strong>Later-line details</strong><br>Extra details that appear after the main call number parts.<br>Examples: <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code></p>
-        </div>
-      </div>
-
-      <div class="inline-actions">
-        <button id="startBtn" type="button">Start Official Training</button>
-        <button id="practiceBtn" type="button" class="secondary" style="border-color: var(--sbu-dark-gray); color: var(--sbu-dark-gray);">Practice Mode (No Score Kept)</button>
-        <button id="rulesBtn" type="button" class="secondary">Show Sorting Rules</button>
-      </div>
+<div class="container">
+  <div id="start-screen" class="card">
+    <div class="pill">Stony Brook University</div>
+    <h1>Shelf It Right</h1>
+    <p>Welcome to the Music Library student assistant training. This application will teach you how to identify musical works and shelve them correctly using Library of Congress classification.</p>
+    
+    <div class="instruction-box">
+      <strong>Prerequisite:</strong> Per training guidelines, you must complete <b>Module X: Music Catalogs</b> before moving into shelf-reading practice.
     </div>
-
-    <div id="rulesCard" class="card hidden rules"></div>
-
-    <div id="app" class="hidden">
-      <div class="card">
-        <div id="stageLabel" class="pill">Module</div>
-        <div class="progress"><div id="bar"></div></div>
-        <div id="screen"></div>
-      </div>
-    </div>
+    
+    <button onclick="initApp()">Begin Training</button>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // --- CONNECTED URL ---
-      var APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybCw6Ww_F3Gh8-V_ADRtbPPNoPfoJHPqNW3uTccjNNt2lCojagjNF50yH6QZQLpEnZwA/exec';
-
-      function safeGetElement(id) {
-        var el = document.getElementById(id);
-        if (!el) console.warn('Element not found:', id);
-        return el;
-      }
-
-      function escapeHtml(str) {
-        return String(str || '')
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#39;');
-      }
-
-      function isValidSbuEmail(email) {
-        return /^[A-Za-z0-9._%+-]+@stonybrook\.edu$/i.test(String(email || '').trim());
-      }
-
-      function nowIso() {
-        return new Date().toISOString();
-      }
-
-      var app = safeGetElement('app');
-      var screen = safeGetElement('screen');
-      var stageLabel = safeGetElement('stageLabel');
-      var bar = safeGetElement('bar');
-      var rulesCard = safeGetElement('rulesCard');
-      var intakeFeedback = safeGetElement('intakeFeedback');
-
-      var realNameInput = safeGetElement('realName');
-      var preferredNameInput = safeGetElement('preferredName');
-      var emailInput = safeGetElement('sbuEmail');
-      var startBtn = safeGetElement('startBtn');
-      var practiceBtn = safeGetElement('practiceBtn');
-      var rulesBtn = safeGetElement('rulesBtn');
-
-      var rulesText = `Local practice used in this prototype\n\n1. Start with the class and the whole number.\n   Examples:\n   M 2 comes before M 2.3\n   M 2.3 comes before M 3\n\n2. If the whole number matches, compare the first cutter.\n   Examples within M 3:\n   .B103 comes before .C4\n   .C4 comes before .H26\n\n3. Next, compare later work elements, year, and later-line details.\n\n4. Roman numerals matter in later-line details.\n   Example:\n   SER.I comes before SER.II, which comes before SER.VI\n\n5. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
-
-      // Thematic Catalog Questions - Progressing from easy to hard
-      var workIdQuestions = [
-        {
-          id: 'x1',
-          prompt: 'What is the primary purpose of thematic catalog labels like BWV, KV, or Hob. printed on a score?',
-          choices: [
-            'They represent the publisher\'s identification code.',
-            'They are used specifically to sort books alphabetically by title.',
-            'They help confirm you have the exact right piece of music for a patron.',
-            'They indicate what instrument the piece is written for.'
-          ],
-          answer: 2,
-          explain: 'Correct! Work IDs act as the ultimate "fingerprint" to confirm you are handing the patron the exact piece they requested.',
-          _done: false
-        },
-        {
-          id: 'x2',
-          prompt: 'Which thematic catalog is used specifically for Wolfgang Amadeus Mozart?',
-          choices: [
-            'BWV',
-            'KV (or K)',
-            'Hob.',
-            'RV'
-          ],
-          answer: 1,
-          explain: 'Correct! KV (or K) is the catalog used for Mozart. BWV is Bach, Hob. is Haydn, and RV is Vivaldi.',
-          _done: false
-        },
-        {
-          id: 'x3',
-          prompt: 'Which one is a general designation, not a composer-specific catalog?',
-          choices: [
-            'BWV',
-            'RV',
-            'WoO',
-            'Hob.'
-          ],
-          answer: 2,
-          explain: 'Correct! WoO stands for "Works without opus number" and is a general designation used across many different composers.',
-          _done: false
-        }
-      ];
-
-      var finalDragCallNumbers = [
-        { id: 'd1', text: 'M 2 .G39 1966 BD.23', order: 1 },
-        { id: 'd2', text: 'M 2.3 .U6 R4 V.66', order: 2 },
-        { id: 'd3', text: 'M 3 .B103 2005 SER.8 V.2', order: 3 },
-        { id: 'd4', text: 'M 3 .C4 1993 SER.VI V.69A', order: 4 },
-        { id: 'd5', text: 'M 452 .H42 H.III:E2', order: 5 }
-      ];
-
-      // --- Dynamic Generation Engine ---
-      var modules; 
-
-      // 1. Seeded PRNG
-      function mulberry32(a) {
-        return function() {
-          var t = a += 0x6D2B79F5;
-          t = Math.imul(t ^ t >>> 15, t | 1);
-          t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-          return ((t ^ t >>> 14) >>> 0) / 4294967296;
-        }
-      }
-
-      // 2. Pre-sorted Data Pools
-      var pools = {
-        classes: ['M'], 
-        wholes: ['2', '2.3', '3', '12', '45', '452'],
-        cutters: ['.B103', '.C4', '.H26', '.O35', '.S36', '.U6'], 
-        years: ['1966', '1988', '1993', '1994', '2001', '2005'],
-        extras: ['BD.20', 'FASC.3', 'SER.I', 'SER.II', 'SER.VI'] 
-      };
-
-      function getLockedItem(arr, rng) {
-        return arr[Math.floor(rng() * arr.length)];
-      }
-
-      function getUniqueIndices(max, count, rng) {
-        var arr = [];
-        while(arr.length < count) {
-          var r = Math.floor(rng() * max);
-          if(arr.indexOf(r) === -1) arr.push(r);
-        }
-        return arr;
-      }
-
-      function shuffleChoices(choices, correctValue, rng) {
-        var shuffled = choices.slice();
-        for (var i = shuffled.length - 1; i > 0; i--) {
-          var j = Math.floor(rng() * (i + 1));
-          var temp = shuffled[i];
-          shuffled[i] = shuffled[j];
-          shuffled[j] = temp;
-        }
-        return {
-          options: shuffled,
-          answerIndex: shuffled.indexOf(correctValue)
-        };
-      }
-
-      // 3. Question Generators
-      function generateMod1(rng) {
-        var cClass = getLockedItem(pools.classes, rng);
-        var cCutt = getLockedItem(pools.cutters, rng);
-        var cYear = getLockedItem(pools.years, rng);
-        
-        var indices = getUniqueIndices(pools.wholes.length, 3, rng);
-        var correctIndex = Math.min.apply(null, indices); 
-        var correctWhole = pools.wholes[correctIndex];
-
-        var choices = indices.map(function(idx) {
-          return cClass + ' ' + pools.wholes[idx] + ' ' + cCutt + ' ' + cYear;
-        });
-        var correctString = cClass + ' ' + correctWhole + ' ' + cCutt + ' ' + cYear;
-
-        var shuffled = shuffleChoices(choices, correctString, rng);
-        return {
-          id: 'dyn_m1_' + Math.floor(rng() * 10000),
-          prompt: 'Which call number comes first?',
-          choices: shuffled.options,
-          answer: shuffled.answerIndex,
-          explain: 'Focus only on the whole numbers. ' + correctWhole + ' comes first.',
-          _done: false
-        };
-      }
-
-      function generateMod2(rng) {
-        var cClass = getLockedItem(pools.classes, rng);
-        var cWhole = getLockedItem(pools.wholes, rng);
-        var cYear = getLockedItem(pools.years, rng);
-        
-        var indices = getUniqueIndices(pools.cutters.length, 3, rng);
-        var correctIndex = Math.min.apply(null, indices); 
-        var correctCutter = pools.cutters[correctIndex];
-
-        var choices = indices.map(function(idx) {
-          return cClass + ' ' + cWhole + ' ' + pools.cutters[idx] + ' ' + cYear;
-        });
-        var correctString = cClass + ' ' + cWhole + ' ' + correctCutter + ' ' + cYear;
-
-        var shuffled = shuffleChoices(choices, correctString, rng);
-        return {
-          id: 'dyn_m2_' + Math.floor(rng() * 10000),
-          prompt: 'Which call number comes first?',
-          choices: shuffled.options,
-          answer: shuffled.answerIndex,
-          explain: 'Whole numbers match, so look at the cutter. ' + correctCutter + ' comes first chronologically/alphabetically.',
-          _done: false
-        };
-      }
-
-      function generateMod3(rng) {
-        var cClass = getLockedItem(pools.classes, rng);
-        var cWhole = getLockedItem(pools.wholes, rng);
-        var cCutt = getLockedItem(pools.cutters, rng);
-        
-        var isTestingYears = rng() > 0.5;
-        var targetPool = isTestingYears ? pools.years : pools.extras;
-        var lockedExtra = isTestingYears ? ' ' + getLockedItem(pools.extras, rng) : ''; 
-        var lockedYear = isTestingYears ? '' : ' ' + getLockedItem(pools.years, rng);
-
-        var indices = getUniqueIndices(targetPool.length, 3, rng);
-        var correctIndex = Math.min.apply(null, indices);
-        var correctDetail = targetPool[correctIndex];
-
-        var choices = indices.map(function(idx) {
-          var detail = targetPool[idx];
-          return cClass + ' ' + cWhole + ' ' + cCutt + (isTestingYears ? ' ' + detail + lockedExtra : lockedYear + ' ' + detail);
-        });
-        
-        var correctString = cClass + ' ' + cWhole + ' ' + cCutt + (isTestingYears ? ' ' + correctDetail + lockedExtra : lockedYear + ' ' + correctDetail);
-
-        var shuffled = shuffleChoices(choices, correctString, rng);
-        return {
-          id: 'dyn_m3_' + Math.floor(rng() * 10000),
-          prompt: 'Which call number comes first?',
-          choices: shuffled.options,
-          answer: shuffled.answerIndex,
-          explain: 'Earlier parts match perfectly. ' + correctDetail + ' is the defining later detail.',
-          _done: false
-        };
-      }
-
-      function buildDynamicModules(rng) {
-        return [
-          {
-            key: 'module1', label: 'Module 1', title: 'Whole Number',
-            generator: generateMod1,
-            masteryText: 'Pass target: 3 correct in a row. A wrong answer generates a fresh question.',
-            insight: 'Crucial Rule: Do not jump to the cutter! Always resolve the whole number first.',
-            teach: '<p>The first part of a call number is the class (like <strong>M</strong>) and the whole number. Think of the whole number just like counting.</p><p>For example, <strong>2</strong> comes before <strong>12</strong>, and <strong>12</strong> comes before <strong>452</strong>.</p><p>Sometimes you will see a decimal like <strong>2.3</strong>. That simply comes directly after <strong>2</strong> and before <strong>3</strong>.</p>',
-            worked: '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 2.3 .U6 1988</code> vs <code class="call">M 3 .B103 2005</code></p><p><strong>M 2.3</strong> comes before <strong>M 3</strong>. Stop right there! Because 2.3 is smaller than 3, it shelves first. You do not even need to look at the cutters or the years.</p></div>',
-            questions: [generateMod1(rng), generateMod1(rng), generateMod1(rng)] 
-          },
-          {
-            key: 'module2', label: 'Module 2', title: 'First Cutter',
-            generator: generateMod2,
-            masteryText: 'Pass target: 3 correct in a row. A wrong answer generates a fresh question.',
-            insight: 'Alpha-Numeric: Cutters always sort alphabetically first, then numerically.',
-            teach: '<p>Only look at the cutter if the class and whole numbers are absolutely identical.</p><p>The cutter starts with a letter, so sort alphabetically first (<strong>.B</strong> comes before <strong>.C</strong>). The numbers that follow the letter help narrow it down further.</p>',
-            worked: '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .B103 2005</code> vs <code class="call">M 3 .C4 1993</code></p><p>The <strong>M 3</strong> matches perfectly on both. Next, look at the cutter. <strong>.B103</strong> comes before <strong>.C4</strong> because the letter B comes before C alphabetically.</p></div>',
-            questions: [generateMod2(rng), generateMod2(rng), generateMod2(rng)]
-          },
-          {
-            key: 'module3', label: 'Module 3', title: 'Years And Later Details',
-            generator: generateMod3,
-            masteryText: 'Pass target: 3 correct in a row. A wrong answer generates a fresh question.',
-            insight: 'Tie breakers: Only look at years and later details when the whole number and cutter match.',
-            teach: '<p>When everything else at the top of the label is identical, you look to the end of the call number to break the tie.</p><p>Sort years chronologically (older years come first). If you see Roman numerals (like SER.I and SER.II), evaluate them in numerical order.</p>',
-            worked: '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .O35 1994</code> vs <code class="call">M 3 .O35 2001</code></p><p>Everything matches until the year. <strong>1994</strong> is older than <strong>2001</strong>, so it shelves first.</p></div>',
-            questions: [generateMod3(rng), generateMod3(rng), generateMod3(rng)]
-          },
-          {
-            key: 'module4', label: 'Module 4', type: 'workIds', title: 'Music Catalogs & Work IDs'
-          },
-          { key: 'finalActivity', label: 'Final Activity', type: 'drag' },
-          { key: 'done', label: 'Complete', type: 'done' }
-        ];
-      }
-
-      var state = {
-        isOfficial: true,
-        seed: null,
-        rng: null,
-        sessionStartedAt: null,
-        sessionCompletedAt: null,
-        step: 0,
-        phase: 'teach',
-        streak: 0,
-        currentQuestion: null,
-        dragItems: null,
-        student: { realName: '', preferredName: '', sbuEmail: '' },
-        metrics: {
-          modulePassed: { module1: false, module2: false, module3: false, finalActivity: false },
-        },
-        workIds: { passed: false, completed: false }
-      };
-
-      function resetMetrics() {
-        state.metrics = {
-          modulePassed: { module1: false, module2: false, module3: false, finalActivity: false }
-        };
-        state.workIds = { passed: false, completed: false };
-        state.dragItems = null;
-        workIdQuestions.forEach(function(q) { q._done = false; });
-      }
-
-      function syncStudentInfo() {
-        state.student.realName = String(realNameInput.value || '').trim();
-        state.student.preferredName = String(preferredNameInput.value || '').trim();
-        state.student.sbuEmail = String(emailInput.value || '').trim();
-      }
-
-      function validateStudentInfo() {
-        syncStudentInfo();
-        if (!state.student.realName) return 'Please enter your real name for official training.';
-        if (!state.student.preferredName) return 'Please enter your preferred name.';
-        if (!isValidSbuEmail(state.student.sbuEmail)) return 'Please enter a valid SBU email ending in @stonybrook.edu.';
-        return '';
-      }
-
-      function showIntakeMessage(message, type) {
-        if (!intakeFeedback) return;
-        if (!message) {
-          intakeFeedback.innerHTML = '';
-          return;
-        }
-        intakeFeedback.innerHTML = '<div class="feedback ' + (type || 'warn') + '">' + escapeHtml(message) + '</div>';
-      }
-
-      window.toggleRules = function() {
-        if (!rulesCard) return;
-        if (rulesCard.classList.contains('hidden')) {
-          rulesCard.classList.remove('hidden');
-          rulesCard.innerHTML = '<h2>Sorting Rules Used In This Prototype</h2><pre>' + escapeHtml(rulesText) + '</pre>';
-        } else {
-          rulesCard.classList.add('hidden');
-          rulesCard.innerHTML = '';
-        }
-      };
-
-      function updateProgress() {
-        if (!bar || !stageLabel) return;
-        var item = modules[state.step];
-        stageLabel.textContent = item.label;
-        bar.style.width = ((state.step) / (modules.length - 1)) * 100 + '%';
-      }
-
-      window.beginSession = function(isOfficialMode) {
-        state.isOfficial = isOfficialMode;
-        
-        if (state.isOfficial) {
-          var validationMessage = validateStudentInfo();
-          if (validationMessage) {
-            showIntakeMessage(validationMessage, 'warn');
-            return;
-          }
-        } else {
-          // Practice Mode - fill with dummy data to avoid errors, but skip sending it later
-          state.student.realName = 'Guest Practice';
-          state.student.preferredName = 'Guest User';
-          state.student.sbuEmail = 'guest@stonybrook.edu';
-        }
-
-        showIntakeMessage('', '');
-        if (rulesCard) {
-          rulesCard.classList.add('hidden');
-          rulesCard.innerHTML = '';
-        }
-
-        state.seed = Math.floor(Math.random() * 90000) + 10000; 
-        state.rng = mulberry32(state.seed);
-        modules = buildDynamicModules(state.rng);
-
-        app.classList.remove('hidden');
-        state.sessionStartedAt = nowIso();
-        state.sessionCompletedAt = null;
-        state.step = 0;
-        state.phase = 'teach';
-        state.streak = 0;
-        state.currentQuestion = null;
-        resetMetrics();
-        window.render();
-      };
-
-      window.render = function() {
-        if (!app || !screen || !modules[state.step]) return;
-        var item = modules[state.step];
-        updateProgress();
-
-        if (item.type === 'workIds') {
-          renderWorkIdsModule();
-          return;
-        }
-        if (item.type === 'drag') {
-          renderDrag();
-          return;
-        }
-        if (item.type === 'done') {
-          renderDone();
-          return;
-        }
-
-        renderModule(item);
-      };
-
-      // --- Module 4 (Work IDs) Functions ---
-      function renderWorkIdsModule() {
-        if (state.phase === 'teach') {
-          screen.innerHTML =
-            '<h2>Module 4: Music Catalogs &amp; Work IDs</h2>' +
-            '<div class="insight-card"><strong>The Golden Rule:</strong> Work IDs are the ultimate "fingerprint" of a piece of music. They help you confirm you have the exact right piece for a patron, but <strong>they are never used in the call number for shelving.</strong></div>' +
-            '<p>Imagine someone asks for "Bach\'s Prelude in C Major". Bach wrote dozens of them! How do you know you are handing them the right book? You check the Work ID.</p>' +
-            '<p>Scholars created special catalog systems for major composers. For example, Bach uses <strong>BWV</strong>, Mozart uses <strong>KV</strong> (or K), and Haydn uses <strong>Hob.</strong></p>' +
-            '<div class="compare-box">' +
-              '<div class="compare-label">COMPOSER-SPECIFIC VS. GENERAL LABELS</div>' +
-              '<p>While <strong>BWV</strong> points specifically to Bach, other labels are general. For example, <strong>WoO</strong> stands for "Works without opus number" and is a general designation used across many different composers.</p>' +
-              '<p>You will also see labels that point to a specific spot <em>inside</em> a piece (like <strong>movt.</strong> for movement), or printing details (like <strong>plate no.</strong>).</p>' +
-            '</div>' +
-            '<p>Here are a few common composer catalogs you will see on score covers:</p>' +
-            '<div class="reference-grid">' +
-              '<div class="reference-box"><strong>BWV</strong>Bach<div class="example">Example: BWV 1007</div></div>' +
-              '<div class="reference-box"><strong>K / KV</strong>Mozart<div class="example">Example: KV 620</div></div>' +
-              '<div class="reference-box"><strong>Hob.</strong>Haydn<div class="example">Example: Hob. I:104</div></div>' +
-              '<div class="reference-box"><strong>RV</strong>Vivaldi<div class="example">Example: RV 31</div></div>' +
-            '</div>' +
-            '<div class="mastery">Pass target: Answer all 3 questions correctly to prove you understand work IDs before moving on to the final activity.</div>' +
-            '<div class="inline-actions">' +
-              '<button type="button" onclick="window.startWorkIdsQuiz()">Start Practice</button>' +
-            '</div>';
-          return;
-        }
-        window.renderWorkIdsQuestion();
-      }
-
-      window.startWorkIdsQuiz = function() {
-        state.phase = 'practice';
-        state.currentQuestion = null;
-        window.renderWorkIdsQuestion();
-      };
-
-      window.renderWorkIdsQuestion = function() {
-        var unanswered = workIdQuestions.filter(function(q) {
-          return !q._done;
-        });
-
-        if (unanswered.length === 0) {
-          state.workIds.completed = true;
-          state.workIds.passed = true;
-          screen.innerHTML =
-            '<h2>Module 4 Complete</h2>' +
-            '<div class="feedback good">You successfully understand how to identify specific works using thematic catalogs.</div>' +
-            '<div class="inline-actions">' +
-              '<button type="button" onclick="window.advanceFromWorkIds()">Continue to Final Activity</button>' +
-            '</div>';
-          return;
-        }
-
-        state.currentQuestion = unanswered[0];
-        var q = state.currentQuestion;
-
-        var choicesHtml = q.choices.map(function(c, i) {
-          return '<button class="choice" onclick="window.checkWorkIdAnswer(' + i + ')">' + escapeHtml(c) + '</button>';
-        }).join('');
-
-        screen.innerHTML = 
-          '<h3>Question ' + (workIdQuestions.length - unanswered.length + 1) + ' of ' + workIdQuestions.length + '</h3>' +
-          '<p><strong>' + escapeHtml(q.prompt) + '</strong></p>' +
-          '<div id="choices">' + choicesHtml + '</div>' +
-          '<div id="qFeedback"></div>';
-      };
-
-      window.checkWorkIdAnswer = function(index) {
-        var q = state.currentQuestion;
-        var fb = document.getElementById('qFeedback');
-        
-        if (index === q.answer) {
-          q._done = true;
-          fb.innerHTML = '<div class="feedback good">' + escapeHtml(q.explain) + '</div>' +
-                         '<button style="margin-top:14px" onclick="window.renderWorkIdsQuestion()">Next Question</button>';
-          
-          var btns = document.querySelectorAll('.choice');
-          for(var i=0; i<btns.length; i++) { btns[i].disabled = true; }
-        } else {
-          fb.innerHTML = '<div class="feedback bad">Not quite. Give it another try!</div>';
-        }
-      };
-
-      window.advanceFromWorkIds = function() {
-        state.step++;
-        state.phase = 'teach';
-        window.render();
-      };
-
-      // --- Standard Module Functions ---
-      function renderModule(item) {
-        if (state.phase === 'teach') {
-          screen.innerHTML = 
-            '<h2>' + escapeHtml(item.title) + '</h2>' +
-            (item.insight ? '<div class="insight-card">' + escapeHtml(item.insight) + '</div>' : '') +
-            item.teach + item.worked + 
-            '<div class="mastery">' + escapeHtml(item.masteryText) + '</div>' +
-            '<button type="button" onclick="window.startModuleQuiz()">Start Practice</button>';
-        } else {
-          renderModuleQuestion(item);
-        }
-      }
-
-      window.startModuleQuiz = function() {
-        state.phase = 'practice';
-        state.streak = 0;
-        state.currentQuestion = null;
-        var item = modules[state.step];
-        item.questions.forEach(function(q) { q._done = false; });
-        window.render();
-      }
-
-      function renderModuleQuestion(item) {
-        var unanswered = item.questions.filter(function(q) { return !q._done; });
-        if (state.streak >= 3) {
-          state.metrics.modulePassed[item.key] = true;
-          screen.innerHTML = 
-            '<h2>Module Complete</h2>' +
-            '<div class="feedback good">You mastered ' + escapeHtml(item.title) + '!</div>' +
-            '<button style="margin-top:14px" type="button" onclick="window.advanceToNextModule()">Next Module</button>';
-          return;
-        }
-
-        state.currentQuestion = unanswered[0];
-        var q = state.currentQuestion;
-
-        var choicesHtml = q.choices.map(function(c, i) {
-          return '<button class="choice" onclick="window.checkModuleAnswer(' + i + ')">' + escapeHtml(c) + '</button>';
-        }).join('');
-
-        screen.innerHTML = 
-          '<h3>Practice: ' + escapeHtml(item.title) + '</h3>' +
-          '<p>Streak: ' + state.streak + ' / 3</p>' +
-          '<p><strong>' + escapeHtml(q.prompt) + '</strong></p>' +
-          '<div id="choices">' + choicesHtml + '</div>' +
-          '<div id="qFeedback"></div>';
-      }
-
-      window.checkModuleAnswer = function(index) {
-        var item = modules[state.step];
-        var q = state.currentQuestion;
-        var fb = document.getElementById('qFeedback');
-        
-        if (index === q.answer) {
-          q._done = true;
-          state.streak++;
-          fb.innerHTML = '<div class="feedback good">Correct! ' + escapeHtml(q.explain) + '</div>' +
-                         '<button style="margin-top:14px" onclick="window.render()">Continue</button>';
-        } else {
-          state.streak = 0;
-          q._done = true; 
-          
-          if (item.generator && state.rng) {
-              item.questions.push(item.generator(state.rng));
-          }
-
-          fb.innerHTML = '<div class="feedback bad">Incorrect. Streak reset to 0. ' + escapeHtml(q.explain) + '</div>' +
-                         '<button style="margin-top:14px" onclick="window.render()">Try a New Question</button>';
-        }
-        var btns = document.querySelectorAll('.choice');
-        for(var i=0; i<btns.length; i++) { btns[i].disabled = true; }
-      };
-
-      window.advanceToNextModule = function() {
-        state.step++;
-        state.phase = 'teach';
-        window.render();
-      };
-
-      // --- Final Activity Drag & Drop ---
-      var draggedEl = null;
-
-      function renderDrag() {
-        if (!state.dragItems) {
-          state.dragItems = finalDragCallNumbers.slice().sort(function() { return Math.random() - 0.5; });
-        }
-
-        var listHtml = state.dragItems.map(function(item) {
-          return '<div class="draggable-item" draggable="true" data-id="' + item.id + '" data-order="' + item.order + '">' +
-                 '<span class="drag-handle">☰</span> <code class="call">' + item.text + '</code>' +
-                 '</div>';
-        }).join('');
-
-        screen.innerHTML = 
-          '<h2>Final Activity: Shelf Reading</h2>' +
-          '<p>Click and drag the items below to place them in the correct shelving order (top to bottom).</p>' +
-          '<div class="draggable-list" id="dragList">' + listHtml + '</div>' +
-          '<div id="dragFeedback"></div>' +
-          '<button type="button" id="checkOrderBtn" style="margin-top: 14px" onclick="window.checkFinalActivity()">Check Order</button>';
-
-        attachDragEvents();
-      }
-
-      function attachDragEvents() {
-        var list = document.getElementById('dragList');
-        if (!list) return;
-        var items = list.querySelectorAll('.draggable-item');
-
-        items.forEach(function(item) {
-          item.addEventListener('dragstart', function(e) {
-            draggedEl = this;
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', this.innerHTML);
-            setTimeout(function() { item.classList.add('dragging'); }, 0);
-          });
-
-          item.addEventListener('dragend', function() {
-            this.classList.remove('dragging');
-            items.forEach(function(el) { el.classList.remove('drag-over'); });
-            draggedEl = null;
-          });
-
-          item.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            return false;
-          });
-
-          item.addEventListener('dragenter', function(e) {
-            if (this !== draggedEl) {
-              this.classList.add('drag-over');
-            }
-          });
-
-          item.addEventListener('dragleave', function() {
-            this.classList.remove('drag-over');
-          });
-
-          item.addEventListener('drop', function(e) {
-            e.stopPropagation();
-            if (draggedEl !== this) {
-              var itemsArr = Array.from(list.querySelectorAll('.draggable-item'));
-              var draggedIdx = itemsArr.indexOf(draggedEl);
-              var droppedIdx = itemsArr.indexOf(this);
-
-              if (draggedIdx < droppedIdx) {
-                  this.parentNode.insertBefore(draggedEl, this.nextSibling);
-              } else {
-                  this.parentNode.insertBefore(draggedEl, this);
-              }
-            }
-            this.classList.remove('drag-over');
-            return false;
-          });
-        });
-      }
-
-      window.checkFinalActivity = function() {
-        var items = document.querySelectorAll('.draggable-item');
-        var isCorrect = true;
-        var fb = document.getElementById('dragFeedback');
-        var checkBtn = document.getElementById('checkOrderBtn');
-
-        for (var i = 0; i < items.length; i++) {
-          if (parseInt(items[i].getAttribute('data-order'), 10) !== i + 1) {
-            isCorrect = false;
-            break;
-          }
-        }
-
-        if (isCorrect) {
-          state.metrics.modulePassed.finalActivity = true;
-          fb.innerHTML = '<div class="feedback good">Perfect! Everything is in the exact right order.</div>' +
-                         '<button style="margin-top:14px" onclick="window.advanceToNextModule()">Finish Training</button>';
-          checkBtn.classList.add('hidden');
-          
-          items.forEach(function(item) {
-              item.setAttribute('draggable', 'false');
-              item.style.cursor = 'default';
-              item.querySelector('.drag-handle').style.display = 'none';
-          });
-
-        } else {
-          fb.innerHTML = '<div class="feedback bad">Not quite right. Double-check your whole numbers first, then cutters, then dates and details.</div>';
-        }
-      };
-
-      // --- Done / Score Submission ---
-      function renderDone() {
-        state.sessionCompletedAt = nowIso();
-        
-        var doneHtml = 
-          '<h2>Training Complete!</h2>' +
-          '<div class="summary-grid">' +
-            '<div class="summary-box"><div class="label">Name</div><div class="value">' + escapeHtml(state.student.preferredName) + '</div></div>' +
-            '<div class="summary-box"><div class="label">Status</div><div class="value" style="color:var(--good)">Passed All Modules</div></div>' +
-          '</div>';
-
-        if (state.isOfficial) {
-          doneHtml += 
-            '<p>Your results are ready to be submitted to the scoreboard.</p>' +
-            '<button type="button" id="submitBtn" onclick="window.submitScore()">Submit Results</button>' +
-            '<div id="submitFeedback" style="margin-top:14px"></div>';
-        } else {
-          doneHtml += 
-            '<div class="info-box">' +
-              '<strong>Practice Mode Complete</strong>' +
-              '<p class="small" style="margin-bottom:0;">Because you played in Practice Mode, your score will not be submitted to the library sheet. You can refresh the page if you would like to complete it for official training credit!</p>' +
-            '</div>';
-        }
-
-        screen.innerHTML = doneHtml;
-      }
-
-      window.submitScore = function() {
-        var btn = document.getElementById('submitBtn');
-        var fb = document.getElementById('submitFeedback');
-        btn.disabled = true;
-        btn.textContent = 'Submitting...';
-
-        var payload = {
-          timestamp: nowIso(),
-          realName: state.student.realName,
-          preferredName: state.student.preferredName,
-          sbuEmail: state.student.sbuEmail,
-          
-          module1Completed: state.metrics.modulePassed.module1,
-          module1Passed: state.metrics.modulePassed.module1,
-          
-          module2Completed: state.metrics.modulePassed.module2,
-          module2Passed: state.metrics.modulePassed.module2,
-          
-          module3Completed: state.metrics.modulePassed.module3,
-          module3Passed: state.metrics.modulePassed.module3,
-          
-          module4Completed: state.workIds.passed,
-          module4Passed: state.workIds.passed,
-          
-          totalModulesCompleted: 4, 
-          totalModulesPassed: 4, 
-          
-          cumulativeCheckPassed: true, 
-          finalDragDropPassed: state.metrics.modulePassed.finalActivity,
-          
-          totalScore: 100, 
-          passFail: "Pass", 
-          attemptCount: 1 
-        };
-
-        fetch(APP_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors', 
-          headers: {
-            'Content-Type': 'text/plain' 
-          },
-          body: JSON.stringify(payload)
-        })
-        .then(function() {
-          fb.innerHTML = '<div class="feedback good">Results submitted successfully!</div>';
-          btn.textContent = 'Submitted';
-        })
-        .catch(function(err) {
-          console.error('Submission error:', err);
-          fb.innerHTML = '<div class="feedback bad">Submission failed. Please check your connection and try again.</div>';
-          btn.disabled = false;
-          btn.textContent = 'Retry Submission';
-        });
-      };
-
-      // --- Initialization ---
-      if(startBtn) startBtn.addEventListener('click', function() { window.beginSession(true); });
-      if(practiceBtn) practiceBtn.addEventListener('click', function() { window.beginSession(false); });
-      if(rulesBtn) rulesBtn.addEventListener('click', window.toggleRules);
+  <div id="app-container" class="hidden">
+    <div class="card">
+      <div id="mod-tag" class="pill">Loading...</div>
+      <div class="progress-container"><div id="progress-fill"></div></div>
+      <div id="content-area"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // APP STATE
+  const state = {
+    currentMod: 0,
+    phase: 'teaching', // 'teaching' or 'quiz'
+    streak: 0,
+    totalMods: 0
+  };
+
+  // MODULE DATA
+  const moduleData = [
+    {
+      title: "Module X: Music Catalogs",
+      type: "quiz",
+      teachContent: `
+        <h2>Identification "Fingerprints"</h2>
+        <p>Before you shelve a book, you must know what it is. Music Catalogs (Work IDs) are the ultimate fingerprint of a piece.</p>
+        <div class="instruction-box">
+          <b>The Golden Rule:</b> These labels are <u>not</u> part of the shelving call number. They help you confirm you are handing the patron the exact right piece.
+        </div>
+        <div class="ref-grid">
+          <div class="ref-card"><b>BWV</b> Bach</div>
+          <div class="ref-card"><b>KV</b> Mozart</div>
+          <div class="ref-card"><b>D.</b> Schubert</div>
+          <div class="ref-card"><b>Hob.</b> Haydn</div>
+        </div>
+      `,
+      questions: [
+        { q: "Which catalog belongs to Mozart?", options: ["BWV", "KV", "Hob."], correct: 1, explanation: "Correct! Mozart uses KV (or K)." },
+        { q: "Which of these is a GENERAL designation used across many composers?", options: ["RV", "BWV", "WoO"], correct: 2, explanation: "Correct! WoO stands for 'Works without opus'." },
+        { q: "True or False: The Work ID (like BWV 1007) is part of the shelving call number.", options: ["True", "False"], correct: 1, explanation: "Correct! They are not part of the call number used for shelving." }
+      ]
+    },
+    {
+      title: "Module 1: Whole Numbers",
+      type: "quiz",
+      teachContent: `
+        <h2>Shelving Rule 1: Whole Numbers</h2>
+        <p>Call numbers are read line-by-line. Start with the Class (M) and the <b>Whole Number</b>.</p>
+        <div class="instruction-box">
+          Example: <code class="call-tag">M 2</code> comes before <code class="call-tag">M 3</code>. <br>
+          Decimals: <code class="call-tag">M 2.3</code> comes before <code class="call-tag">M 3</code>.
+        </div>
+      `,
+      questions: [
+        { q: "Which call number comes first?", options: ["M 3 .C4 2001", "M 2 .B103 1994"], correct: 1, explanation: "Correct! Whole number 2 comes before 3." },
+        { q: "Which call number comes first?", options: ["M 14.5 .S4", "M 15 .A2"], correct: 0, explanation: "Correct! 14.5 is smaller than 15." }
+      ]
+    },
+    {
+      title: "Module 2: The First Cutter",
+      type: "quiz",
+      teachContent: `
+        <h2>Shelving Rule 2: First Cutters</h2>
+        <p>If the whole numbers match, move to the <b>Cutter</b> (Letter + Number).</p>
+        <div class="instruction-box">
+          <b>Rule:</b> Letters are alphabetical; Numbers are read as decimals.
+        </div>
+      `,
+      questions: [
+        { q: "Which call number comes first?", options: ["M 45 .C4 1988", "M 45 .S36 1988"], correct: 0, explanation: "Correct! .C comes before .S alphabetically." },
+        { q: "Which comes first?", options: ["M 3 .B103", "M 3 .B21"], correct: 0, explanation: "Correct! In cutters, .B103 (103) is smaller than .B21 (210)." }
+      ]
+    },
+    {
+      title: "Final Assessment",
+      type: "drag",
+      teachContent: `
+        <h2>Final Exam: Shelf Reading</h2>
+        <p>Now, apply everything you've learned. Arrange these items in the correct order as they would appear on the shelf.</p>
+      `,
+      items: [
+        { id: "a", text: "M 2 .G39 1966 BD.23", rank: 0 },
+        { id: "b", text: "M 2.3 .U6 R4 V.66", rank: 1 },
+        { id: "c", text: "M 3 .B103 2005 SER.8", rank: 2 },
+        { id: "d", text: "M 3 .C4 1993 SER.VI", rank: 3 }
+      ]
+    }
+  ];
+
+  function initApp() {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('app-container').classList.remove('hidden');
+    state.totalMods = moduleData.length;
+    render();
+  }
+
+  function render() {
+    const mod = moduleData[state.currentMod];
+    const content = document.getElementById('content-area');
+    const fill = document.getElementById('progress-fill');
+    
+    document.getElementById('mod-tag').textContent = mod.title;
+    fill.style.width = ((state.currentMod / state.totalMods) * 100) + "%";
+
+    if (state.phase === 'teaching') {
+      content.innerHTML = mod.teachContent + `<button onclick="startQuiz()">Start Practice</button>`;
+    } else {
+      if (mod.type === 'quiz') renderQuiz(mod);
+      else renderDrag(mod);
+    }
+  }
+
+  function startQuiz() {
+    state.phase = 'quiz';
+    state.streak = 0;
+    render();
+  }
+
+  function renderQuiz(mod) {
+    const q = mod.questions[state.streak];
+    const content = document.getElementById('content-area');
+    content.innerHTML = `
+      <h3>Question ${state.streak + 1} of ${mod.questions.length}</h3>
+      <p style="font-size: 1.3rem; font-weight: 700;">${q.q}</p>
+      <div id="options">
+        ${q.options.map((opt, i) => `<button class="choice" onclick="checkAnswer(${i})">${opt}</button>`).join('')}
+      </div>
+      <div id="feedback-slot"></div>
+    `;
+  }
+
+  function checkAnswer(idx) {
+    const mod = moduleData[state.currentMod];
+    const q = mod.questions[state.streak];
+    const slot = document.getElementById('feedback-slot');
+    const btns = document.querySelectorAll('.choice');
+    
+    btns.forEach(b => b.disabled = true);
+
+    if (idx === q.correct) {
+      slot.innerHTML = `<div class="feedback good">${q.explanation}</div>`;
+      state.streak++;
+      const btnText = state.streak >= mod.questions.length ? "Finish Module" : "Continue";
+      const nextFn = state.streak >= mod.questions.length ? "nextModule()" : "render()";
+      slot.innerHTML += `<button style="margin-top:15px" onclick="${nextFn}">${btnText}</button>`;
+    } else {
+      slot.innerHTML = `<div class="feedback bad">Not quite. Review the rule and try again.</div>`;
+      slot.innerHTML += `<button style="margin-top:15px; background: #666" onclick="startQuiz()">Restart Module</button>`;
+    }
+  }
+
+  // DRAG AND DROP LOGIC
+  function renderDrag(mod) {
+    const content = document.getElementById('content-area');
+    content.innerHTML = `
+      <h3>Arrange from Top to Bottom</h3>
+      <div class="drag-zone" id="sortable"></div>
+      <button onclick="checkDrag()">Verify Shelf Order</button>
+      <div id="feedback-slot"></div>
+    `;
+    
+    const zone = document.getElementById('sortable');
+    const shuffled = [...mod.items].sort(() => Math.random() - 0.5);
+    
+    shuffled.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'drag-item';
+      el.draggable = true;
+      el.dataset.rank = item.rank;
+      el.innerHTML = `<span class="handle">☰</span> <code class="call-tag">${item.text}</code>`;
+      
+      el.addEventListener('dragstart', () => el.classList.add('dragging'));
+      el.addEventListener('dragend', () => el.classList.remove('dragging'));
+      zone.appendChild(el);
     });
-  </script>
+
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      const dragging = document.querySelector('.dragging');
+      const siblings = [...zone.querySelectorAll('.drag-item:not(.dragging)')];
+      let nextSibling = siblings.find(sib => e.clientY <= sib.getBoundingClientRect().top + sib.getBoundingClientRect().height / 2);
+      zone.insertBefore(dragging, nextSibling);
+    });
+  }
+
+  function checkDrag() {
+    const currentOrder = [...document.querySelectorAll('.drag-item')];
+    const isCorrect = currentOrder.every((el, i) => parseInt(el.dataset.rank) === i);
+    const slot = document.getElementById('feedback-slot');
+
+    if (isCorrect) {
+      slot.innerHTML = `<div class="feedback good">Perfect! You have mastered shelf reading.</div>
+                        <button style="margin-top:15px" onclick="nextModule()">Complete Training</button>`;
+    } else {
+      slot.innerHTML = `<div class="feedback bad">The order is incorrect. Check the whole numbers first, then the cutters.</div>`;
+    }
+  }
+
+  function nextModule() {
+    state.currentMod++;
+    state.phase = 'teaching';
+    if (state.currentMod < moduleData.length) {
+      render();
+    } else {
+      document.getElementById('content-area').innerHTML = `
+        <h2 style="font-size: 3rem">🎉 Certified!</h2>
+        <p>You have successfully completed the Stony Brook Music Library Shelf Reading Training.</p>
+        <button onclick="location.reload()">Restart Training</button>
+      `;
+      document.getElementById('progress-fill').style.width = "100%";
+    }
+  }
+</script>
+
 </body>
 </html>
