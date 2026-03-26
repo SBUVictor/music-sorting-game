@@ -1,159 +1,1250 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Shelf It Right - V4</title>
-<style>
-body { font-family: Arial; margin:20px; }
-.card { border:1px solid #ccc; padding:15px; margin-bottom:15px; border-radius:10px;}
-button { padding:8px 12px; margin-top:10px;}
-input { margin:5px; padding:5px;}
-.hidden { display:none; }
-.pass { color:green; }
-.fail { color:red; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shelf It Right</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d7dee8;
+      --accent: #1d5f91;
+      --accent-2: #2d74ac;
+      --good: #166534;
+      --good-bg: #dcfce7;
+      --bad: #991b1b;
+      --bad-bg: #fee2e2;
+      --warn: #92400e;
+      --warn-bg: #fef3c7;
+      --chip: #eff6ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
+    }
+
+    h1, h2, h3 { margin-top: 0; }
+    h1 { font-size: 2.7rem; line-height: 1.1; margin-bottom: 12px; }
+    h2 { font-size: 1.65rem; margin-bottom: 10px; }
+    h3 { font-size: 1.08rem; margin-bottom: 8px; }
+    p { margin: 0 0 14px 0; font-size: 1.02rem; }
+
+    .version {
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .info-box {
+      background: #f7fafc;
+      border: 1px solid #c8d9ea;
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin: 14px 0;
+    }
+
+    .info-box strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 5px;
+      font-size: 1.02rem;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #e7eef6;
+      color: #34516c;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--chip);
+      border: 1px solid #cfe3ff;
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0 18px;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width .2s ease;
+    }
+
+    .mastery,
+    .lesson-note,
+    .insight-card {
+      margin: 0 0 14px 0;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: .96rem;
+      color: var(--muted);
+    }
+
+    .insight-card {
+      border-left: 4px solid var(--accent);
+      background: #fbfdff;
+      color: var(--ink);
+    }
+
+    .reference-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .reference-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .reference-box strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+
+    .reference-box .example {
+      color: var(--muted);
+      font-size: .94rem;
+      margin-top: 4px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button:hover { background: var(--accent-2); }
+
+    button.secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    button.secondary:hover { background: #f8fafc; }
+
+    button.choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 10px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    button.choice:hover {
+      border-color: var(--accent);
+      background: #f8fbff;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .feedback {
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 14px;
+      font-weight: 600;
+    }
+
+    .good { background: var(--good-bg); color: var(--good); }
+    .bad  { background: var(--bad-bg); color: var(--bad); }
+    .warn { background: var(--warn-bg); color: var(--warn); }
+
+    .hidden { display: none; }
+
+    .small {
+      color: var(--muted);
+      font-size: .96rem;
+    }
+
+    code.call {
+      display: inline-block;
+      background: #f3f4f6;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: .96rem;
+      margin: 3px 4px 3px 0;
+      vertical-align: middle;
+    }
+
+    .rules pre {
+      white-space: pre-wrap;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: .97rem;
+      line-height: 1.6;
+    }
+
+    .compare-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+      margin: 12px 0;
+    }
+
+    .compare-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .sortbank, .sortslots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 76px;
+      padding: 14px;
+      border: 2px dashed var(--line);
+      border-radius: 16px;
+      background: #fafafa;
+    }
+
+    .draggable {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: grab;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      min-width: 210px;
+    }
+
+    .slot {
+      min-height: 68px;
+      min-width: 210px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .slotlabel {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .draggable:focus,
+    button:focus,
+    input:focus {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .draggable.dragging {
+      opacity: 0.7;
+      box-shadow: 0 4px 12px rgba(29, 95, 145, 0.3);
+    }
+
+    .slot.drag-over {
+      background: #eef4ff;
+      border-color: var(--accent);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin: 14px 0 18px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .summary-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .summary-box .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-box .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .status-line {
+      margin-top: 14px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table.reference-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .95rem;
+    }
+
+    table.reference-table th,
+    table.reference-table td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    table.reference-table th {
+      background: #f3f4f6;
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff; }
+      .wrap { max-width: none; padding: 0; }
+      .card { box-shadow: none; }
+    }
+
+    @media (max-width: 700px) {
+      .wrap { padding: 14px; }
+      .card { padding: 18px; }
+      h1 { font-size: 2.1rem; }
+      .draggable, .slot { min-width: 160px; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <div class="card no-print">
+      <div class="version">Version 8.1 - V4 Mandatory Module X</div>
+      <h1>Shelf It Right</h1>
+      <p>This version keeps the working scoreboard submission flow and adds a required music work-ID module before shelf-reading starts.</p>
 
-<h1>Shelf It Right — V4</h1>
+      <div class="info-box">
+        <strong>Student Information</strong>
+        <div class="form-grid">
+          <div class="field">
+            <label for="realName">Real Name</label>
+            <input id="realName" type="text" autocomplete="name" placeholder="Enter full name" />
+          </div>
+          <div class="field">
+            <label for="preferredName">Preferred Name</label>
+            <input id="preferredName" type="text" placeholder="Enter preferred name" />
+          </div>
+          <div class="field">
+            <label for="sbuEmail">SBU Email</label>
+            <input id="sbuEmail" type="email" autocomplete="email" placeholder="name@stonybrook.edu" />
+          </div>
+        </div>
+        <div id="intakeFeedback"></div>
+      </div>
 
-<div class="card" id="start">
-<h3>Student Info</h3>
-<input id="real" placeholder="Real Name"><br>
-<input id="pref" placeholder="Preferred Name"><br>
-<input id="email" placeholder="SBU Email"><br>
+      <div class="info-box">
+        <strong>Key Terms</strong>
+        <div>
+          <p><strong>Whole number</strong><br>The number after the class.<br>Examples: <code class="call">M 2</code>, <code class="call">M 2.3</code>, <code class="call">M 3</code></p>
+          <p><strong>First cutter</strong><br>The first letter-number group after the class number.<br>Examples: <code class="call">.B103</code>, <code class="call">.C4</code>, <code class="call">.S36</code></p>
+          <p><strong>Later work element</strong><br>A short work-style code that comes after the first cutter in some labels.<br>Example: <code class="call">R4</code> in <code class="call">M 2.3 .U6 R4 V.66</code></p>
+          <p><strong>Year</strong><br>The publication year.<br>Example: <code class="call">1994</code></p>
+          <p><strong>Later-line details</strong><br>Extra details that appear after the main call number parts.<br>Examples: <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code>, <code class="call">FASC.3</code>, <code class="call">H.III:E2</code></p>
+        </div>
+      </div>
 
-<button onclick="startTraining()">Start Training</button>
-</div>
+      <div class="info-box">
+        <strong>How This Version Works</strong>
+        <div>Module X is now required. Students must complete it before they can begin the scored shelf-reading modules and final drag/drop.</div>
+      </div>
 
-<div class="card hidden" id="moduleX">
-<h3>Optional: Music Work IDs</h3>
-<p>Example: KV 620</p>
-<p>What is it?</p>
+      <div class="inline-actions">
+        <button id="startBtn" type="button">Start Training</button>
+        <button id="rulesBtn" type="button" class="secondary">Show Sorting Rules</button>
+        <button id="referenceBtn" type="button" class="secondary">Show Work ID Quick Reference</button>
+      </div>
+    </div>
 
-<button onclick="answerX(true)">Work ID (Correct)</button>
-<button onclick="answerX(false)">Call Number</button>
+    <div id="rulesCard" class="card hidden rules"></div>
 
-<br><br>
-<button onclick="skipX()">Skip</button>
-</div>
+    <div id="referenceCard" class="card hidden">
+      <span class="chip">Quick Reference</span>
+      <h2>Music Catalogs &amp; Work IDs</h2>
+      <p class="small">Use these to confirm the exact piece a patron wants. They are not part of the shelving call number.</p>
 
-<div class="card hidden" id="module1">
-<h3>Module 1</h3>
-<p>Which comes first?</p>
-<p>M 100 or M 200</p>
+      <div class="reference-grid">
+        <div class="reference-box"><strong>BWV</strong>Bach work ID.<div class="example">Example: BWV 1007</div></div>
+        <div class="reference-box"><strong>K / KV</strong>Mozart work ID.<div class="example">Example: KV 620</div></div>
+        <div class="reference-box"><strong>D.</strong>Schubert work ID.<div class="example">Example: D. 328</div></div>
+        <div class="reference-box"><strong>Hob.</strong>Haydn work ID, often with genre section.<div class="example">Example: Hob. I:104</div></div>
+        <div class="reference-box"><strong>RV</strong>Vivaldi work ID.<div class="example">Example: RV 31</div></div>
+        <div class="reference-box"><strong>HWV</strong>Handel work ID.<div class="example">Example: HWV Anh. B</div></div>
+        <div class="reference-box"><strong>Sz</strong>Bartók work ID.<div class="example">Example: Sz 56</div></div>
+        <div class="reference-box"><strong>B.</strong>Dvořák work ID.<div class="example">Example: B178</div></div>
+      </div>
 
-<button onclick="answer(1,true)">M 100</button>
-<button onclick="answer(1,false)">M 200</button>
-</div>
+      <div class="table-wrap">
+        <table class="reference-table">
+          <thead>
+            <tr>
+              <th>Also Useful</th>
+              <th>What It Means</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>WoO</td><td>Works without opus number.</td><td>WoO 53</td></tr>
+            <tr><td>movt.</td><td>Movement inside a work.</td><td>movt. 2 / II. Andante</td></tr>
+            <tr><td>no.</td><td>Number inside a set.</td><td>op. 27, no. 2</td></tr>
+            <tr><td>plate no.</td><td>Publisher edition identifier.</td><td>Pl. No. 8474</td></tr>
+            <tr><td>ISMN</td><td>Published music edition identifier.</td><td>979-0-...</td></tr>
+            <tr><td>Anh.</td><td>Appendix / Anhang label in some catalogs.</td><td>BWV Anh.</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-<div class="card hidden" id="module2">
-<h3>Module 2</h3>
-<p>Which comes first?</p>
-<p>M 100 A vs M 100 B</p>
+      <div class="inline-actions no-print">
+        <button type="button" class="secondary" onclick="window.print()">Print Quick Reference</button>
+        <button type="button" class="secondary" id="closeReferenceBtn">Close</button>
+      </div>
+    </div>
 
-<button onclick="answer(2,true)">A</button>
-<button onclick="answer(2,false)">B</button>
-</div>
+    <div id="app" class="hidden">
+      <div class="card">
+        <div id="stageLabel" class="pill">Module X</div>
+        <div class="progress"><div id="bar"></div></div>
+        <div id="screen"></div>
+      </div>
+    </div>
+  </div>
 
-<div class="card hidden" id="module3">
-<h3>Module 3</h3>
-<p>Which comes first?</p>
-<p>M 100 A 1990 vs 2000</p>
+  <script>
+    var APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUoY2_eFLWVWyw5JX7Vv15ZdbDYYkYceQ_fpn0sZPGb3gpCtsrPfe3i_iItmv3ZFdiPA/exec';
 
-<button onclick="answer(3,true)">1990</button>
-<button onclick="answer(3,false)">2000</button>
-</div>
+    function safeGetElement(id) {
+      var el = document.getElementById(id);
+      if (!el) console.warn('Element not found:', id);
+      return el;
+    }
 
-<div class="card hidden" id="final">
-<h3>Final Drag/Drop (Simulated)</h3>
-<p>Score:</p>
+    function safeQuery(selector) {
+      try {
+        return document.querySelectorAll(selector);
+      } catch (e) {
+        console.error('Query selector error:', e.message);
+        return [];
+      }
+    }
 
-<button onclick="finalScore(100)">Perfect (100)</button>
-<button onclick="finalScore(70)">Partial (70)</button>
-<button onclick="finalScore(40)">Fail (40)</button>
-</div>
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
-<div class="card hidden" id="result">
-<h3>Results</h3>
-<p id="status"></p>
-<button onclick="saveResult()">Save to Scoreboard</button>
-</div>
+    function isValidSbuEmail(email) {
+      return /^[A-Za-z0-9._%+-]+@stonybrook\.edu$/i.test(String(email || '').trim());
+    }
 
-<div class="card">
-<h3>Scoreboard Preview</h3>
-<ul id="board"></ul>
-</div>
+    function nowIso() {
+      return new Date().toISOString();
+    }
 
-<script>
+    var app = safeGetElement('app');
+    var screen = safeGetElement('screen');
+    var stageLabel = safeGetElement('stageLabel');
+    var bar = safeGetElement('bar');
+    var rulesCard = safeGetElement('rulesCard');
+    var referenceCard = safeGetElement('referenceCard');
+    var intakeFeedback = safeGetElement('intakeFeedback');
 
-let student = {};
-let scores = {m1:false, m2:false, m3:false, final:0};
-let attempts = 0;
+    var realNameInput = safeGetElement('realName');
+    var preferredNameInput = safeGetElement('preferredName');
+    var emailInput = safeGetElement('sbuEmail');
+    var startBtn = safeGetElement('startBtn');
+    var rulesBtn = safeGetElement('rulesBtn');
+    var referenceBtn = safeGetElement('referenceBtn');
+    var closeReferenceBtn = safeGetElement('closeReferenceBtn');
 
-function startTraining(){
-student.real = document.getElementById("real").value;
-student.pref = document.getElementById("pref").value;
-student.email = document.getElementById("email").value;
+    var rulesText = `Local practice used in this prototype
 
-attempts++;
+1. Start with the class and the whole number.
+   Examples:
+   M 2 comes before M 2.3
+   M 2.3 comes before M 3
+   M 3 comes before M 452
 
-document.getElementById("start").classList.add("hidden");
-document.getElementById("moduleX").classList.remove("hidden");
-}
+2. If the whole number matches, compare the first cutter.
+   Examples within M 3:
+   .B103 comes before .C4
+   .C4 comes before .H26
+   .H26 comes before .O35
+   .O35 comes before .S36
 
-function answerX(correct){
-alert(correct ? "Correct — this is a Work ID" : "Incorrect");
-next("module1");
-}
+3. If the earlier parts match, compare later work elements, year, and later-line details.
 
-function skipX(){
-next("module1");
-}
+4. Roman numerals matter in later-line details.
+   Example:
+   SER.I comes before SER.II, which comes before SER.VI
 
-function answer(module, correct){
-scores["m"+module] = correct;
-next("module"+(module+1));
-}
+5. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
 
-function finalScore(val){
-scores.final = val;
-next("result");
+    var moduleXQuestions = [
+      {
+        id: 'x1',
+        prompt: 'You see “KV 620” on a case spine. What kind of number is it?',
+        choices: [
+          'A call number used for shelving',
+          'A composer work ID number used to identify a specific piece',
+          'A plate number for the publisher’s printing',
+          'A rehearsal mark inside the score'
+        ],
+        answer: 1,
+        explain: 'KV/K numbers are work IDs. They help confirm the exact piece. They are not part of the shelving call number.'
+      },
+      {
+        id: 'x2',
+        prompt: 'Which one is a general designation, not a composer-specific catalog?',
+        choices: [
+          'BWV',
+          'RV',
+          'WoO',
+          'Hob.'
+        ],
+        answer: 2,
+        explain: 'WoO means works without opus number. It is a general designation rather than a single composer-specific catalog prefix.'
+      },
+      {
+        id: 'x3',
+        prompt: 'A patron says, “I need the second movement of this symphony.” Which label helps you point to the spot?',
+        choices: [
+          'movt.',
+          'ISMN',
+          'BWV',
+          'plate no.'
+        ],
+        answer: 0,
+        explain: 'Movement labels tell you where inside the piece you are.'
+      }
+    ];
 
-let passedModules = scores.m1 && scores.m2 && scores.m3;
-let passedFinal = val >= 70;
-let pass = passedModules && passedFinal;
+    var modules = [
+      {
+        key: 'moduleX',
+        label: 'Module X',
+        type: 'moduleX',
+        title: 'Music Catalogs & Work IDs'
+      },
+      {
+        key: 'module1',
+        label: 'Module 1',
+        title: 'Whole Number',
+        masteryText: 'Pass target: 3 correct in a row.',
+        insight: 'Work ID tip: If you see letters + a number such as BWV, KV, Hob., or RV, that is a work identifier, not a shelving number.',
+        teach:
+          '<p>Always start with the class and whole number. Do not jump to the cutter too early.</p>' +
+          '<p>Examples: <code class="call">M 2</code> comes before <code class="call">M 2.3</code>, and both come before <code class="call">M 3</code>.</p>',
+        worked:
+          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 2.3 .U6 R4 V.66</code> comes before <code class="call">M 3 .B103 2005 SER.8 V.2</code> because 2.3 comes before 3. Stop there. Do not look at the cutter yet.</p></div>',
+        questions: [
+          { id: 'm1q1', prompt: 'Which call number comes first?', choices: ['M 3', 'M 2.3', 'M 452'], answer: 1, explain: '2.3 comes before 3 and 452.' },
+          { id: 'm1q2', prompt: 'Which call number comes first?', choices: ['M 2', 'M 3', 'M 2.3'], answer: 0, explain: '2 comes before 2.3 and 3.' },
+          { id: 'm1q3', prompt: 'Which call number comes first?', choices: ['M 452 .H42 H.III:E2', 'M 2 .G39 1966 BD.23', 'M 3 .C4 1993 SER.VI V.69A'], answer: 1, explain: '2 comes before 3 and 452.' }
+        ]
+      },
+      {
+        key: 'module2',
+        label: 'Module 2',
+        title: 'First Cutter',
+        masteryText: 'Pass target: 3 correct in a row.',
+        insight: 'Opus tip: “op.” does not always mean chronological order. Use a catalog number, when present, to confirm the exact piece.',
+        teach:
+          '<p>If the whole number matches, compare the first cutter.</p>' +
+          '<p>Examples within <code class="call">M 3</code>: <code class="call">.B103</code> comes before <code class="call">.C4</code>, which comes before <code class="call">.H26</code>.</p>',
+        worked:
+          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .B1133 SER.I BD.32 PT.1</code> comes before <code class="call">M 3 .C4 1993 SER.VI V.69A</code> because the whole number matches and B comes before C.</p></div>',
+        questions: [
+          { id: 'm2q1', prompt: 'Which call number comes first?', choices: ['M 3 .C4', 'M 3 .B103', 'M 3 .S36'], answer: 1, explain: 'B comes before C and S.' },
+          { id: 'm2q2', prompt: 'Which call number comes first?', choices: ['M 3 .H26', 'M 3 .O35', 'M 3 .C4'], answer: 2, explain: 'C comes before H and O.' },
+          { id: 'm2q3', prompt: 'Which call number comes first?', choices: ['M 3 .S36', 'M 3 .O35', 'M 3 .H26'], answer: 2, explain: 'H comes before O and S.' }
+        ]
+      },
+      {
+        key: 'module3',
+        label: 'Module 3',
+        title: 'Year And Later Details',
+        masteryText: 'Pass target: 3 correct in a row.',
+        insight: 'Edition tip: If two scores look alike, check identifiers like plate numbers or ISMN to confirm the exact edition.',
+        teach:
+          '<p>If the earlier parts match, later details decide the order. That can include year, series, and other later-line details.</p>' +
+          '<p>Example: <code class="call">M 3 .O35 1994 SER.II FASC.3</code> comes before <code class="call">M 3 .O35 2001 SER.II FASC.3</code>.</p>',
+        worked:
+          '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .O35 1994 SER.II FASC.3</code> comes before <code class="call">M 3 .O35 2001 SER.II FASC.3</code> because the earlier parts match, so the year decides it.</p></div>',
+        questions: [
+          { id: 'm3q1', prompt: 'Which call number comes first?', choices: ['M 3 .O35 1994 SER.II FASC.3', 'M 3 .O35 2001 SER.II FASC.3'], answer: 0, explain: '1994 comes before 2001.' },
+          { id: 'm3q2', prompt: 'Which later detail comes first?', choices: ['SER.VI', 'SER.I', 'SER.II'], answer: 1, explain: 'SER.I comes before SER.II, which comes before SER.VI.' },
+          { id: 'm3q3', prompt: 'Which call number comes first?', choices: ['M 452 .H42 H.III:E2', 'M 452 .H42 H.II:E2'], answer: 1, explain: 'II comes before III.' }
+        ]
+      },
+      {
+        key: 'finalActivity',
+        label: 'Final Activity',
+        type: 'drag'
+      },
+      {
+        key: 'done',
+        label: 'Complete',
+        type: 'done'
+      }
+    ];
 
-document.getElementById("status").innerHTML =
-pass ? "<span class='pass'>PASS</span>" : "<span class='fail'>FAIL</span>";
-}
+    var state = {
+      sessionStartedAt: null,
+      sessionCompletedAt: null,
+      submitted: false,
+      step: 0,
+      phase: 'teach',
+      score: 0,
+      streak: 0,
+      currentQuestion: null,
+      tryCount: 0,
 
-function saveResult(){
+      student: {
+        realName: '',
+        preferredName: '',
+        sbuEmail: ''
+      },
 
-let passedModules = scores.m1 && scores.m2 && scores.m3;
-let passedFinal = scores.final >= 70;
-let pass = passedModules && passedFinal;
+      metrics: {
+        moduleAttempts: {
+          module1: 0,
+          module2: 0,
+          module3: 0,
+          finalActivity: 0
+        },
+        modulePassed: {
+          module1: false,
+          module2: false,
+          module3: false,
+          finalActivity: false
+        },
+        moduleCompletedCount: 0,
+        modulePassedCount: 0,
+        lessonsCompleted: 0,
+        lessonsPassed: 0,
+        finalActivityPass: false,
+        overallPass: false
+      },
 
-let entry = {
-time: new Date().toLocaleString(),
-real: student.real,
-pref: student.pref,
-email: student.email,
-modulesPassed: passedModules,
-finalScore: scores.final,
-pass: pass,
-attempts: attempts
-};
+      moduleX: {
+        passed: false,
+        completed: false,
+        attempts: 0,
+        score: 0
+      }
+    };
 
-let data = JSON.parse(localStorage.getItem("scores") || "[]");
-data.push(entry);
-localStorage.setItem("scores", JSON.stringify(data));
+    function resetMetrics() {
+      state.metrics = {
+        moduleAttempts: {
+          module1: 0,
+          module2: 0,
+          module3: 0,
+          finalActivity: 0
+        },
+        modulePassed: {
+          module1: false,
+          module2: false,
+          module3: false,
+          finalActivity: false
+        },
+        moduleCompletedCount: 0,
+        modulePassedCount: 0,
+        lessonsCompleted: 0,
+        lessonsPassed: 0,
+        finalActivityPass: false,
+        overallPass: false
+      };
 
-renderBoard();
-}
+      state.moduleX = {
+        passed: false,
+        completed: false,
+        attempts: 0,
+        score: 0
+      };
 
-function renderBoard(){
-let data = JSON.parse(localStorage.getItem("scores") || "[]");
-let board = document.getElementById("board");
-board.innerHTML = "";
+      moduleXQuestions.forEach(function(q) {
+        q._done = false;
+      });
+    }
+
+    function syncStudentInfo() {
+      state.student.realName = String(realNameInput.value || '').trim();
+      state.student.preferredName = String(preferredNameInput.value || '').trim();
+      state.student.sbuEmail = String(emailInput.value || '').trim();
+    }
+
+    function validateStudentInfo() {
+      syncStudentInfo();
+
+      if (!state.student.realName) return 'Please enter the student’s real name.';
+      if (!state.student.preferredName) return 'Please enter the student’s preferred name.';
+      if (!isValidSbuEmail(state.student.sbuEmail)) return 'Please enter a valid SBU email ending in @stonybrook.edu.';
+      return '';
+    }
+
+    function showIntakeMessage(message, type) {
+      if (!intakeFeedback) return;
+      if (!message) {
+        intakeFeedback.innerHTML = '';
+        return;
+      }
+      intakeFeedback.innerHTML = '<div class="feedback ' + (type || 'warn') + '">' + escapeHtml(message) + '</div>';
+    }
+
+    function toggleRules() {
+      if (!rulesCard) return;
+      if (rulesCard.classList.contains('hidden')) {
+        rulesCard.classList.remove('hidden');
+        rulesCard.innerHTML = '<h2>Sorting Rules Used In This Prototype</h2><pre>' + escapeHtml(rulesText) + '</pre>';
+      } else {
+        rulesCard.classList.add('hidden');
+        rulesCard.innerHTML = '';
+      }
+    }
+
+    function toggleReference(forceOpen) {
+      if (!referenceCard) return;
+      if (forceOpen === true) {
+        referenceCard.classList.remove('hidden');
+        return;
+      }
+      if (forceOpen === false) {
+        referenceCard.classList.add('hidden');
+        return;
+      }
+      referenceCard.classList.toggle('hidden');
+    }
+
+    function compareCallNumbers(a, b) {
+      function getWhole(x) {
+        var m = x.match(/\b(MT|ML|M)\s*(\d+(?:\.\d+)?)/i);
+        return m ? parseFloat(m[2]) : Number.POSITIVE_INFINITY;
+      }
+
+      function getFirstCutter(x) {
+        var m = x.match(/\.([A-Z]{1,3})(\d+(?:\.\d+)?)([A-Z]?)/i);
+        if (!m) return null;
+        return { letters: m[1].toUpperCase(), num: parseFloat(m[2]), suffix: (m[3] || '').toUpperCase() };
+      }
+
+      function getYear(x) {
+        var m = x.match(/\b(1[6-9]\d{2}|20\d{2})\b/);
+        return m ? parseInt(m[1], 10) : null;
+      }
+
+      function cmpStr(x, y) {
+        return String(x || '').localeCompare(String(y || ''));
+      }
+
+      function cmpNum(x, y) {
+        var aa = x == null ? -Infinity : x;
+        var bb = y == null ? -Infinity : y;
+        if (aa < bb) return -1;
+        if (aa > bb) return 1;
+        return 0;
+      }
+
+      var wa = getWhole(a);
+      var wb = getWhole(b);
+      if (wa !== wb) return cmpNum(wa, wb);
+
+      var ca = getFirstCutter(a);
+      var cb = getFirstCutter(b);
+
+      if (ca || cb) {
+        if (!ca) return -1;
+        if (!cb) return 1;
+        if (ca.letters !== cb.letters) return cmpStr(ca.letters, cb.letters);
+        if (ca.num !== cb.num) return cmpNum(ca.num, cb.num);
+        if (ca.suffix !== cb.suffix) return cmpStr(ca.suffix, cb.suffix);
+      }
+
+      var ya = getYear(a);
+      var yb = getYear(b);
+      if (ya !== yb) return cmpNum(ya, yb);
+
+      return cmpStr(a, b);
+    }
+
+    function explainDifference(correct, chosen) {
+      function getWhole(x) {
+        var m = x.match(/\b(MT|ML|M)\s*(\d+(?:\.\d+)?)/i);
+        return m ? parseFloat(m[2]) : Number.POSITIVE_INFINITY;
+      }
+
+      function getFirstCutter(x) {
+        var m = x.match(/\.([A-Z]{1,3})(\d+(?:\.\d+)?)([A-Z]?)/i);
+        if (!m) return null;
+        return { letters: m[1].toUpperCase(), num: parseFloat(m[2]), suffix: (m[3] || '').toUpperCase() };
+      }
+
+      var cw = getWhole(correct);
+      var hw = getWhole(chosen);
+      if (cw !== hw) {
+        return 'You should stop at the whole number here. ' + cw + ' comes before ' + hw + '.';
+      }
+
+      var cc = getFirstCutter(correct);
+      var hc = getFirstCutter(chosen);
+      if (cc && hc && (cc.letters !== hc.letters || cc.num !== hc.num || cc.suffix !== hc.suffix)) {
+        return 'The whole number matches, so the first cutter decides it here.';
+      }
+
+      return 'The earlier parts match, so you have to compare what comes later.';
+    }
+
+    function updateProgress() {
+      if (!bar || !stageLabel) return;
+      var item = modules[state.step];
+      stageLabel.textContent = item.label;
+      bar.style.width = ((state.step) / (modules.length - 1)) * 100 + '%';
+    }
+
+    function startTraining() {
+      var validationMessage = validateStudentInfo();
+      if (validationMessage) {
+        showIntakeMessage(validationMessage, 'warn');
+        return;
+      }
+
+      showIntakeMessage('', '');
+      toggleReference(false);
+      if (rulesCard) {
+        rulesCard.classList.add('hidden');
+        rulesCard.innerHTML = '';
+      }
+
+      app.classList.remove('hidden');
+
+      state.sessionStartedAt = nowIso();
+      state.sessionCompletedAt = null;
+      state.submitted = false;
+      state.step = 0;
+      state.phase = 'teach';
+      state.score = 0;
+      state.streak = 0;
+      state.currentQuestion = null;
+      state.tryCount = 0;
+      resetMetrics();
+
+      render();
+    }
+
+    function render() {
+      if (!app || !screen || !modules[state.step]) return;
+      var item = modules[state.step];
+      updateProgress();
+
+      if (item.type === 'moduleX') {
+        renderModuleX();
+        return;
+      }
+
+      if (item.type === 'drag') {
+        renderDrag();
+        return;
+      }
+
+      if (item.type === 'done') {
+        renderDone();
+        return;
+      }
+
+      renderModule(item);
+    }
+
+    function renderModuleX() {
+      if (state.phase === 'teach') {
+        screen.innerHTML =
+          '<h2>Module X: Music Catalogs &amp; Work IDs</h2>' +
+          '<div class="lesson-note">This module is required. You must complete it before moving into shelf-reading.</div>' +
+          '<p>These labels help confirm the exact piece a patron wants. They are <strong>not</strong> part of the shelving call number.</p>' +
+          '<div class="reference-grid">' +
+            '<div class="reference-box"><strong>BWV</strong>Bach<div class="example">BWV 1007</div></div>' +
+            '<div class="reference-box"><strong>KV</strong>Mozart<div class="example">KV 620</div></div>' +
+            '<div class="reference-box"><strong>D.</strong>Schubert<div class="example">D. 328</div></div>' +
+            '<div class="reference-box"><strong>Hob.</strong>Haydn<div class="example">Hob. I:104</div></div>' +
+          '</div>' +
+          '<div class="inline-actions">' +
+            '<button type="button" onclick="startModuleXQuiz()">Begin Module X Questions</button>' +
+            '<button type="button" class="secondary" onclick="toggleReference(true)">Open Quick Reference</button>' +
+          '</div>';
+        return;
+      }
+
+      renderModuleXQuestion();
+    }
+
+    function startModuleXQuiz() {
+      state.phase = 'practice';
+      state.currentQuestion = null;
+      state.tryCount = 0;
+      state.moduleX.attempts += 1;
+      renderModuleXQuestion();
+    }
+
+    function renderModuleXQuestion() {
+      if (!state.currentQuestion) {
+        var unanswered = moduleXQuestions.filter(function(q) {
+          return !q._done;
+        });
+
+        if (unanswered.length === 0) {
+          state.moduleX.completed = true;
+          state.moduleX.passed = true;
+          screen.innerHTML =
+            '<h2>Module X Complete</h2>' +
+            '<div class="feedback good">You completed the required work-ID questions.</div>' +
+            '<p>Good. Now move into the shelf-reading modules.</p>' +
+            '<div class="inline-actions">' +
+              '<button type="button" onclick="advanceFromModuleX()">Continue to Module 1</button>' +
+              '<button type="button" class="secondary" onclick="toggleReference(true)">Open Quick Reference</button>' +
+            '</div>';
+          return;
+        }
+
+        state.currentQuestion = unanswered[0];
+        state.tryCount = 0;
+      }
+
+      var q = state.currentQuestion;
+      screen.innerHTML =
+        '<h2>Module X: Music Catalogs &amp; Work IDs</h2>' +
+        '<div class="chip">Required</div>' +
+        '<p><strong>' + escapeHtml(q.prompt) + '</strong></p>' +
+        '<div id="xChoices"></div>' +
+        '<div id="xFeedback"></div>';
+
+      var choicesDiv = safeGetElement('xChoices');
+      q.choices.forEach(function(choice, index) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'choice';
+        btn.textContent = choice;
+        btn.onclick = function() { handleModuleXAnswer(index); };
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function handleModuleXAnswer(index) {
+      var q = state.currentQuestion;
+      var feedback = safeGetElement('xFeedback');
+      if (!q || !feedback) return;
+
+      if (index === q.answer) {
+        q._done = true;
+        state.moduleX.score += 1;
+        feedback.className = 'feedback good';
+        feedback.innerHTML = escapeHtml(q.explain) + '<br><br><button type="button" onclick="nextModuleXQuestion()">Next</button>';
+        safeQuery('#xChoices .choice').forEach(function(btn) {
+          btn.disabled = true;
+        });
+        return;
+      }
+
+      state.tryCount += 1;
+
+      if (state.tryCount === 1) {
+        feedback.className = 'feedback bad';
+        feedback.innerHTML = 'Not quite. Try again.';
+        return;
+      }
+
+      feedback.className = 'feedback bad';
+      feedback.innerHTML =
+        'Not quite. The best answer is <strong>' + escapeHtml(q.choices[q.answer]) + '</strong>.<br><br>' +
+        escapeHtml(q.explain) +
+        '<br><br><button type="button" onclick="nextModuleXQuestion()">Next</button>';
+
+      q._done = true;
+      safeQuery('#xChoices .choice').forEach(function(btn) {
+        btn.disabled = true;
+      });
+    }
+
+    function nextModuleXQuestion() {
+      state.currentQuestion = null;
+      renderModuleXQuestion();
+    }
+
+    function advanceFromModuleX() {
+      state.currentQuestion = null;
+      state.step = 1;
+      state.phase = 'teach';
+      render();
+    }
+
+    function renderModule(module) {
+      if (state.phase === 'teach') {
+        screen.innerHTML =
+          '<h2>' + escapeHtml(module.title) + '</h2>' +
+          module.teach +
+          '<div class="mastery">' + escapeHtml(module.masteryText) + ' Current streak: ' + state.streak + '</div>' +
+          '<button type="button" onclick="showWorked()">Continue</button>';
+        return;
+      }
+
+      if (state.phase === 'worked') {
+        var insightHtml = module.insight
+          ? '<div class="insight-card"><strong>Music Catalogs Insight</strong><br>' + escapeHtml(module.insight) + '</div>'
+          : '';
+
+        screen.innerHTML =
+          '<h2>' + escapeHtml(module.title) + '</h2>' +
+          module.worked +
+          insightHtml +
+          '<div class="mastery">' + escapeHtml(module.masteryText) + ' Current streak: ' + state.streak + '</div>' +
+          '<button type="button" onclick="showPractice()">Continue</button>';
+        return;
+      }
+
+      renderPracticeQuestion(module);
+    }
+
+    function showWorked() {
+      state.phase = 'worked';
+      render();
+    }
+
+    function showPractice() {
+      state.phase = 'practice';
+      state.currentQuestion = null;
+      state.tryCount = 0;
+      render();
+    }
+
+    function renderPracticeQuestion(module) {
+      if (!state.currentQuestion) {
+        var questions = module.questions || [];
+        state.currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+        state.tryCount = 0;
+        state.metrics.moduleAttempts[module.key] += 1;
+      }
+
+      var q = state.currentQuestion;
+      screen.innerHTML =
+        '<h2>' + escapeHtml(module.title) + '</h2>' +
+        '<p><strong>' + escapeHtml(q.prompt) + '</strong></p>' +
+        '<div id="choices"></div>' +
+        '<div id="feedback"></div>' +
+        '<div class="mastery">' + escapeHtml(module.masteryText) + ' Current streak: ' + state.streak + '</div>';
+
+      var choicesDiv = safeGetElement('choices');
+
+      q.choices.forEach(function(choice, index) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'choice';
+        btn.textContent = choice;
+        btn.onclick = function() { handleAnswer(index); };
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function disableChoices() {
+      safeQuery('.choice').forEach(function(btn) {
+        btn.disabled = true;
+      });
+    }
+
+    function markModulePassed(moduleKey) {
+      if (!state.metrics.modulePassed[moduleKey]) {
+        state.metrics.modulePassed[moduleKey] = true;
+        state.metrics.modulePassedCount += 1;
+        state.metrics.lessonsPassed = state.metrics.modulePassedCount;
+      }
+    }
+
+    function advanceModule() {
+      var currentModule = modules[state.step];
+
+      if (currentModule && currentModule.key !== 'moduleX' && currentModule.key !== 'finalActivity' && currentModule.key !== 'done') {
+        markModulePassed(currentModule.key);
+        state.metrics.moduleCompletedCount += 1;
+        state.metrics.lessonsCompleted = state.metrics.moduleCompletedCount;
+      }
+
+      state.step += 1;
+      state.phase = 'teach';
+      state.streak = 0;
+      state.currentQuestion = null;
+      state.tryCount = 0;
+      render();
+    }
+
+    function nextQuestion() {
+      state.currentQuestion = null;
+      state.tryCount = 0;
+      render();
+    }
+
+    function handleAnswer(index) {
+      var module = modules[state.step];
+      var q = state.currentQuestion;
+      var feedback = safeGetElement('feedback');
+      if (!module || !q || !feedback) return;
+
+      if (index === q.answer) {
+        state.score += 1;
+        state.streak += 1;
+
+        feedback.className = 'feedback good';
+        feedback.innerHTML =
+          'Correct. ' + escapeHtml(q.explain) + '<br><br>' +
+          (state.streak >= 3
+            ? '<button type="button" onclick="advanceModule()">Pass Lesson</button>'
+            : '<button type="button" onclick="nextQuestion()">Next Similar Problem</button>');
+
+        disableChoices();
+        return;
+      }
+
+      state.streak = 0;
+      state.tryCount += 1;
+
+      if (state.tryCount === 1) {
+        feedback.className = 'feedback bad';
+        feedback.innerHTML =
+          'Not quite. ' + escapeHtml(explainDifference(q.choices[q.answer], q.choices[index])) +
+          '<br><br>Try again before the answer is revealed.';
+        return;
+      }
+
+      feedback.className = 'feedback bad';
+      feedback.innerHTML =
+        'Not quite. The correct answer is <code class="call">' + escapeHtml(q.choices[q.answer]) + '</code>.<br><br>' +
+        escapeHtml(q.explain) +
+        '<br><br><button type="button" onclick="nextQuestion()">Try Another Similar Problem</button>';
+
+      disableChoices();
+    }
+
+    function shuffle(arr) {
+      var copy = arr.slice();
+      for (var i = copy.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = tmp;
+      }
+      return copy;
+    }
+
+    function makeDraggable(text, id) {
+      var div = document.createElement('div');
+      div.className = 'draggable';
+      div.draggable = true;
+      div.tabIndex = 0;
+      div.id = id;
+      div.setAttribute('data-value', text);
+      div.text
