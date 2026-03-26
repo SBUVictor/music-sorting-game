@@ -1,125 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shelf It Right | Stony Brook Music Library</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SBU Music Library Training</title>
   <style>
-    :root {
-      --sbu-red: #990000; --sbu-black: #000000; --sbu-cream: #F8F2C5; 
-      --sbu-light-gray: #BEBEBE; --sbu-celery: #BCCF9D; --sbu-forest: #104247;
-    }
-    body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fdfdfd; color: var(--sbu-black); line-height: 1.6; }
-    .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: #fff; border: 1px solid var(--sbu-light-gray); border-radius: 24px; padding: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); margin-bottom: 25px; }
-    .pill { display: inline-block; padding: 6px 14px; border-radius: 50px; border: 2px solid var(--sbu-red); color: var(--sbu-red); font-weight: 800; font-size: 12px; text-transform: uppercase; margin-bottom: 15px; }
-    .progress { width: 100%; height: 10px; background: #eee; border-radius: 20px; margin-bottom: 30px; overflow: hidden; }
-    #bar { height: 100%; width: 0%; background: var(--sbu-red); transition: width 0.4s ease; }
-    h2 { color: var(--sbu-red); font-size: 1.8rem; margin-top: 0; }
-    .instruction { background: var(--sbu-cream); padding: 20px; border-radius: 12px; border-left: 6px solid var(--sbu-red); margin: 20px 0; }
-    button { background: var(--sbu-red); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 16px; }
-    button.choice { display: block; width: 100%; text-align: left; background: white; color: black; border: 1px solid #ddd; margin-bottom: 12px; padding: 18px; transition: 0.2s; }
-    button.choice:hover { background: var(--sbu-cream); border-color: var(--sbu-red); }
-    .feedback { padding: 18px; border-radius: 12px; margin-top: 20px; font-weight: bold; border: 1px solid transparent; }
-    .good { background: var(--sbu-celery); color: var(--sbu-forest); border-color: var(--sbu-forest); }
-    .bad { background: #fff1f1; color: #b91c1c; border-color: #f87171; }
-    code { background: #f4f4f4; padding: 3px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
-    .drag-item { padding: 15px; background: white; border: 2px solid #ddd; border-radius: 10px; cursor: grab; margin-bottom: 8px; font-weight: bold; }
-    .hidden { display: none !important; }
+    :root { --red: #990000; --black: #000000; --cream: #F8F2C5; --gray: #ddd; }
+    body { font-family: sans-serif; line-height: 1.5; background: #f9f9f9; padding: 20px; color: #333; }
+    .card { background: white; max-width: 800px; margin: 0 auto; padding: 30px; border-radius: 15px; border: 1px solid var(--gray); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .pill { display: inline-block; padding: 4px 12px; border: 2px solid var(--red); color: var(--red); border-radius: 50px; font-size: 12px; font-weight: bold; margin-bottom: 20px; }
+    .progress { height: 8px; background: #eee; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+    #bar { height: 100%; width: 0%; background: var(--red); transition: width 0.3s; }
+    .lesson { background: var(--cream); border-left: 5px solid var(--red); padding: 15px; margin: 20px 0; }
+    button { background: var(--red); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+    button:hover { background: #6b0000; }
+    .choice { display: block; width: 100%; text-align: left; background: white; border: 1px solid var(--gray); margin-bottom: 10px; padding: 15px; color: #000; font-size: 16px; border-radius: 8px; }
+    .choice:hover { background: var(--cream); border-color: var(--red); }
+    .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: bold; }
+    .correct { background: #e7f3ef; color: #1d4436; border: 1px solid #1d4436; }
+    .incorrect { background: #fee2e2; color: #991b1b; border: 1px solid #991b1b; }
+    .drag-zone { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; }
+    .drag-item { background: white; padding: 12px; border: 1px solid #bbb; border-radius: 6px; cursor: grab; font-family: monospace; font-weight: bold; }
+    .dragging { opacity: 0.5; background: #eee; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div id="landing" class="card">
-      <div class="pill">Stony Brook University</div>
-      <h1>Shelf It Right</h1>
-      <p>This training ensures every score is in the right place. We start with identification and end with shelf-reading.</p>
-      <button onclick="startApp()">Start Official Training</button>
-    </div>
 
-    <div id="app" class="hidden">
-      <div class="card">
-        <div id="mod-tag" class="pill">Module</div>
-        <div class="progress"><div id="bar"></div></div>
-        <div id="screen"></div>
-      </div>
-    </div>
+<div class="card">
+  <div id="landing">
+    <div class="pill">SBU MUSIC LIBRARY</div>
+    <h1>Shelf It Right</h1>
+    <p>Staff Training: Identifying and shelving music scores correctly.</p>
+    <button onclick="start()">Begin Training</button>
   </div>
 
-  <script>
-    let state = { step: 0, phase: 'teach', streak: 0 };
+  <div id="app" class="hidden">
+    <div id="header">
+      <div id="mod-title" class="pill">Module</div>
+      <div class="progress"><div id="bar"></div></div>
+    </div>
+    <div id="screen"></div>
+  </div>
+</div>
 
-    const modules = [
-      {
-        id: "modX",
-        title: "Module X: Music Catalogs",
-        teach: `<h2>Thematic Catalogs & Work IDs</h2>
-                <div class="instruction"><strong>The Golden Rule:</strong> Work IDs confirm the exact piece for a patron but are <b>never</b> used for shelving.</div>
-                <p><strong>Composer-Specific Labels:</strong> <b>BWV</b> (Bach), <b>KV</b> (Mozart), <b>Hob.</b> (Haydn), <b>RV</b> (Vivaldi).</p>
-                <p><strong>General Labels:</strong> <b>WoO</b> stands for "Works without opus number" and is used for <u>many</u> different composers.</p>`,
-        questions: [
-          { q: "Which one is a general designation, not a composer-specific catalog?", c: ["BWV", "RV", "WoO", "Hob."], a: 2, e: "Correct! WoO is general." },
-          { q: "Which thematic catalog is used specifically for Wolfgang Amadeus Mozart?", c: ["BWV", "KV (or K)", "Hob.", "RV"], a: 1, e: "Correct! Mozart uses KV." }
-        ]
-      },
-      {
-        id: "mod2",
-        title: "Module 2: First Cutter",
-        teach: `<h2>Rule: First Cutters</h2>
-                <p>When whole numbers match, look at the first Letter. If letters match, the numbers are read as decimals.</p>
-                <div class="instruction">Example: <code class="call">.C4</code> comes before <code class="call">.H26</code>.</div>`,
-        questions: [
-          { q: "Which call number comes first?", c: ["M 45 .C4 1988", "M 45 .S36 1988", "M 45 .H26 1988"], a: 0, e: "Correct! .C before .S alphabetically." }
-        ]
-      },
-      {
-        id: "mod3",
-        title: "Module 3: Years & Details",
-        teach: `<h2>Rule: Years and Later Details</h2>
-                <p>After the Cutter and Year, we look at Series (SER.), Fascicles (FASC.), or Volumes.</p>
-                <div class="instruction"><strong>Roman Numerals:</strong> SER. I comes before SER. VI. <br><strong>Sequence:</strong> Fascicles (FASC.) are treated similarly to volumes.</div>`,
-        questions: [
-          { q: "Which call number comes first?", c: ["M 452 .S36 2005 SER.VI", "M 452 .S36 2005 FASC.3", "M 452 .S36 2005 SER.I"], a: 2, e: "Correct! Series I (Roman Numeral I) comes before VI." }
-        ]
-      }
-    ];
+<script>
+const data = [
+  {
+    title: "Module X: Music Catalogs",
+    type: "quiz",
+    lesson: `<h2>Thematic Catalogs</h2><div class="lesson"><b>Rule:</b> Work IDs identify specific pieces but aren't for shelving. <b>KV</b> is Mozart, <b>BWV</b> is Bach, and <b>WoO</b> is a <u>general</u> label for works without opus.</div>`,
+    questions: [
+      { q: "Which of these is a GENERAL label, not specific to one composer?", c: ["BWV", "KV", "WoO", "RV"], a: 2, e: "WoO is general (Works without opus)." },
+      { q: "Which catalog is used for Mozart?", c: ["BWV", "KV", "Hob."], a: 1, e: "Mozart uses KV (Koechel)." }
+    ]
+  },
+  {
+    title: "Module 1: Whole Numbers",
+    type: "quiz",
+    lesson: `<h2>Whole Numbers</h2><div class="lesson">Line 1 is the Class (M). Line 2 is the Whole Number. <b>M 14.5</b> comes before <b>M 15</b>.</div>`,
+    questions: [
+      { q: "Which comes first?", c: ["M 14.5 .S4", "M 15 .A2"], a: 0, e: "14.5 is mathematically smaller than 15." }
+    ]
+  },
+  {
+    title: "Module 2: First Cutter",
+    type: "quiz",
+    lesson: `<h2>The Cutter</h2><div class="lesson">Letters are alphabetical. Numbers are decimals. <b>.C4</b> comes before <b>.C42</b> (because .40 is smaller than .42).</div>`,
+    questions: [
+      { q: "Which comes first?", c: ["M 45 .C4 1988", "M 45 .C36 1988"], a: 1, e: ".C36 comes before .C4 (36 vs 40)." }
+    ]
+  },
+  {
+    title: "Module 3: Series/Details",
+    type: "quiz",
+    lesson: `<h2>Series & Roman Numerals</h2><div class="lesson">Series (SER.) and Fascicles (FASC.) follow the year. Roman Numerals: <b>SER. I</b> comes before <b>SER. VI</b>.</div>`,
+    questions: [
+      { q: "Which comes first?", c: ["M 452 .S36 2005 SER.VI", "M 452 .S36 2005 SER.I"], a: 1, e: "Roman Numeral I comes before VI." }
+    ]
+  },
+  {
+    title: "Assessment",
+    type: "drag",
+    lesson: `<h2>Final Check</h2><p>Drag these items into the correct order as they would appear on the shelf.</p>`,
+    items: [
+      { text: "M 2 .G39 1966 BD.23", r: 0 },
+      { text: "M 2.3 .U6 R4 V.66", r: 1 },
+      { text: "M 3 .B103 2005 SER.8", r: 2 },
+      { text: "M 3 .C4 1993 SER.VI", r: 3 }
+    ]
+  }
+];
 
-    function startApp() {
-      document.getElementById('landing').classList.add('hidden');
-      document.getElementById('app').classList.remove('hidden');
-      render();
-    }
+let state = { mod: 0, phase: 'teach', qIdx: 0 };
 
-    function render() {
-      if (state.step >= modules.length) { finish(); return; }
-      const mod = modules[state.step];
-      document.getElementById('mod-tag').textContent = mod.title;
-      document.getElementById('bar').style.width = (state.step / modules.length * 100) + "%";
-      const scr = document.getElementById('screen');
+function start() {
+  document.getElementById('landing').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  render();
+}
 
-      if (state.phase === 'teach') {
-        scr.innerHTML = mod.teach + `<button onclick="state.phase='quiz';render()">Begin Practice</button>`;
-      } else {
-        const q = mod.questions[state.streak];
-        scr.innerHTML = `<h3>Practice</h3><p><b>${q.q}</b></p>` +
-          q.c.map((opt, i) => `<button class="choice" onclick="checkAns(${i})">${opt}</button>`).join('') + `<div id="fb"></div>`;
-      }
-    }
+function render() {
+  const mod = data[state.mod];
+  document.getElementById('mod-title').textContent = mod.title;
+  document.getElementById('bar').style.width = (state.mod / data.length * 100) + "%";
+  const screen = document.getElementById('screen');
 
-    window.checkAns = function(i) {
-      const q = modules[state.step].questions[state.streak];
-      const div = document.getElementById('fb');
-      if (i === q.a) {
-        state.streak++;
-        div.innerHTML = `<div class="feedback good">${q.e}</div>` + 
-          (state.streak >= modules[state.step].questions.length ? `<button onclick="nextMod()">Next Module</button>` : `<button onclick="render()">Continue</button>`);
-      } else {
-        div.innerHTML = `<div class="feedback bad">Incorrect. Let's review the rule.</div><button onclick="state.streak=0;state.phase='teach';render()">Review Rule</button>`;
-      }
-    };
+  if (state.phase === 'teach') {
+    screen.innerHTML = mod.lesson + `<button onclick="state.phase='test';render()">Start Practice</button>`;
+  } else if (mod.type === 'quiz') {
+    const q = mod.questions[state.qIdx];
+    screen.innerHTML = `<p><b>${q.q}</b></p>` + 
+      q.c.map((opt, i) => `<button class="choice" onclick="check(${i})">${opt}</button>`).join('') + `<div id="fb"></div>`;
+  } else {
+    renderDrag(mod);
+  }
+}
 
-    window.nextMod = function() { state.step++; state.phase = 'teach'; state.streak = 0; render(); };
-    function finish() { document.getElementById('screen').innerHTML = `<h2>Success!</h2><p>You have mastered the shelving standards.</p><button onclick="location.reload()">Restart</button>`; }
-  </script>
+function check(i) {
+  const q = data[state.mod].questions[state.qIdx];
+  const fb = document.getElementById('fb');
+  if (i === q.a) {
+    state.qIdx++;
+    fb.innerHTML = `<div class="feedback correct">Correct! ${q.e}</div>` + 
+      (state.qIdx >= data[state.mod].questions.length ? `<button onclick="next()">Continue</button>` : `<button onclick="render()">Next Question</button>`);
+  } else {
+    fb.innerHTML = `<div class="feedback incorrect">Incorrect. Review the lesson and try again.</div><button onclick="state.phase='teach';state.qIdx=0;render()">Back to Lesson</button>`;
+  }
+}
+
+function renderDrag(mod) {
+  const screen = document.getElementById('screen');
+  screen.innerHTML = `<div class="drag-zone" id="dz"></div><button onclick="checkDrag()">Verify Shelf</button><div id="fb"></div>`;
+  const dz = document.getElementById('dz');
+  [...mod.items].sort(() => Math.random() - 0.5).forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'drag-item'; el.draggable = true; el.dataset.r = item.r;
+    el.innerHTML = `☰ &nbsp; ${item.text}`;
+    el.addEventListener('dragstart', () => el.classList.add('dragging'));
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+    dz.appendChild(el);
+  });
+  dz.addEventListener('dragover', e => {
+    e.preventDefault();
+    const dragging = document.querySelector('.dragging');
+    const nextSib = [...dz.querySelectorAll('.drag-item:not(.dragging)')].find(s => e.clientY <= s.getBoundingClientRect().top + s.getBoundingClientRect().height / 2);
+    dz.insertBefore(dragging, nextSib);
+  });
+}
+
+function checkDrag() {
+  const win = [...document.querySelectorAll('.drag-item')].every((el, i) => parseInt(el.dataset.r) === i);
+  const fb = document.getElementById('fb');
+  if (win) fb.innerHTML = `<div class="feedback correct">Correct! Everything is in order.</div><button onclick="next()">Finish</button>`;
+  else fb.innerHTML = `<div class="feedback incorrect">Incorrect order. Check numbers first.</div>`;
+}
+
+function next() {
+  state.mod++; state.phase = 'teach'; state.qIdx = 0;
+  if (state.mod >= data.length) {
+    document.getElementById('screen').innerHTML = "<h2>Training Complete</h2><button onclick='location.reload()'>Restart</button>";
+    document.getElementById('bar').style.width = "100%";
+  } else { render(); }
+}
+</script>
 </body>
 </html>
