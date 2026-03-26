@@ -3,178 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SBU Music Library | Staff Training</title>
+  <title>SBU Music Library Training</title>
   <style>
-    :root { --sbu-red: #990000; --cream: #F8F2C5; --black: #000; --gray: #ddd; }
+    :root { --sbu-red: #990000; --cream: #F8F2C5; --gray: #ddd; }
     body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f4f4f4; padding: 20px; color: #333; line-height: 1.6; }
-    .card { background: white; max-width: 800px; margin: 0 auto; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--gray); }
+    .card { background: white; max-width: 700px; margin: 0 auto; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--gray); }
     .pill { display: inline-block; padding: 5px 15px; border: 2px solid var(--sbu-red); color: var(--sbu-red); border-radius: 50px; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; }
-    .progress-bar { height: 8px; background: #eee; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
-    #progress { height: 100%; width: 0%; background: var(--sbu-red); transition: width 0.4s; }
-    .lesson-box { background: var(--cream); border-left: 6px solid var(--sbu-red); padding: 20px; margin: 25px 0; border-radius: 0 12px 12px 0; }
-    button { background: var(--sbu-red); color: white; border: none; padding: 16px 32px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    button:hover { background: #700; }
-    .choice { display: block; width: 100%; text-align: left; background: white; border: 1px solid var(--gray); margin-bottom: 12px; padding: 20px; border-radius: 12px; font-size: 1.1rem; cursor: pointer; }
-    .choice:hover { background: var(--cream); border-color: var(--sbu-red); }
+    .lesson-box { background: var(--cream); border-left: 6px solid var(--sbu-red); padding: 20px; margin: 20px 0; border-radius: 8px; }
+    button { background: var(--sbu-red); color: white; border: none; padding: 16px 32px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .choice-btn { display: block; width: 100%; text-align: left; background: white; border: 1px solid var(--gray); margin-bottom: 12px; padding: 20px; border-radius: 12px; font-size: 1.1rem; cursor: pointer; color: #333; }
+    .choice-btn:hover { background: var(--cream); border-color: var(--sbu-red); }
     .feedback { padding: 20px; border-radius: 12px; margin-top: 20px; font-weight: bold; border: 1px solid transparent; }
     .correct { background: #e7f3ef; color: #104247; border-color: #104247; }
     .incorrect { background: #fff1f1; color: #b91c1c; border-color: #f87171; }
-    .drag-item { padding: 15px; background: white; border: 1px solid #bbb; border-radius: 10px; cursor: grab; margin-bottom: 10px; font-family: monospace; font-weight: bold; }
-    .dragging { opacity: 0.4; }
     .hidden { display: none !important; }
-    code { background: #eee; padding: 2px 5px; border-radius: 4px; }
   </style>
 </head>
 <body>
 
-<div class="card">
-  <div id="landing">
-    <div class="pill">Official Training</div>
+<div class="card" id="app-card">
+  <div id="screen-start">
+    <div class="pill">Staff Training</div>
     <h1>Shelving Music Scores</h1>
-    <p>We will move from the simplest rules (Whole Numbers) to expert identification (Thematic Catalogs). Follow each module to earn your certification.</p>
-    <button onclick="startTraining()">Begin Step 1</button>
+    <p>Follow the modules in order to learn the SBU shelving system.</p>
+    <button onclick="showScreen('screen-m1-lesson')">Begin Step 1</button>
   </div>
 
-  <div id="app" class="hidden">
-    <div id="mod-tag" class="pill">Module</div>
-    <div class="progress-bar"><div id="progress"></div></div>
-    <div id="content"></div>
+  <div id="screen-m1-lesson" class="hidden">
+    <div class="pill">Step 1: Numbers</div>
+    <h2>Whole Numbers</h2>
+    <p>Line 2 is a whole number. Sort them mathematically.</p>
+    <div class="lesson-box">
+      <b>The Rule:</b> <code>14.5</code> comes before <code>15</code>.
+    </div>
+    <button onclick="showScreen('screen-m1-quiz')">Start Practice</button>
+  </div>
+
+  <div id="screen-m1-quiz" class="hidden">
+    <div class="pill">Step 1: Practice</div>
+    <h3>Which call number goes first on the shelf?</h3>
+    <button class="choice-btn" onclick="checkM1(true)">M 14.5 .S4</button>
+    <button class="choice-btn" onclick="checkM1(false)">M 15 .A2</button>
+    <div id="fb-m1"></div>
+  </div>
+
+  <div id="screen-m2-lesson" class="hidden">
+    <div class="pill">Step 2: Cutters</div>
+    <h2>Decimal Logic</h2>
+    <p>The Cutter (Letter + Number) is always a decimal.</p>
+    <div class="lesson-box">
+      <b>The Rule:</b> <code>.C36</code> comes before <code>.C4</code> (.4 is .40).
+    </div>
+    <button onclick="showScreen('screen-m2-quiz')">Start Practice</button>
+  </div>
+
+  <div id="screen-m2-quiz" class="hidden">
+    <div class="pill">Step 2: Practice</div>
+    <h3>Which Cutter is filed first?</h3>
+    <button class="choice-btn" onclick="checkM2(true)">.C36</button>
+    <button class="choice-btn" onclick="checkM2(false)">.C4</button>
+    <div id="fb-m2"></div>
+  </div>
+
+  <div id="screen-m3-lesson" class="hidden">
+    <div class="pill">Step 3: Catalogs</div>
+    <h2>Thematic Catalogs & Work IDs</h2>
+    <p>Work IDs confirm the piece but are <b>never</b> used for shelving.</p>
+    <div class="lesson-box">
+      <b>KV:</b> Mozart<br>
+      <b>BWV:</b> Bach<br>
+      <b>WoO:</b> General label for "Works without opus".
+    </div>
+    <button onclick="showScreen('screen-m3-quiz')">Start Practice</button>
+  </div>
+
+  <div id="screen-m3-quiz" class="hidden">
+    <div class="pill">Step 3: Practice</div>
+    <h3>Which label is a general designation used for many different composers?</h3>
+    <button class="choice-btn" onclick="checkM3(false)">KV (Mozart)</button>
+    <button class="choice-btn" onclick="checkM3(true)">WoO (Works without opus)</button>
+    <button class="choice-btn" onclick="checkM3(false)">BWV (Bach)</button>
+    <div id="fb-m3"></div>
+  </div>
+
+  <div id="screen-finish" class="hidden">
+    <h2>Training Complete</h2>
+    <p>You have finished the basic shelving certification.</p>
+    <button onclick="location.reload()">Restart</button>
   </div>
 </div>
 
 <script>
-const trainingData = [
-  {
-    title: "Step 1: Whole Numbers",
-    type: "quiz",
-    lesson: `<h2>The Neighborhood: Whole Numbers</h2>
-             <p>Call numbers begin with the Class (M) followed by a <b>Whole Number</b> on the second line.</p>
-             <div class="lesson-box">
-               <b>The Rule:</b> Sort mathematically. <code>14.5</code> comes BEFORE <code>15</code>.
-             </div>`,
-    questions: [
-      { q: "Which call number goes first on the shelf?", c: ["M 14.5 .S4", "M 15 .A2"], a: 0, e: "Correct. 14.5 is numerically smaller than 15." }
-    ]
-  },
-  {
-    title: "Step 2: The Cutter",
-    type: "quiz",
-    lesson: `<h2>The Street: Decimal Cutters</h2>
-             <p>The third line (The Cutter) uses a Letter and a Number. <b>This number is a decimal.</b></p>
-             <div class="lesson-box">
-               <b>The Rule:</b> Think of <code>.C4</code> as <code>.40</code>. Therefore, <b>.C36</b> comes before <b>.C4</b>.
-             </div>`,
-    questions: [
-      { q: "Which of these Cutters is filed first?", c: [".C4", ".C36"], a: 1, e: "Correct. .36 is smaller than .40 in decimal logic." }
-    ]
-  },
-  {
-    title: "Step 3: Years and Sub-units",
-    type: "quiz",
-    lesson: `<h2>The House: Series and Fascicles</h2>
-             <p>When the main numbers match, look at the details like Year and Part.</p>
-             <div class="lesson-box">
-               <b>1. Alphabetical:</b> <u>F</u>ASC. (Fascicle) comes before <u>S</u>ER. (Series).<br>
-               <b>2. Roman Numerals:</b> Use standard order. <b>SER. I</b> comes before <b>SER. VI</b>.
-             </div>`,
-    questions: [
-      { q: "Between these two, which one is filed first?", c: ["M 452 .S36 2005 SER.I", "M 452 .S36 2005 FASC.3"], a: 1, e: "Correct. 'F' (Fascicle) comes before 'S' (Series) alphabetically." }
-    ]
-  },
-  {
-    title: "Step 4: Thematic Catalogs",
-    type: "quiz",
-    lesson: `<h2>The Identity: Work IDs</h2>
-             <p>Work IDs help patrons find specific pieces but are not the primary shelf order.</p>
-             <div class="lesson-box">
-               <b>Specific:</b> KV (Mozart), BWV (Bach), Hob. (Haydn).<br>
-               <b>General Label:</b> <u>WoO</u> stands for "Works without opus" and is used for many composers.
-             </div>`,
-    questions: [
-      { q: "Which of these is a general label used for many different composers?", c: ["BWV", "KV", "WoO"], a: 2, e: "Correct. WoO is the general 'Works without opus' label." }
-    ]
-  },
-  {
-    title: "Final Assessment",
-    type: "drag",
-    lesson: `<h2>Final Performance Check</h2>
-             <p>Drag these call numbers into the correct shelf order (Top to Bottom).</p>`,
-    items: [
-      { text: "M 2 .G39 1966", r: 0 },
-      { text: "M 2.3 .U6 R4", r: 1 },
-      { text: "M 3 .B103 2005", r: 2 },
-      { text: "M 3 .C4 1993", r: 3 }
-    ]
+  function showScreen(id) {
+    document.querySelectorAll('#app-card > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    window.scrollTo(0,0);
   }
-];
 
-let state = { mod: 0, phase: 'teach', qIdx: 0 };
-
-function startTraining() {
-  document.getElementById('landing').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  render();
-}
-
-function render() {
-  if (state.mod >= trainingData.length) { finish(); return; }
-  const mod = trainingData[state.mod];
-  document.getElementById('mod-tag').textContent = mod.title;
-  document.getElementById('progress').style.width = (state.mod / trainingData.length * 100) + "%";
-  const content = document.getElementById('content');
-
-  if (state.phase === 'teach') {
-    content.innerHTML = mod.lesson + `<button onclick="state.phase='test';render()">Start Practice</button>`;
-  } else if (mod.type === 'quiz') {
-    const q = mod.questions[state.qIdx];
-    content.innerHTML = `<h3>Practice Question</h3><p><b>${q.q}</b></p>` + 
-      q.c.map((opt, i) => `<button class="choice" onclick="handleChoice(${i})">${opt}</button>`).join('') + `<div id="feedback"></div>`;
-  } else {
-    renderDrag(mod);
+  function checkM1(isCorrect) {
+    const fb = document.getElementById('fb-m1');
+    if(isCorrect) {
+      fb.innerHTML = '<div class="feedback correct">Correct! 14.5 is numerically smaller than 15.</div><br><button onclick="showScreen(\'screen-m2-lesson\')">Next Module</button>';
+    } else {
+      fb.innerHTML = '<div class="feedback incorrect">Not quite. Remember that 14.5 comes before 15.</div>';
+    }
   }
-}
 
-function handleChoice(i) {
-  const q = trainingData[state.mod].questions[state.qIdx];
-  const fb = document.getElementById('feedback');
-  if (i === q.a) {
-    state.qIdx++;
-    fb.innerHTML = `<div class="feedback correct">Correct! ${q.e}</div>` + 
-      (state.qIdx >= trainingData[state.mod].questions.length ? `<button onclick="nextModule()">Next Module</button>` : `<button onclick="render()">Continue</button>`);
-  } else {
-    fb.innerHTML = `<div class="feedback incorrect">Not quite. Review the rule and try again.</div><button onclick="state.phase='teach';state.qIdx=0;render()">Back to Lesson</button>`;
+  function checkM2(isCorrect) {
+    const fb = document.getElementById('fb-m2');
+    if(isCorrect) {
+      fb.innerHTML = '<div class="feedback correct">Correct! .36 is smaller than .40.</div><br><button onclick="showScreen(\'screen-m3-lesson\')">Next Module</button>';
+    } else {
+      fb.innerHTML = '<div class="feedback incorrect">Incorrect. Cutters are decimals! .C4 is .40.</div>';
+    }
   }
-}
 
-function renderDrag(mod) {
-  const content = document.getElementById('content');
-  content.innerHTML = `<div id="drag-zone"></div><button onclick="validateDrag()">Verify Shelf Order</button><div id="feedback"></div>`;
-  const dz = document.getElementById('drag-zone');
-  [...mod.items].sort(() => Math.random() - 0.5).forEach(item => {
-    const el = document.createElement('div');
-    el.className = 'drag-item'; el.draggable = true; el.dataset.r = item.r;
-    el.innerHTML = `☰ &nbsp; <code>${item.text}</code>`;
-    el.addEventListener('dragstart', () => el.classList.add('dragging'));
-    el.addEventListener('dragend', () => el.classList.remove('dragging'));
-    dz.appendChild(el);
-  });
-  dz.addEventListener('dragover', e => {
-    e.preventDefault();
-    const dragging = document.querySelector('.dragging');
-    const nextSib = [...dz.querySelectorAll('.drag-item:not(.dragging)')].find(s => e.clientY <= s.getBoundingClientRect().top + s.getBoundingClientRect().height / 2);
-    dz.insertBefore(dragging, nextSib);
-  });
-}
-
-function validateDrag() {
-  const isCorrect = [...document.querySelectorAll('.drag-item')].every((el, i) => parseInt(el.dataset.r) === i);
-  const fb = document.getElementById('feedback');
-  if (isCorrect) fb.innerHTML = `<div class="feedback correct">Success! Everything is in order.</div><button onclick="nextModule()">Finish Training</button>`;
-  else fb.innerHTML = `<div class="feedback incorrect">Incorrect order. Check the whole numbers and decimals again.</div>`;
-}
-
-function nextModule() { state.mod++; state.phase = 'teach'; state.qIdx = 0; render(); }
-function finish() { document.getElementById('content').innerHTML = `<h2>Training Complete</h2><p>You have finished the library shelving tutorial.</p><button onclick="location.reload()">Restart Session</button>`; }
+  function checkM3(isCorrect) {
+    const fb = document.getElementById('fb-m3');
+    if(isCorrect) {
+      fb.innerHTML = '<div class="feedback correct">Correct! WoO is a general label.</div><br><button onclick="showScreen(\'screen-finish\')">Finish Training</button>';
+    } else {
+      fb.innerHTML = '<div class="feedback incorrect">Try again. Look for the label used for many composers.</div>';
+    }
+  }
 </script>
 
 </body>
