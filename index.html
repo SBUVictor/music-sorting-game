@@ -349,30 +349,6 @@
       margin-top: 14px;
     }
 
-    .table-wrap {
-      overflow-x: auto;
-      margin-top: 12px;
-    }
-
-    table.reference-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .95rem;
-    }
-
-    table.reference-table th,
-    table.reference-table td {
-      border: 1px solid var(--line);
-      padding: 8px 10px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    table.reference-table th {
-      background: var(--sbu-cream);
-      color: var(--sbu-red);
-    }
-
     /* Drag and Drop Styles */
     .draggable-list {
       display: flex;
@@ -429,9 +405,9 @@
 <body>
   <div class="wrap">
     <div class="card no-print">
-      <div class="version">Version 11.0 - Logical Sequencing & Practice Mode</div>
+      <div class="version">Version 12.0 - Simple to Hard Progression</div>
       <h1>Shelf It Right</h1>
-      <p>Library training for identifying work IDs and correctly shelving music scores.</p>
+      <p>Library training for reading call numbers and identifying music scores.</p>
 
       <div class="info-box">
         <strong>Student Information (Optional for Practice)</strong>
@@ -454,11 +430,10 @@
       </div>
 
       <div class="info-box">
-        <strong>Key Terms (Top to Bottom of Label)</strong>
+        <strong>Key Call Number Terms (Top to Bottom)</strong>
         <div>
           <p><strong>Whole number</strong><br>The number after the class.<br>Examples: <code class="call">M 2</code>, <code class="call">M 2.3</code>, <code class="call">M 3</code></p>
           <p><strong>First cutter</strong><br>The first letter-number group after the class number.<br>Examples: <code class="call">.B103</code>, <code class="call">.C4</code>, <code class="call">.S36</code></p>
-          <p><strong>Work ID</strong><br>Thematic catalogs (like BWV) or Opus numbers. These often come right after the cutter.<br>Example: <code class="call">BWV 846</code> in <code class="call">M 22 .B3 BWV 846</code></p>
           <p><strong>Year</strong><br>The publication year.<br>Example: <code class="call">1994</code></p>
           <p><strong>Later-line details</strong><br>Extra details that appear after the main call number parts.<br>Examples: <code class="call">SER.I</code>, <code class="call">BD.20</code>, <code class="call">PTS.1-6</code></p>
         </div>
@@ -468,53 +443,10 @@
         <button id="startBtn" type="button">Start Official Training</button>
         <button id="practiceBtn" type="button" class="secondary" style="border-color: var(--sbu-dark-gray); color: var(--sbu-dark-gray);">Practice Mode (No Score Kept)</button>
         <button id="rulesBtn" type="button" class="secondary">Show Sorting Rules</button>
-        <button id="referenceBtn" type="button" class="secondary">Show Work ID Quick Reference</button>
       </div>
     </div>
 
     <div id="rulesCard" class="card hidden rules"></div>
-
-    <div id="referenceCard" class="card hidden">
-      <span class="chip">Quick Reference</span>
-      <h2>Music Catalogs &amp; Work IDs</h2>
-      <p class="small">Use these to confirm the exact piece a patron wants. For prolific composers, these are often added directly to the call number to keep works in order.</p>
-
-      <div class="reference-grid">
-        <div class="reference-box"><strong>BWV</strong>Bach work ID.<div class="example">Shelves as: BWV 1007</div></div>
-        <div class="reference-box"><strong>K / KV</strong>Mozart work ID.<div class="example">Shelves as: KV 620</div></div>
-        <div class="reference-box"><strong>D.</strong>Schubert work ID.<div class="example">Shelves as: D. 328</div></div>
-        <div class="reference-box"><strong>Hob.</strong>Haydn work ID, often with genre section.<div class="example">Shelves as: Hob. I:104</div></div>
-        <div class="reference-box"><strong>RV</strong>Vivaldi work ID.<div class="example">Shelves as: RV 31</div></div>
-        <div class="reference-box"><strong>HWV</strong>Handel work ID.<div class="example">Shelves as: HWV Anh. B</div></div>
-        <div class="reference-box"><strong>Sz</strong>Bartók work ID.<div class="example">Shelves as: Sz 56</div></div>
-        <div class="reference-box"><strong>B.</strong>Dvořák work ID.<div class="example">Shelves as: B178</div></div>
-      </div>
-
-      <div class="table-wrap">
-        <table class="reference-table">
-          <thead>
-            <tr>
-              <th>Also Useful</th>
-              <th>What It Means</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>WoO</td><td>Works without opus number.</td><td>WoO 53</td></tr>
-            <tr><td>movt.</td><td>Movement inside a work.</td><td>movt. 2 / II. Andante</td></tr>
-            <tr><td>no.</td><td>Number inside a set.</td><td>op. 27, no. 2</td></tr>
-            <tr><td>plate no.</td><td>Publisher edition identifier.</td><td>Pl. No. 8474</td></tr>
-            <tr><td>ISMN</td><td>Published music edition identifier.</td><td>979-0-...</td></tr>
-            <tr><td>Anh.</td><td>Appendix / Anhang label in some catalogs.</td><td>BWV Anh.</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="inline-actions no-print">
-        <button type="button" class="secondary" onclick="window.print()">Print Quick Reference</button>
-        <button type="button" class="secondary" id="closeReferenceBtn">Close</button>
-      </div>
-    </div>
 
     <div id="app" class="hidden">
       <div class="card">
@@ -558,7 +490,6 @@
       var stageLabel = safeGetElement('stageLabel');
       var bar = safeGetElement('bar');
       var rulesCard = safeGetElement('rulesCard');
-      var referenceCard = safeGetElement('referenceCard');
       var intakeFeedback = safeGetElement('intakeFeedback');
 
       var realNameInput = safeGetElement('realName');
@@ -567,48 +498,48 @@
       var startBtn = safeGetElement('startBtn');
       var practiceBtn = safeGetElement('practiceBtn');
       var rulesBtn = safeGetElement('rulesBtn');
-      var referenceBtn = safeGetElement('referenceBtn');
-      var closeReferenceBtn = safeGetElement('closeReferenceBtn');
 
-      var rulesText = `Local practice used in this prototype\n\n1. Start with the class and the whole number.\n   Examples:\n   M 2 comes before M 2.3\n   M 2.3 comes before M 3\n\n2. If the whole number matches, compare the first cutter.\n   Examples within M 3:\n   .B103 comes before .C4\n   .C4 comes before .H26\n\n3. If the cutter matches, look for a Work ID (Opus, BWV, K, Hob.). Sort these numerically.\n   Example:\n   M 22 .B3 BWV 846 comes before M 22 .B3 BWV 847\n\n4. Next, compare later work elements, year, and later-line details.\n\n5. Roman numerals matter in later-line details.\n   Example:\n   SER.I comes before SER.II, which comes before SER.VI\n\n6. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
+      var rulesText = `Local practice used in this prototype\n\n1. Start with the class and the whole number.\n   Examples:\n   M 2 comes before M 2.3\n   M 2.3 comes before M 3\n\n2. If the whole number matches, compare the first cutter.\n   Examples within M 3:\n   .B103 comes before .C4\n   .C4 comes before .H26\n\n3. Next, compare later work elements, year, and later-line details.\n\n4. Roman numerals matter in later-line details.\n   Example:\n   SER.I comes before SER.II, which comes before SER.VI\n\n5. This is a local training prototype. If local practice changes, the rules should be revised and tested again.`;
 
+      // Thematic Catalog Questions - Progressing from easy to hard
       var workIdQuestions = [
         {
           id: 'x1',
-          prompt: 'You are shelving two Mozart sonatas: "M 22 .M89 K 331" and "M 22 .M89 K 545". How do you order them?',
+          prompt: 'What is the primary purpose of thematic catalog labels like BWV, KV, or Hob. printed on a score?',
           choices: [
-            'K 545 comes first because 5 is bigger than 3.',
-            'K 331 comes first because 331 is numerically smaller than 545.',
-            'Ignore the K number and sort by the publication year instead.',
-            'Sort them alphabetically by the title of the piece.'
+            'They represent the publisher\'s identification code.',
+            'They are used specifically to sort books alphabetically by title.',
+            'They help confirm you have the exact right piece of music for a patron.',
+            'They indicate what instrument the piece is written for.'
           ],
-          answer: 1,
-          explain: 'When the class, whole number, and cutter match, you sort numerically by the thematic catalog number (K 331 comes before K 545).',
+          answer: 2,
+          explain: 'Correct! Work IDs act as the ultimate "fingerprint" to confirm you are handing the patron the exact piece they requested.',
           _done: false
         },
         {
           id: 'x2',
-          prompt: 'In the call number "M 1001 .H39 Hob.I:94", what does the "Hob." tell you?',
+          prompt: 'Which thematic catalog is used specifically for Wolfgang Amadeus Mozart?',
           choices: [
-            'It is a general code for "Works without opus number".',
-            'It is Haydn\'s specific thematic catalog identifier, used to sort his works.',
-            'It indicates this is a miniature study score.',
-            'It is the publisher\'s plate number.'
+            'BWV',
+            'KV (or K)',
+            'Hob.',
+            'RV'
           ],
           answer: 1,
-          explain: 'Hob. stands for the Hoboken catalog, which is the standard thematic index used to identify and shelf Joseph Haydn\'s compositions.',
+          explain: 'Correct! KV (or K) is the catalog used for Mozart. BWV is Bach, Hob. is Haydn, and RV is Vivaldi.',
           _done: false
         },
         {
           id: 'x3',
-          prompt: 'Which call number comes first on the shelf?',
+          prompt: 'Which one is a general designation, not a composer-specific catalog?',
           choices: [
-            'M 1045 .B4 op. 15',
-            'M 1045 .B4 op. 2',
-            'M 1045 .B4 op. 115'
+            'BWV',
+            'RV',
+            'WoO',
+            'Hob.'
           ],
-          answer: 1,
-          explain: 'Opus numbers are sorted numerically. op. 2 is the smallest number, so it shelves first!',
+          answer: 2,
+          explain: 'Correct! WoO stands for "Works without opus number" and is a general designation used across many different composers.',
           _done: false
         }
       ];
@@ -721,7 +652,7 @@
         };
       }
 
-      function generateMod4(rng) {
+      function generateMod3(rng) {
         var cClass = getLockedItem(pools.classes, rng);
         var cWhole = getLockedItem(pools.wholes, rng);
         var cCutt = getLockedItem(pools.cutters, rng);
@@ -744,7 +675,7 @@
 
         var shuffled = shuffleChoices(choices, correctString, rng);
         return {
-          id: 'dyn_m4_' + Math.floor(rng() * 10000),
+          id: 'dyn_m3_' + Math.floor(rng() * 10000),
           prompt: 'Which call number comes first?',
           choices: shuffled.options,
           answer: shuffled.answerIndex,
@@ -774,16 +705,16 @@
             questions: [generateMod2(rng), generateMod2(rng), generateMod2(rng)]
           },
           {
-            key: 'module3', label: 'Module 3', type: 'workIds', title: 'Music Catalogs & Work IDs'
-          },
-          {
-            key: 'module4', label: 'Module 4', title: 'Year And Later Details',
-            generator: generateMod4,
+            key: 'module3', label: 'Module 3', title: 'Years And Later Details',
+            generator: generateMod3,
             masteryText: 'Pass target: 3 correct in a row. A wrong answer generates a fresh question.',
-            insight: 'Tie breakers: Only look at years and later details when the whole number, cutter, and work IDs match.',
+            insight: 'Tie breakers: Only look at years and later details when the whole number and cutter match.',
             teach: '<p>When everything else at the top of the label is identical, you look to the end of the call number to break the tie.</p><p>Sort years chronologically (older years come first). If you see Roman numerals (like SER.I and SER.II), evaluate them in numerical order.</p>',
             worked: '<div class="compare-box"><div class="compare-label">Worked Example</div><p><code class="call">M 3 .O35 1994</code> vs <code class="call">M 3 .O35 2001</code></p><p>Everything matches until the year. <strong>1994</strong> is older than <strong>2001</strong>, so it shelves first.</p></div>',
-            questions: [generateMod4(rng), generateMod4(rng), generateMod4(rng)]
+            questions: [generateMod3(rng), generateMod3(rng), generateMod3(rng)]
+          },
+          {
+            key: 'module4', label: 'Module 4', type: 'workIds', title: 'Music Catalogs & Work IDs'
           },
           { key: 'finalActivity', label: 'Final Activity', type: 'drag' },
           { key: 'done', label: 'Complete', type: 'done' }
@@ -803,14 +734,14 @@
         dragItems: null,
         student: { realName: '', preferredName: '', sbuEmail: '' },
         metrics: {
-          modulePassed: { module1: false, module2: false, module4: false, finalActivity: false },
+          modulePassed: { module1: false, module2: false, module3: false, finalActivity: false },
         },
         workIds: { passed: false, completed: false }
       };
 
       function resetMetrics() {
         state.metrics = {
-          modulePassed: { module1: false, module2: false, module4: false, finalActivity: false }
+          modulePassed: { module1: false, module2: false, module3: false, finalActivity: false }
         };
         state.workIds = { passed: false, completed: false };
         state.dragItems = null;
@@ -851,19 +782,6 @@
         }
       };
 
-      window.toggleReference = function(forceOpen) {
-        if (!referenceCard) return;
-        if (forceOpen === true) {
-          referenceCard.classList.remove('hidden');
-          return;
-        }
-        if (forceOpen === false) {
-          referenceCard.classList.add('hidden');
-          return;
-        }
-        referenceCard.classList.toggle('hidden');
-      };
-
       function updateProgress() {
         if (!bar || !stageLabel) return;
         var item = modules[state.step];
@@ -888,7 +806,6 @@
         }
 
         showIntakeMessage('', '');
-        window.toggleReference(false);
         if (rulesCard) {
           rulesCard.classList.add('hidden');
           rulesCard.innerHTML = '';
@@ -930,28 +847,29 @@
         renderModule(item);
       };
 
-      // --- Module 3 (Work IDs) Functions ---
+      // --- Module 4 (Work IDs) Functions ---
       function renderWorkIdsModule() {
         if (state.phase === 'teach') {
           screen.innerHTML =
-            '<h2>Module 3: Music Catalogs &amp; Work IDs</h2>' +
-            '<div class="insight-card"><strong>The Golden Rule:</strong> Now that you know how to sort by whole number and cutter, look for thematic catalogs (like BWV, KV) and Opus numbers. They are added directly into the call number right after the cutter to keep a composer\'s works in order!</div>' +
+            '<h2>Module 4: Music Catalogs &amp; Work IDs</h2>' +
+            '<div class="insight-card"><strong>The Golden Rule:</strong> Work IDs are the ultimate "fingerprint" of a piece of music. They help you confirm you have the exact right piece for a patron, but <strong>they are never used in the call number for shelving.</strong></div>' +
+            '<p>Imagine someone asks for "Bach\'s Prelude in C Major". Bach wrote dozens of them! How do you know you are handing them the right book? You check the Work ID.</p>' +
+            '<p>Scholars created special catalog systems for major composers. For example, Bach uses <strong>BWV</strong>, Mozart uses <strong>KV</strong> (or K), and Haydn uses <strong>Hob.</strong></p>' +
             '<div class="compare-box">' +
-              '<div class="compare-label">Work IDs in Call Numbers</div>' +
-              '<p>A real call number for Bach looks like this: <code class="call">M 22 .B3 BWV 846</code></p>' +
-              '<p>You verify the Class (M), the Whole Number (22), and the Cutter (.B3). <strong>Then</strong> you sort numerically by the Work ID (BWV 846 comes before BWV 847).</p>' +
+              '<div class="compare-label">COMPOSER-SPECIFIC VS. GENERAL LABELS</div>' +
+              '<p>While <strong>BWV</strong> points specifically to Bach, other labels are general. For example, <strong>WoO</strong> stands for "Works without opus number" and is a general designation used across many different composers.</p>' +
+              '<p>You will also see labels that point to a specific spot <em>inside</em> a piece (like <strong>movt.</strong> for movement), or printing details (like <strong>plate no.</strong>).</p>' +
             '</div>' +
-            '<p>Here are the most common composer catalogs you will see right on the spine:</p>' +
+            '<p>Here are a few common composer catalogs you will see on score covers:</p>' +
             '<div class="reference-grid">' +
-              '<div class="reference-box"><strong>BWV</strong>Bach<div class="example">Shelves as: BWV 1007</div></div>' +
-              '<div class="reference-box"><strong>K / KV</strong>Mozart<div class="example">Shelves as: K 620</div></div>' +
-              '<div class="reference-box"><strong>Hob.</strong>Haydn<div class="example">Shelves as: Hob. I:104</div></div>' +
-              '<div class="reference-box"><strong>op.</strong>Various (Opus)<div class="example">Shelves as: op. 47</div></div>' +
+              '<div class="reference-box"><strong>BWV</strong>Bach<div class="example">Example: BWV 1007</div></div>' +
+              '<div class="reference-box"><strong>K / KV</strong>Mozart<div class="example">Example: KV 620</div></div>' +
+              '<div class="reference-box"><strong>Hob.</strong>Haydn<div class="example">Example: Hob. I:104</div></div>' +
+              '<div class="reference-box"><strong>RV</strong>Vivaldi<div class="example">Example: RV 31</div></div>' +
             '</div>' +
-            '<div class="mastery">Pass target: Answer all 3 questions correctly to prove you understand Work IDs before moving on to dates and later details.</div>' +
+            '<div class="mastery">Pass target: Answer all 3 questions correctly to prove you understand work IDs before moving on to the final activity.</div>' +
             '<div class="inline-actions">' +
               '<button type="button" onclick="window.startWorkIdsQuiz()">Start Practice</button>' +
-              '<button type="button" class="secondary" onclick="window.toggleReference(true)">Open Full Quick Reference</button>' +
             '</div>';
           return;
         }
@@ -973,11 +891,10 @@
           state.workIds.completed = true;
           state.workIds.passed = true;
           screen.innerHTML =
-            '<h2>Module 3 Complete</h2>' +
-            '<div class="feedback good">You successfully sorted using thematic catalogs.</div>' +
+            '<h2>Module 4 Complete</h2>' +
+            '<div class="feedback good">You successfully understand how to identify specific works using thematic catalogs.</div>' +
             '<div class="inline-actions">' +
-              '<button type="button" onclick="window.advanceFromWorkIds()">Continue to Module 4</button>' +
-              '<button type="button" class="secondary" onclick="window.toggleReference(true)">Open Quick Reference</button>' +
+              '<button type="button" onclick="window.advanceFromWorkIds()">Continue to Final Activity</button>' +
             '</div>';
           return;
         }
@@ -1002,13 +919,13 @@
         
         if (index === q.answer) {
           q._done = true;
-          fb.innerHTML = '<div class="feedback good">Correct! ' + escapeHtml(q.explain) + '</div>' +
+          fb.innerHTML = '<div class="feedback good">' + escapeHtml(q.explain) + '</div>' +
                          '<button style="margin-top:14px" onclick="window.renderWorkIdsQuestion()">Next Question</button>';
           
           var btns = document.querySelectorAll('.choice');
           for(var i=0; i<btns.length; i++) { btns[i].disabled = true; }
         } else {
-          fb.innerHTML = '<div class="feedback bad">Not quite. Hint: ' + escapeHtml(q.explain) + '</div>';
+          fb.innerHTML = '<div class="feedback bad">Not quite. Give it another try!</div>';
         }
       };
 
@@ -1251,11 +1168,11 @@
           module2Completed: state.metrics.modulePassed.module2,
           module2Passed: state.metrics.modulePassed.module2,
           
-          module3Completed: state.workIds.passed,
-          module3Passed: state.workIds.passed,
+          module3Completed: state.metrics.modulePassed.module3,
+          module3Passed: state.metrics.modulePassed.module3,
           
-          module4Completed: state.metrics.modulePassed.module4,
-          module4Passed: state.metrics.modulePassed.module4,
+          module4Completed: state.workIds.passed,
+          module4Passed: state.workIds.passed,
           
           totalModulesCompleted: 4, 
           totalModulesPassed: 4, 
@@ -1292,8 +1209,6 @@
       if(startBtn) startBtn.addEventListener('click', function() { window.beginSession(true); });
       if(practiceBtn) practiceBtn.addEventListener('click', function() { window.beginSession(false); });
       if(rulesBtn) rulesBtn.addEventListener('click', window.toggleRules);
-      if(referenceBtn) referenceBtn.addEventListener('click', function() { window.toggleReference(true); });
-      if(closeReferenceBtn) closeReferenceBtn.addEventListener('click', function() { window.toggleReference(false); });
     });
   </script>
 </body>
