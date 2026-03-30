@@ -1,289 +1,880 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Shelf It Right - Stable Mini Lesson</title>
-
-<style>
-body { font-family: Arial; background:#f4f7fb; padding:20px; }
-.card { max-width:800px; margin:auto; background:white; padding:25px; border-radius:12px; }
-button { padding:10px; margin:5px; cursor:pointer; }
-.choice { display:block; width:100%; }
-.feedback { margin-top:10px; font-weight:bold; }
-.good { color:green; }
-.bad { color:red; }
-.hidden { display:none; }
-.box { border:1px solid #ddd; padding:12px; margin:10px 0; border-radius:8px; }
-</style>
-</head>
-
-<body>
-
-<div class="card">
-
-<h2>Shelf It Right</h2>
-
-<div id="setup">
-<input id="name" placeholder="Name"><br>
-<input id="email" placeholder="name@stonybrook.edu"><br>
-<button onclick="start()">Start Training</button>
-</div>
-
-<div id="app" class="hidden"></div>
-
-</div>
-
-<script>
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUoY2_eFLWVWyw5JX7Vv15ZdbDYYkYceQ_fpn0sZPGb3gpCtsrPfe3i_iItmv3ZFdiPA/exec";
-
-let state = {
-  step:0,
-  phase:"teach",
-  qIndex:0,
-  score:0,
-  name:"",
-  email:"",
-  teachPassed:false
-};
-
-const modules = [
-
-{
-title:"Module 1 - Whole Number",
-teach: `
-<strong>Rule:</strong> Always compare the whole number first.<br><br>
-Ignore everything else at first.<br><br>
-
-Example:<br>
-M 2.3 .U6<br>
-M 3 .B103<br><br>
-
-👉 2.3 comes before 3<br><br>
-
-<strong>Common mistake:</strong><br>
-Looking at letters first.
-`,
-check:["M 3","M 2.3",1],
-worked:"M 2.3 comes before M 3",
-questions:[
-["Which first?","M 3","M 2.3",1],
-["Which first?","M 2","M 3",0],
-["Which first?","M 452","M 3",1],
-["Which first?","M 2.1","M 2.3",0],
-["Which first?","M 5","M 12",0],
-["Which first?","M 9","M 2",1],
-["Which first?","M 1","M 1.5",0],
-["Which first?","M 100","M 50",1],
-["Which first?","M 3","M 3.1",0],
-["Which first?","M 2.9","M 2.1",1]
-]
-},
-
-{
-title:"Module 2 - Cutter",
-teach: `
-<strong>Rule:</strong> If whole number matches, use cutter.<br><br>
-
-Example:<br>
-M 3 .B<br>
-M 3 .C<br><br>
-
-👉 B comes before C<br><br>
-
-<strong>Common mistake:</strong><br>
-Comparing numbers before letters.
-`,
-check:["M 3 .C","M 3 .B",1],
-worked:".B comes before .C",
-questions:[
-["Which first?","M 3 .C","M 3 .B",1],
-["Which first?","M 3 .A","M 3 .B",0],
-["Which first?","M 3 .D","M 3 .C",1],
-["Which first?","M 3 .B2","M 3 .B10",0],
-["Which first?","M 3 .S2","M 3 .S1",1],
-["Which first?","M 3 .H","M 3 .G",1],
-["Which first?","M 3 .A9","M 3 .A2",1],
-["Which first?","M 3 .Z","M 3 .Y",1],
-["Which first?","M 3 .C3","M 3 .C4",0],
-["Which first?","M 3 .M","M 3 .L",1]
-]
-},
-
-{
-title:"Module 3 - Details",
-teach: `
-<strong>Rule:</strong> If everything matches, use details.<br><br>
-
-Example:<br>
-1994 vs 2001 → 1994 first<br><br>
-
-<strong>Common mistake:</strong><br>
-Ignoring Roman numerals.
-`,
-check:["2001","1994",1],
-worked:"1994 comes before 2001",
-questions:[
-["Which first?","1994","2001",0],
-["Which first?","SER.I","SER.II",0],
-["Which first?","SER.V","SER.II",1],
-["Which first?","1990","1980",1],
-["Which first?","VOL 1","VOL 2",0],
-["Which first?","PT 2","PT 1",1],
-["Which first?","SER.I","SER.VI",0],
-["Which first?","2000","1999",1],
-["Which first?","FASC.2","FASC.3",0],
-["Which first?","III","II",1]
-]
-}
-
-];
-
-function start(){
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-
-  if(!name) return alert("Enter name");
-  if(!email.includes("@stonybrook.edu")) return alert("Use SBU email");
-
-  state.name = name;
-  state.email = email;
-
-  document.getElementById("setup").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-
-  render();
-}
-
-function render(){
-  const app = document.getElementById("app");
-
-  if(state.step >= modules.length){
-    renderFinal();
-    return;
-  }
-
-  const mod = modules[state.step];
-
-  if(state.phase==="teach"){
-    app.innerHTML = `
-      <h2>${mod.title}</h2>
-      <div class="box">${mod.teach}</div>
-
-      <p><strong>Check (must be correct):</strong></p>
-
-      <button class="choice" onclick="teachCheck(0)">${mod.check[0]}</button>
-      <button class="choice" onclick="teachCheck(1)">${mod.check[1]}</button>
-
-      <div id="fb"></div>
-    `;
-  }
-
-  else if(state.phase==="worked"){
-    app.innerHTML = `
-      <h2>Worked Example</h2>
-      <div class="box">${mod.worked}</div>
-      <button onclick="nextPhase('quiz')">Continue</button>
-    `;
-  }
-
-  else{
-    const q = mod.questions[state.qIndex];
-
-    app.innerHTML = `
-      <h2>${mod.title}</h2>
-      <p>${q[0]}</p>
-
-      <button class="choice" onclick="answer(0)">${q[1]}</button>
-      <button class="choice" onclick="answer(1)">${q[2]}</button>
-
-      <div id="fb"></div>
-    `;
-  }
-}
-
-function teachCheck(choice){
-  const mod = modules[state.step];
-  const fb = document.getElementById("fb");
-
-  if(choice === mod.check[2]){
-    fb.innerHTML = "Correct";
-    state.phase = "worked";
-    setTimeout(render,500);
-  } else {
-    fb.innerHTML = "Try again";
-  }
-}
-
-function nextPhase(p){
-  state.phase = p;
-  render();
-}
-
-function answer(choice){
-  const q = modules[state.step].questions[state.qIndex];
-  const fb = document.getElementById("fb");
-
-  if(choice === q[3]){
-    state.score++;
-    fb.innerHTML = "Correct";
-  } else {
-    fb.innerHTML = "Wrong";
-  }
-
-  setTimeout(()=>{
-    state.qIndex++;
-
-    if(state.qIndex >= 10){
-      state.step++;
-      state.qIndex = 0;
-      state.phase = "teach";
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shelf It Right</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d7dee8;
+      --accent: #1d5f91;
+      --accent-2: #2d74ac;
+      --good: #166534;
+      --good-bg: #dcfce7;
+      --bad: #991b1b;
+      --bad-bg: #fee2e2;
+      --warn: #92400e;
+      --warn-bg: #fef3c7;
     }
 
-    render();
-  },600);
-}
+    * { box-sizing: border-box; }
 
-function renderFinal(){
-  const app = document.getElementById("app");
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
 
-  app.innerHTML = `
-    <h2>Final Activity</h2>
-    <p>Drag order mentally (simplified final for stability)</p>
-    <p>Correct order:</p>
-    M 2 → M 2.3 → M 3 → M 452
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+    }
 
-    <br><br>
-    <button onclick="finish()">Finish</button>
-  `;
-}
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
+    }
 
-function finish(){
-  submit();
-}
+    h1, h2, h3 { margin-top: 0; }
+    h1 { font-size: 2.2rem; margin-bottom: 10px; }
+    h2 { font-size: 1.5rem; margin-bottom: 10px; }
 
-async function submit(){
-  await fetch(SCRIPT_URL,{
-    method:"POST",
-    mode:"no-cors",
-    body:JSON.stringify({
-      realName: state.name,
-      preferredName: state.name,
-      sbuEmail: state.email,
-      totalScore: state.score,
-      passFail: "Pass",
-      attemptCount: 1
-    })
-  });
+    .version {
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-  document.getElementById("app").innerHTML = `
-    <h2>Done</h2>
-    <p>Score: ${state.score}</p>
-    <p>Submitted</p>
-  `;
-}
+    .form-grid {
+      display: grid;
+      gap: 12px;
+      margin: 16px 0;
+    }
 
-</script>
+    .field label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
 
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #e7eef6;
+      color: #34516c;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      margin-bottom: 10px;
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0 18px;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width .2s ease;
+    }
+
+    .lesson-box, .worked-box, .check-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin: 14px 0;
+    }
+
+    .worked-box {
+      background: #ffffff;
+    }
+
+    .section-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    code.call {
+      display: inline-block;
+      background: #f3f4f6;
+      padding: 4px 8px;
+      border-radius: 8px;
+      margin: 3px 4px 3px 0;
+      font-family: Consolas, monospace;
+      font-size: .95rem;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+    }
+
+    button:hover { background: var(--accent-2); }
+
+    button.choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 10px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    button.choice:hover {
+      border-color: var(--accent);
+      background: #f8fbff;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .feedback {
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    .good { background: var(--good-bg); color: var(--good); }
+    .bad  { background: var(--bad-bg); color: var(--bad); }
+    .warn { background: var(--warn-bg); color: var(--warn); }
+
+    .hidden { display: none; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .summary-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .summary-box .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-box .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .sortbank, .sortslots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 76px;
+      padding: 14px;
+      border: 2px dashed var(--line);
+      border-radius: 16px;
+      background: #fafafa;
+      margin-bottom: 12px;
+    }
+
+    .draggable {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: grab;
+      min-width: 230px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      font-family: Consolas, monospace;
+      font-size: .95rem;
+    }
+
+    .slot {
+      min-height: 68px;
+      min-width: 230px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .slotlabel {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .drag-over {
+      background: #eef4ff;
+      border-color: var(--accent);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 700px) {
+      .wrap { padding: 14px; }
+      .card { padding: 18px; }
+      h1 { font-size: 1.9rem; }
+      .draggable, .slot { min-width: 170px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="version">Version 10.0 - Real Labels / Teach First / No Module X</div>
+      <h1>Shelf It Right</h1>
+      <p>This version teaches comparison logic directly with real-looking music library call numbers before moving into quiz questions and the final drag activity.</p>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="realName">Real Name</label>
+          <input id="realName" type="text" placeholder="Enter full name" />
+        </div>
+        <div class="field">
+          <label for="preferredName">Preferred Name</label>
+          <input id="preferredName" type="text" placeholder="Enter preferred name" />
+        </div>
+        <div class="field">
+          <label for="sbuEmail">SBU Email</label>
+          <input id="sbuEmail" type="email" placeholder="name@stonybrook.edu" />
+        </div>
+      </div>
+
+      <div id="intakeFeedback"></div>
+      <button id="startBtn" type="button">Start Training</button>
+    </div>
+
+    <div id="app" class="hidden">
+      <div class="card">
+        <div id="stageLabel" class="pill">Module 1</div>
+        <div class="progress"><div id="bar"></div></div>
+        <div id="screen"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUoY2_eFLWVWyw5JX7Vv15ZdbDYYkYceQ_fpn0sZPGb3gpCtsrPfe3i_iItmv3ZFdiPA/exec";
+
+    const realNameInput = document.getElementById("realName");
+    const preferredNameInput = document.getElementById("preferredName");
+    const emailInput = document.getElementById("sbuEmail");
+    const intakeFeedback = document.getElementById("intakeFeedback");
+    const app = document.getElementById("app");
+    const screen = document.getElementById("screen");
+    const stageLabel = document.getElementById("stageLabel");
+    const bar = document.getElementById("bar");
+
+    const modules = [
+      {
+        key: "module1",
+        label: "Module 1",
+        title: "Main Number Comes First",
+        teach: `
+          <div class="section-label">Mini Lesson</div>
+          <p><strong>Rule:</strong> Start with the main number after <code class="call">M</code>.</p>
+          <p>Even when the rest of the label looks messy, the first real comparison is the main number.</p>
+          <p><strong>Examples from your shelf style:</strong></p>
+          <p><code class="call">M 451 .S3 H4 Bd.1 v.1 c.3</code></p>
+          <p><code class="call">M 412 .S415 D.487 1970z</code></p>
+          <p>The second one comes first because <strong>412 comes before 451</strong>.</p>
+          <p><strong>Common mistake:</strong> Jumping to <code class="call">.S3</code>, <code class="call">H4</code>, <code class="call">Bd.1</code>, or the year too early.</p>
+        `,
+        check: {
+          prompt: "Which comes first?",
+          choices: [
+            "M 451 .S3 H4 Bd.1 v.1 c.3",
+            "M 412 .S415 D.487 1970z"
+          ],
+          answer: 1,
+          explain: "412 comes before 451, so the second label comes first."
+        },
+        worked: `
+          <div class="section-label">Worked Example</div>
+          <p><code class="call">M 412.4 .H4 H.XIV:7</code></p>
+          <p><code class="call">M 552 .M8 K.515 1956</code></p>
+          <p>Compare the main number first: <strong>412.4 comes before 552</strong>. So the first label comes first.</p>
+        `,
+        questions: [
+          ["Which comes first?", "M 451 .S3 H4 Bd.1 v.1 c.3", "M 412 .S15 Emaj. 1992", 1, "412 comes before 451."],
+          ["Which comes first?", "M 552 .M8 K.515 1956", "M 451 .S3 H4 Bd.2 v.1 c.2", 1, "451 comes before 552."],
+          ["Which comes first?", "M 412.4 .H4 H.XIV:7", "M 412 .S415 D.487 1970z", 1, "412 comes before 412.4."],
+          ["Which comes first?", "M 452 .J63 no. 8 1991", "M 322 .R54 op. 2 v.1", 1, "322 comes before 452."],
+          ["Which comes first?", "M 412 .S15 Emaj. 1992", "M 552 .M8 K.515 1956", 0, "412 comes before 552."],
+          ["Which comes first?", "M 451 .S3 H4 Bd.2 v.1 c.2", "M 452 .J63 no. 8 1991", 0, "451 comes before 452."],
+          ["Which comes first?", "M 412 .S415 D.487 1970z", "M 412.4 .H4 H.XIV:7", 0, "412 comes before 412.4."],
+          ["Which comes first?", "M 322 .R54 op. 2 v.1", "M 412 .S15 Emaj. 1992", 0, "322 comes before 412."],
+          ["Which comes first?", "M 552 .M8 K.515 1956", "M 412.4 .H4 H.XIV:7", 1, "412.4 comes before 552."],
+          ["Which comes first?", "M 452 .J63 no. 8 1991", "M 451 .S3 H4 Bd.1 v.1 c.3", 1, "451 comes before 452."]
+        ]
+      },
+      {
+        key: "module2",
+        label: "Module 2",
+        title: "Then Compare the Next Element",
+        teach: `
+          <div class="section-label">Mini Lesson</div>
+          <p><strong>Rule:</strong> If the main number matches, compare the next meaningful element.</p>
+          <p>That is often the first cutter, but with real labels it may be a stacked or flattened element such as <code class="call">.S15</code>, <code class="call">.S415</code>, <code class="call">.J63</code>, or <code class="call">.M8</code>.</p>
+          <p><strong>Example:</strong></p>
+          <p><code class="call">M 412 .S15 Emaj. 1992</code></p>
+          <p><code class="call">M 412 .S415 D.487 1970z</code></p>
+          <p>The first label comes first because after the same main number, <strong>.S15 comes before .S415</strong>.</p>
+          <p><strong>Common mistake:</strong> Jumping to the later item like <code class="call">Emaj.</code> or <code class="call">D.487</code> before settling the earlier element.</p>
+        `,
+        check: {
+          prompt: "Which comes first?",
+          choices: [
+            "M 412 .S15 Emaj. 1992",
+            "M 412 .S415 D.487 1970z"
+          ],
+          answer: 0,
+          explain: ".S15 comes before .S415."
+        },
+        worked: `
+          <div class="section-label">Worked Example</div>
+          <p><code class="call">M 451 .J63 no. 8 1991</code></p>
+          <p><code class="call">M 451 .S3 H4 Bd.2 v.1 c.2</code></p>
+          <p>The main number matches. Now compare the next element: <strong>.J63 comes before .S3</strong>. So the first label comes first.</p>
+        `,
+        questions: [
+          ["Which comes first?", "M 412 .S15 Emaj. 1992", "M 412 .S415 D.487 1970z", 0, ".S15 comes before .S415."],
+          ["Which comes first?", "M 451 .J63 no. 8 1991", "M 451 .S3 H4 Bd.2 v.1 c.2", 0, ".J63 comes before .S3."],
+          ["Which comes first?", "M 552 .A2 K.515 1956", "M 552 .M8 K.515 1956", 0, ".A2 comes before .M8."],
+          ["Which comes first?", "M 412.4 .H4 H.XIV:7", "M 412.4 .S2 H.XIV:7", 0, ".H4 comes before .S2."],
+          ["Which comes first?", "M 322 .R54 op. 2 v.1", "M 322 .S10 op. 2 v.1", 0, ".R54 comes before .S10."],
+          ["Which comes first?", "M 451 .S3 H4 Bd.1 v.1 c.3", "M 451 .S4 H4 Bd.1 v.1 c.3", 0, ".S3 comes before .S4."],
+          ["Which comes first?", "M 412 .S415 D.487 1970z", "M 412 .T1 D.487 1970z", 0, ".S415 comes before .T1."],
+          ["Which comes first?", "M 552 .M8 K.515 1956", "M 552 .M9 K.515 1956", 0, ".M8 comes before .M9."],
+          ["Which comes first?", "M 451 .J63 no. 8 1991", "M 451 .K1 no. 8 1991", 0, ".J63 comes before .K1."],
+          ["Which comes first?", "M 322 .R54 op. 2 v.1", "M 322 .R60 op. 2 v.1", 0, ".R54 comes before .R60."]
+        ]
+      },
+      {
+        key: "module3",
+        label: "Module 3",
+        title: "Then Use Years, Volumes, Parts, and Other Details",
+        teach: `
+          <div class="section-label">Mini Lesson</div>
+          <p><strong>Rule:</strong> If the earlier parts match, use the later details.</p>
+          <p>On your shelves that can include:</p>
+          <p><code class="call">1992</code> <code class="call">1956</code> <code class="call">Bd.1</code> <code class="call">Bd.2</code> <code class="call">v.1</code> <code class="call">c.2</code> <code class="call">c.3</code> <code class="call">no. 8</code> <code class="call">op. 2</code> Roman numerals like <code class="call">XIV</code>, and year suffixes like <code class="call">1970z</code>.</p>
+          <p><strong>Example:</strong></p>
+          <p><code class="call">M 451 .S3 H4 Bd.1 v.1 c.3</code></p>
+          <p><code class="call">M 451 .S3 H4 Bd.2 v.1 c.2</code></p>
+          <p>The earlier parts match, so now <strong>Bd.1 comes before Bd.2</strong>.</p>
+          <p><strong>Common mistake:</strong> Treating later details as if they matter before the earlier comparison is settled.</p>
+        `,
+        check: {
+          prompt: "Which comes first?",
+          choices: [
+            "M 451 .S3 H4 Bd.1 v.1 c.3",
+            "M 451 .S3 H4 Bd.2 v.1 c.2"
+          ],
+          answer: 0,
+          explain: "Bd.1 comes before Bd.2."
+        },
+        worked: `
+          <div class="section-label">Worked Example</div>
+          <p><code class="call">M 412 .S15 Emaj. 1992</code></p>
+          <p><code class="call">M 412 .S15 Emaj. 2006bx</code></p>
+          <p>The earlier parts match, so the year decides it: <strong>1992 comes before 2006bx</strong>.</p>
+        `,
+        questions: [
+          ["Which comes first?", "M 451 .S3 H4 Bd.1 v.1 c.3", "M 451 .S3 H4 Bd.2 v.1 c.2", 0, "Bd.1 comes before Bd.2."],
+          ["Which comes first?", "M 412 .S15 Emaj. 1992", "M 412 .S15 Emaj. 2006bx", 0, "1992 comes before 2006bx."],
+          ["Which comes first?", "M 552 .M8 K.515 1956", "M 552 .M8 K.515 1970z", 0, "1956 comes before 1970z."],
+          ["Which comes first?", "M 451 .J63 no. 8 1991", "M 451 .J63 no. 9 1991", 0, "No. 8 comes before no. 9."],
+          ["Which comes first?", "M 322 .R54 op. 2 v.1", "M 322 .R54 op. 2 v.2", 0, "v.1 comes before v.2."],
+          ["Which comes first?", "M 451 .S3 H4 Bd.2 v.1 c.2", "M 451 .S3 H4 Bd.2 v.1 c.3", 0, "c.2 comes before c.3."],
+          ["Which comes first?", "M 412.4 .H4 H.XIII:7", "M 412.4 .H4 H.XIV:7", 0, "XIII comes before XIV."],
+          ["Which comes first?", "M 412 .S415 D.487 1970z", "M 412 .S415 D.487 1992", 0, "1970z comes before 1992."],
+          ["Which comes first?", "M 552 .M8 K.515 1956", "M 552 .M8 K.516 1956", 0, "K.515 comes before K.516."],
+          ["Which comes first?", "M 451 .J63 no. 8 1991", "M 451 .J63 no. 8 2006bx", 0, "1991 comes before 2006bx."]
+        ]
+      }
+    ];
+
+    let state = {};
+
+    function resetState() {
+      state = {
+        step: 0,
+        phase: "teach",
+        qIndex: 0,
+        score: 0,
+        submitted: false,
+        student: {
+          realName: realNameInput.value.trim(),
+          preferredName: preferredNameInput.value.trim(),
+          sbuEmail: emailInput.value.trim()
+        },
+        moduleCorrect: {
+          module1: 0,
+          module2: 0,
+          module3: 0
+        },
+        finalDragPassed: false
+      };
+    }
+
+    function showIntakeMessage(message, type = "warn") {
+      if (!message) {
+        intakeFeedback.innerHTML = "";
+        return;
+      }
+      intakeFeedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+    }
+
+    function validateStudentInfo() {
+      const real = realNameInput.value.trim();
+      const preferred = preferredNameInput.value.trim();
+      const email = emailInput.value.trim();
+
+      if (!real) return "Please enter the student’s real name.";
+      if (!preferred) return "Please enter the student’s preferred name.";
+      if (!/^[A-Za-z0-9._%+-]+@stonybrook\.edu$/i.test(email)) {
+        return "Please enter a valid SBU email ending in @stonybrook.edu.";
+      }
+      return "";
+    }
+
+    function startTraining() {
+      const validationMessage = validateStudentInfo();
+      if (validationMessage) {
+        showIntakeMessage(validationMessage);
+        return;
+      }
+      showIntakeMessage("");
+      resetState();
+      app.classList.remove("hidden");
+      render();
+    }
+
+    function render() {
+      if (state.step < modules.length) {
+        renderModule();
+      } else if (state.step === modules.length) {
+        renderFinalDrag();
+      } else {
+        renderDone();
+      }
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const totalStages = modules.length + 2;
+      const currentStage = Math.min(state.step + 1, totalStages);
+      stageLabel.textContent =
+        state.step < modules.length ? modules[state.step].label :
+        state.step === modules.length ? "Final Activity" :
+        "Complete";
+      bar.style.width = `${(currentStage / totalStages) * 100}%`;
+    }
+
+    function renderModule() {
+      const mod = modules[state.step];
+
+      if (state.phase === "teach") {
+        screen.innerHTML = `
+          <h2>${mod.title}</h2>
+          <div class="lesson-box">${mod.teach}</div>
+          <button onclick="goCheck()">Continue</button>
+        `;
+        return;
+      }
+
+      if (state.phase === "check") {
+        screen.innerHTML = `
+          <h2>${mod.title}</h2>
+          <div class="check-box">
+            <div class="section-label">Quick Check — must be correct to continue</div>
+            <p>${mod.check.prompt}</p>
+            <button class="choice" onclick="checkTeachAnswer(0)">${mod.check.choices[0]}</button>
+            <button class="choice" onclick="checkTeachAnswer(1)">${mod.check.choices[1]}</button>
+            <div id="checkFeedback"></div>
+          </div>
+        `;
+        return;
+      }
+
+      if (state.phase === "worked") {
+        screen.innerHTML = `
+          <h2>${mod.title}</h2>
+          <div class="worked-box">${mod.worked}</div>
+          <button onclick="goQuiz()">Continue</button>
+        `;
+        return;
+      }
+
+      const q = mod.questions[state.qIndex];
+      screen.innerHTML = `
+        <h2>${mod.title}</h2>
+        <p><strong>Question ${state.qIndex + 1} of 10</strong></p>
+        <p>${q[0]}</p>
+        <button class="choice" onclick="answerQuestion(0)">${q[1]}</button>
+        <button class="choice" onclick="answerQuestion(1)">${q[2]}</button>
+        <div id="quizFeedback"></div>
+      `;
+    }
+
+    function goCheck() {
+      state.phase = "check";
+      render();
+    }
+
+    function checkTeachAnswer(choice) {
+      const mod = modules[state.step];
+      const feedback = document.getElementById("checkFeedback");
+      const correct = choice === mod.check.answer;
+
+      feedback.innerHTML = `
+        <div class="feedback ${correct ? "good" : "bad"}">
+          ${correct ? "Correct." : "Not quite."} ${mod.check.explain}
+        </div>
+      `;
+
+      if (correct) {
+        feedback.innerHTML += `<button onclick="goWorked()">Continue</button>`;
+        document.querySelectorAll(".choice").forEach(btn => btn.disabled = true);
+      }
+    }
+
+    function goWorked() {
+      state.phase = "worked";
+      render();
+    }
+
+    function goQuiz() {
+      state.phase = "quiz";
+      render();
+    }
+
+    function answerQuestion(choice) {
+      const mod = modules[state.step];
+      const q = mod.questions[state.qIndex];
+      const correct = choice === q[3];
+
+      if (correct) {
+        state.score += 1;
+        state.moduleCorrect[mod.key] += 1;
+      }
+
+      const feedback = document.getElementById("quizFeedback");
+      feedback.innerHTML = `
+        <div class="feedback ${correct ? "good" : "bad"}">
+          ${correct ? "Correct." : "Not quite."} ${q[4]}
+        </div>
+        <button onclick="nextQuestion()">Continue</button>
+      `;
+
+      document.querySelectorAll(".choice").forEach(btn => btn.disabled = true);
+    }
+
+    function nextQuestion() {
+      state.qIndex += 1;
+      if (state.qIndex >= 10) {
+        state.step += 1;
+        state.phase = "teach";
+        state.qIndex = 0;
+      }
+      render();
+    }
+
+    function makeDraggable(text, id) {
+      const div = document.createElement("div");
+      div.className = "draggable";
+      div.draggable = true;
+      div.id = id;
+      div.dataset.value = text;
+      div.textContent = text;
+      return div;
+    }
+
+    function makeSlot(n) {
+      const div = document.createElement("div");
+      div.className = "slot";
+      div.innerHTML = `<div class="slotlabel">Position ${n}</div>`;
+      return div;
+    }
+
+    function shuffle(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function renderFinalDrag() {
+      const correctOrder = [
+        "M 322 .R54 op. 2 v.1",
+        "M 412 .S15 Emaj. 1992",
+        "M 412 .S415 D.487 1970z",
+        "M 412.4 .H4 H.XIV:7",
+        "M 451 .S3 H4 Bd.1 v.1 c.3"
+      ];
+
+      const shuffled = shuffle(correctOrder);
+
+      screen.innerHTML = `
+        <h2>Final Activity</h2>
+        <p>Drag each label into the correct order from first to last.</p>
+        <p class="muted">Use the same comparison logic you practiced: main number first, then the next element, then later details if needed.</p>
+        <h3>Label Bank</h3>
+        <div class="sortbank" id="bank"></div>
+        <h3>Order Slots</h3>
+        <div class="sortslots" id="slots"></div>
+        <div id="dragFeedback"></div>
+        <button onclick="checkDrag()">Check Order</button>
+        <button class="secondary" onclick="renderFinalDrag()">Reset</button>
+      `;
+
+      const bank = document.getElementById("bank");
+      const slots = document.getElementById("slots");
+
+      shuffled.forEach((item, i) => bank.appendChild(makeDraggable(item, "item-" + i)));
+      correctOrder.forEach((_, i) => slots.appendChild(makeSlot(i + 1)));
+
+      enableDnD();
+    }
+
+    function enableDnD() {
+      document.querySelectorAll(".draggable").forEach(el => {
+        el.addEventListener("dragstart", function(e) {
+          e.dataTransfer.setData("text/plain", this.id);
+        });
+      });
+
+      document.querySelectorAll(".slot").forEach(slot => {
+        slot.addEventListener("dragover", function(e) {
+          e.preventDefault();
+          this.classList.add("drag-over");
+        });
+
+        slot.addEventListener("dragleave", function() {
+          this.classList.remove("drag-over");
+        });
+
+        slot.addEventListener("drop", function(e) {
+          e.preventDefault();
+          this.classList.remove("drag-over");
+          const id = e.dataTransfer.getData("text/plain");
+          const el = document.getElementById(id);
+          const bank = document.getElementById("bank");
+          if (!el) return;
+
+          const existing = this.querySelector(".draggable");
+          if (existing && bank) bank.appendChild(existing);
+
+          this.appendChild(el);
+        });
+      });
+
+      const bank = document.getElementById("bank");
+      bank.addEventListener("dragover", e => e.preventDefault());
+      bank.addEventListener("drop", function(e) {
+        e.preventDefault();
+        const id = e.dataTransfer.getData("text/plain");
+        const el = document.getElementById(id);
+        if (el) bank.appendChild(el);
+      });
+    }
+
+    function checkDrag() {
+      const correctOrder = [
+        "M 322 .R54 op. 2 v.1",
+        "M 412 .S15 Emaj. 1992",
+        "M 412 .S415 D.487 1970z",
+        "M 412.4 .H4 H.XIV:7",
+        "M 451 .S3 H4 Bd.1 v.1 c.3"
+      ];
+
+      const chosen = [];
+      document.querySelectorAll(".slot").forEach(slot => {
+        const item = slot.querySelector(".draggable");
+        if (item) chosen.push(item.dataset.value);
+      });
+
+      const feedback = document.getElementById("dragFeedback");
+
+      if (chosen.length !== correctOrder.length) {
+        feedback.innerHTML = `<div class="feedback warn">Please place every label into a slot before checking the order.</div>`;
+        return;
+      }
+
+      let ok = true;
+      for (let i = 0; i < correctOrder.length; i++) {
+        if (chosen[i] !== correctOrder[i]) {
+          ok = false;
+          break;
+        }
+      }
+
+      state.finalDragPassed = ok;
+
+      feedback.innerHTML = `
+        <div class="feedback ${ok ? "good" : "bad"}">
+          ${ok ? "Correct. You placed the labels in the right order." : "Not quite. The final order is not correct yet."}
+        </div>
+        <button onclick="finishTraining()">Continue</button>
+      `;
+    }
+
+    function finishTraining() {
+      state.step += 1;
+      render();
+    }
+
+    function buildPayload() {
+      const module1Passed = state.moduleCorrect.module1 >= 7;
+      const module2Passed = state.moduleCorrect.module2 >= 7;
+      const module3Passed = state.moduleCorrect.module3 >= 7;
+      const totalModulesPassed = [module1Passed, module2Passed, module3Passed, state.finalDragPassed].filter(Boolean).length;
+      const totalScore = state.score + (state.finalDragPassed ? 1 : 0);
+      const overallPass = module1Passed && module2Passed && module3Passed && state.finalDragPassed;
+
+      return {
+        timestamp: new Date().toISOString(),
+        realName: state.student.realName,
+        preferredName: state.student.preferredName,
+        sbuEmail: state.student.sbuEmail,
+
+        module1Completed: true,
+        module1Passed: module1Passed,
+
+        module2Completed: true,
+        module2Passed: module2Passed,
+
+        module3Completed: true,
+        module3Passed: module3Passed,
+
+        module4Completed: true,
+        module4Passed: state.finalDragPassed,
+
+        totalModulesCompleted: 4,
+        totalModulesPassed: totalModulesPassed,
+
+        cumulativeCheckPassed: totalScore >= 22,
+        finalDragDropPassed: state.finalDragPassed,
+
+        totalScore: totalScore,
+        passFail: overallPass ? "Pass" : "Fail",
+        attemptCount: 1
+      };
+    }
+
+    function renderDone() {
+      const payload = buildPayload();
+
+      screen.innerHTML = `
+        <h2>Training Complete</h2>
+        <div class="summary-grid">
+          <div class="summary-box"><div class="label">Student</div><div class="value">${payload.preferredName}</div></div>
+          <div class="summary-box"><div class="label">Real Name</div><div class="value">${payload.realName}</div></div>
+          <div class="summary-box"><div class="label">Email</div><div class="value">${payload.sbuEmail}</div></div>
+          <div class="summary-box"><div class="label">Total Score</div><div class="value">${payload.totalScore} / 31</div></div>
+          <div class="summary-box"><div class="label">Module 1</div><div class="value">${state.moduleCorrect.module1} / 10</div></div>
+          <div class="summary-box"><div class="label">Module 2</div><div class="value">${state.moduleCorrect.module2} / 10</div></div>
+          <div class="summary-box"><div class="label">Module 3</div><div class="value">${state.moduleCorrect.module3} / 10</div></div>
+          <div class="summary-box"><div class="label">Final Drag</div><div class="value">${state.finalDragPassed ? "Passed" : "Not Passed"}</div></div>
+          <div class="summary-box"><div class="label">Overall Result</div><div class="value">${payload.passFail}</div></div>
+        </div>
+
+        <button id="submitBtn" onclick="submitResults()">Submit Results</button>
+        <div id="submitStatus"></div>
+      `;
+    }
+
+    async function submitResults() {
+      const status = document.getElementById("submitStatus");
+      const payload = buildPayload();
+
+      if (state.submitted) {
+        status.innerHTML = `<div class="feedback good">Results already submitted for this run.</div>`;
+        return;
+      }
+
+      status.innerHTML = `<div class="feedback warn">Submitting results...</div>`;
+
+      try {
+        await fetch(APP_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        state.submitted = true;
+        status.innerHTML = `<div class="feedback good">Submission sent. Check the sheet in a few seconds.</div>`;
+      } catch (error) {
+        status.innerHTML = `<div class="feedback bad">Submission failed in the browser.</div>`;
+      }
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startTraining);
+  </script>
 </body>
 </html>
