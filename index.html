@@ -1,215 +1,805 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shelf It Right - HARD LOCK VERSION</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shelf It Right - Stable Teach Version</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d7dee8;
+      --accent: #1d5f91;
+      --accent-2: #2d74ac;
+      --good: #166534;
+      --good-bg: #dcfce7;
+      --bad: #991b1b;
+      --bad-bg: #fee2e2;
+      --warn: #92400e;
+      --warn-bg: #fef3c7;
+    }
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background:#f4f7fb;
-  padding:20px;
-}
-.card {
-  max-width:700px;
-  margin:auto;
-  background:white;
-  padding:25px;
-  border-radius:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
-}
-.big-marker {
-  background:#ff0000;
-  color:white;
-  padding:10px;
-  font-weight:bold;
-  text-align:center;
-  margin-bottom:15px;
-}
-button {
-  padding:10px 15px;
-  margin-top:10px;
-  cursor:pointer;
-}
-.choice {
-  display:block;
-  width:100%;
-  margin:8px 0;
-}
-.hidden { display:none; }
-.feedback { margin-top:10px; font-weight:bold; }
-</style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
+    }
+
+    h1, h2, h3 { margin-top: 0; }
+    h1 { font-size: 2.2rem; margin-bottom: 10px; }
+    h2 { font-size: 1.5rem; margin-bottom: 10px; }
+
+    .version {
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0 18px;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width .2s ease;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #e7eef6;
+      color: #34516c;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      margin-bottom: 10px;
+    }
+
+    .lesson-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin: 14px 0;
+    }
+
+    .compare-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      margin: 14px 0;
+    }
+
+    .compare-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button:hover { background: var(--accent-2); }
+
+    button.choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 10px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    button.choice:hover {
+      border-color: var(--accent);
+      background: #f8fbff;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .feedback {
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 14px;
+      font-weight: 600;
+    }
+
+    .good { background: var(--good-bg); color: var(--good); }
+    .bad { background: var(--bad-bg); color: var(--bad); }
+    .warn { background: var(--warn-bg); color: var(--warn); }
+
+    .hidden { display: none; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .summary-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .summary-box .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-box .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .sortbank, .sortslots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 76px;
+      padding: 14px;
+      border: 2px dashed var(--line);
+      border-radius: 16px;
+      background: #fafafa;
+      margin-bottom: 12px;
+    }
+
+    .draggable {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: grab;
+      min-width: 210px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    .slot {
+      min-height: 68px;
+      min-width: 210px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .slotlabel {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .drag-over {
+      background: #eef4ff;
+      border-color: var(--accent);
+    }
+
+    code.call {
+      background: #f3f4f6;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <div class="card">
+      <div class="version">Version 9.0 - Teach / Worked / 10 Questions / No Module X</div>
+      <h1>Shelf It Right</h1>
+      <p>This version teaches first, then shows a worked example, then runs 10 fixed questions per module, followed by the final drag/drop and scoreboard submission.</p>
 
-<div class="card">
+      <div class="form-grid">
+        <div class="field">
+          <label for="realName">Real Name</label>
+          <input id="realName" type="text" placeholder="Enter full name" />
+        </div>
+        <div class="field">
+          <label for="preferredName">Preferred Name</label>
+          <input id="preferredName" type="text" placeholder="Enter preferred name" />
+        </div>
+        <div class="field">
+          <label for="sbuEmail">SBU Email</label>
+          <input id="sbuEmail" type="email" placeholder="name@stonybrook.edu" />
+        </div>
+      </div>
 
-<div class="big-marker">
-🚨 MODULE X MUST APPEAR FIRST 🚨
-</div>
+      <div id="intakeFeedback"></div>
 
-<div id="setup">
-  <h2>Start Training</h2>
-  <input id="name" placeholder="Name"><br>
-  <input id="email" placeholder="name@stonybrook.edu"><br>
-  <button onclick="start()">START</button>
-</div>
+      <button id="startBtn" type="button">Start Training</button>
+    </div>
 
-<div id="app" class="hidden"></div>
+    <div id="app" class="hidden">
+      <div class="card">
+        <div id="stageLabel" class="pill">Module 1</div>
+        <div class="progress"><div id="bar"></div></div>
+        <div id="screen"></div>
+      </div>
+    </div>
+  </div>
 
-</div>
+  <script>
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUoY2_eFLWVWyw5JX7Vv15ZdbDYYkYceQ_fpn0sZPGb3gpCtsrPfe3i_iItmv3ZFdiPA/exec";
 
-<script>
+    const realNameInput = document.getElementById("realName");
+    const preferredNameInput = document.getElementById("preferredName");
+    const emailInput = document.getElementById("sbuEmail");
+    const intakeFeedback = document.getElementById("intakeFeedback");
+    const app = document.getElementById("app");
+    const screen = document.getElementById("screen");
+    const stageLabel = document.getElementById("stageLabel");
+    const bar = document.getElementById("bar");
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUoY2_eFLWVWyw5JX7Vv15ZdbDYYkYceQ_fpn0sZPGb3gpCtsrPfe3i_iItmv3ZFdiPA/exec";
+    const modules = [
+      {
+        key: "module1",
+        label: "Module 1",
+        title: "Whole Number",
+        teach: `
+          <p>Always compare the whole number first.</p>
+          <p>Do not jump to the cutter too early.</p>
+          <p>Examples: <code class="call">M 2</code> comes before <code class="call">M 2.3</code>, and both come before <code class="call">M 3</code>.</p>
+        `,
+        worked: `
+          <div class="compare-box">
+            <div class="compare-label">Worked Example</div>
+            <p><code class="call">M 2.3 .U6 R4 V.66</code> comes before <code class="call">M 3 .B103 2005 SER.8 V.2</code> because <strong>2.3 comes before 3</strong>.</p>
+          </div>
+        `,
+        questions: [
+          { prompt: "Which call number comes first?", choices: ["M 3", "M 2.3"], answer: 1, explain: "2.3 comes before 3." },
+          { prompt: "Which call number comes first?", choices: ["M 2", "M 3"], answer: 0, explain: "2 comes before 3." },
+          { prompt: "Which call number comes first?", choices: ["M 452", "M 3"], answer: 1, explain: "3 comes before 452." },
+          { prompt: "Which call number comes first?", choices: ["M 2.1", "M 2.3"], answer: 0, explain: "2.1 comes before 2.3." },
+          { prompt: "Which call number comes first?", choices: ["M 5", "M 12"], answer: 0, explain: "5 comes before 12." },
+          { prompt: "Which call number comes first?", choices: ["M 9", "M 2"], answer: 1, explain: "2 comes before 9." },
+          { prompt: "Which call number comes first?", choices: ["M 1", "M 1.5"], answer: 0, explain: "1 comes before 1.5." },
+          { prompt: "Which call number comes first?", choices: ["M 100", "M 50"], answer: 1, explain: "50 comes before 100." },
+          { prompt: "Which call number comes first?", choices: ["M 3", "M 3.1"], answer: 0, explain: "3 comes before 3.1." },
+          { prompt: "Which call number comes first?", choices: ["M 2.9", "M 2.1"], answer: 1, explain: "2.1 comes before 2.9." }
+        ]
+      },
+      {
+        key: "module2",
+        label: "Module 2",
+        title: "First Cutter",
+        teach: `
+          <p>If the whole number matches, compare the first cutter.</p>
+          <p>Examples within <code class="call">M 3</code>: <code class="call">.B103</code> comes before <code class="call">.C4</code>, and <code class="call">.C4</code> comes before <code class="call">.S36</code>.</p>
+        `,
+        worked: `
+          <div class="compare-box">
+            <div class="compare-label">Worked Example</div>
+            <p><code class="call">M 3 .B103</code> comes before <code class="call">M 3 .C4</code> because the whole number matches and <strong>B comes before C</strong>.</p>
+          </div>
+        `,
+        questions: [
+          { prompt: "Which call number comes first?", choices: ["M 3 .C4", "M 3 .B1"], answer: 1, explain: "B comes before C." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .A2", "M 3 .B1"], answer: 0, explain: "A comes before B." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .D2", "M 3 .C9"], answer: 1, explain: "C comes before D." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .B2", "M 3 .B10"], answer: 0, explain: "Within the same letter, 2 comes before 10." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .S2", "M 3 .S1"], answer: 1, explain: "1 comes before 2." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .H3", "M 3 .G4"], answer: 1, explain: "G comes before H." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .A9", "M 3 .A2"], answer: 1, explain: "2 comes before 9." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .Z1", "M 3 .Y1"], answer: 1, explain: "Y comes before Z." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .C3", "M 3 .C4"], answer: 0, explain: "3 comes before 4." },
+          { prompt: "Which call number comes first?", choices: ["M 3 .M1", "M 3 .L9"], answer: 1, explain: "L comes before M." }
+        ]
+      },
+      {
+        key: "module3",
+        label: "Module 3",
+        title: "Year and Later Details",
+        teach: `
+          <p>If the earlier parts match, then later details decide the order.</p>
+          <p>This can include years, series, volumes, parts, and Roman numerals.</p>
+        `,
+        worked: `
+          <div class="compare-box">
+            <div class="compare-label">Worked Example</div>
+            <p><code class="call">M 3 .O35 1994 SER.II</code> comes before <code class="call">M 3 .O35 2001 SER.II</code> because the earlier parts match, so the <strong>year</strong> decides it.</p>
+          </div>
+        `,
+        questions: [
+          { prompt: "Which comes first?", choices: ["1994", "2001"], answer: 0, explain: "1994 comes before 2001." },
+          { prompt: "Which comes first?", choices: ["SER.I", "SER.II"], answer: 0, explain: "I comes before II." },
+          { prompt: "Which comes first?", choices: ["SER.V", "SER.II"], answer: 1, explain: "II comes before V." },
+          { prompt: "Which comes first?", choices: ["1990", "1980"], answer: 1, explain: "1980 comes before 1990." },
+          { prompt: "Which comes first?", choices: ["VOL 1", "VOL 2"], answer: 0, explain: "1 comes before 2." },
+          { prompt: "Which comes first?", choices: ["PT 2", "PT 1"], answer: 1, explain: "1 comes before 2." },
+          { prompt: "Which comes first?", choices: ["SER.I", "SER.VI"], answer: 0, explain: "I comes before VI." },
+          { prompt: "Which comes first?", choices: ["2000", "1999"], answer: 1, explain: "1999 comes before 2000." },
+          { prompt: "Which comes first?", choices: ["FASC.2", "FASC.3"], answer: 0, explain: "2 comes before 3." },
+          { prompt: "Which comes first?", choices: ["III", "II"], answer: 1, explain: "II comes before III." }
+        ]
+      }
+    ];
 
-let state = {
-  step: "moduleX",
-  score: 0,
-  name:"",
-  email:""
-};
+    let state = {};
 
-function start(){
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
+    function resetState() {
+      state = {
+        step: 0,
+        phase: "teach",
+        qIndex: 0,
+        score: 0,
+        submitted: false,
+        student: {
+          realName: realNameInput.value.trim(),
+          preferredName: preferredNameInput.value.trim(),
+          sbuEmail: emailInput.value.trim()
+        },
+        moduleCorrect: {
+          module1: 0,
+          module2: 0,
+          module3: 0
+        },
+        finalDragPassed: false
+      };
+    }
 
-  if(!name) return alert("Enter name");
-  if(!email.endsWith("@stonybrook.edu")) return alert("Use SBU email");
+    function showIntakeMessage(message, type = "warn") {
+      if (!message) {
+        intakeFeedback.innerHTML = "";
+        return;
+      }
+      intakeFeedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+    }
 
-  state.name = name;
-  state.email = email;
+    function validateStudentInfo() {
+      const real = realNameInput.value.trim();
+      const preferred = preferredNameInput.value.trim();
+      const email = emailInput.value.trim();
 
-  document.getElementById("setup").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
+      if (!real) return "Please enter the student’s real name.";
+      if (!preferred) return "Please enter the student’s preferred name.";
+      if (!/^[A-Za-z0-9._%+-]+@stonybrook\.edu$/i.test(email)) {
+        return "Please enter a valid SBU email ending in @stonybrook.edu.";
+      }
+      return "";
+    }
 
-  render();
-}
+    function startTraining() {
+      const validationMessage = validateStudentInfo();
+      if (validationMessage) {
+        showIntakeMessage(validationMessage);
+        return;
+      }
 
-function render(){
-  const app = document.getElementById("app");
+      showIntakeMessage("");
+      resetState();
+      app.classList.remove("hidden");
+      render();
+    }
 
-  if(state.step === "moduleX"){
-    app.innerHTML = `
-      <h2>MODULE X (MANDATORY)</h2>
-      <p>Work IDs identify the piece, NOT shelving order.</p>
-      <button onclick="startModuleX()">Begin Module X</button>
-    `;
-  }
+    function render() {
+      if (state.step < modules.length) {
+        renderModule();
+      } else if (state.step === modules.length) {
+        renderFinalDrag();
+      } else {
+        renderDone();
+      }
+      updateProgress();
+    }
 
-  else if(state.step === "moduleXQuiz"){
-    app.innerHTML = `
-      <h2>MODULE X QUIZ</h2>
-      <p>What is KV 620?</p>
-      <button class="choice" onclick="answerX(0)">Call number</button>
-      <button class="choice" onclick="answerX(1)">Work ID</button>
-      <div id="fb"></div>
-    `;
-  }
+    function updateProgress() {
+      const totalStages = modules.length + 2;
+      const currentStage = Math.min(state.step + 1, totalStages);
+      stageLabel.textContent =
+        state.step < modules.length ? modules[state.step].label :
+        state.step === modules.length ? "Final Activity" :
+        "Complete";
+      bar.style.width = `${(currentStage / totalStages) * 100}%`;
+    }
 
-  else if(state.step === "module1Teach"){
-    app.innerHTML = `
-      <h2>MODULE 1 - TEACH</h2>
-      <p>Always start with the whole number.</p>
-      <button onclick="next('module1Worked')">Continue</button>
-    `;
-  }
+    function renderModule() {
+      const mod = modules[state.step];
 
-  else if(state.step === "module1Worked"){
-    app.innerHTML = `
-      <h2>WORKED EXAMPLE</h2>
-      <p>M 2.3 comes before M 3</p>
-      <button onclick="next('module1Quiz')">Continue</button>
-    `;
-  }
+      if (state.phase === "teach") {
+        screen.innerHTML = `
+          <h2>${mod.title}</h2>
+          <div class="lesson-box">${mod.teach}</div>
+          <button onclick="goWorked()">Continue</button>
+        `;
+        return;
+      }
 
-  else if(state.step === "module1Quiz"){
-    app.innerHTML = `
-      <h2>MODULE 1 TEST</h2>
-      <p>Which comes first?</p>
-      <button class="choice" onclick="answer1(0)">M 3</button>
-      <button class="choice" onclick="answer1(1)">M 2.3</button>
-      <div id="fb"></div>
-    `;
-  }
+      if (state.phase === "worked") {
+        screen.innerHTML = `
+          <h2>${mod.title}</h2>
+          ${mod.worked}
+          <button onclick="goQuiz()">Continue</button>
+        `;
+        return;
+      }
 
-  else if(state.step === "done"){
-    app.innerHTML = `
-      <h2>DONE</h2>
-      <p>Score: ${state.score}</p>
-      <button onclick="submit()">Submit</button>
-      <div id="status"></div>
-    `;
-  }
-}
+      const q = mod.questions[state.qIndex];
+      screen.innerHTML = `
+        <h2>${mod.title}</h2>
+        <p><strong>Question ${state.qIndex + 1} of 10</strong></p>
+        <p>${q.prompt}</p>
+        <button class="choice" onclick="answerQuestion(0)">${q.choices[0]}</button>
+        <button class="choice" onclick="answerQuestion(1)">${q.choices[1]}</button>
+        <div id="quizFeedback"></div>
+      `;
+    }
 
-function startModuleX(){
-  state.step = "moduleXQuiz";
-  render();
-}
+    function goWorked() {
+      state.phase = "worked";
+      render();
+    }
 
-function answerX(choice){
-  const fb = document.getElementById("fb");
-  if(choice === 1){
-    fb.innerHTML = "Correct";
-    state.score++;
-    setTimeout(()=> next("module1Teach"), 800);
-  } else {
-    fb.innerHTML = "Wrong";
-  }
-}
+    function goQuiz() {
+      state.phase = "quiz";
+      render();
+    }
 
-function answer1(choice){
-  const fb = document.getElementById("fb");
-  if(choice === 1){
-    fb.innerHTML = "Correct";
-    state.score++;
-    setTimeout(()=> next("done"), 800);
-  } else {
-    fb.innerHTML = "Wrong";
-  }
-}
+    function answerQuestion(choice) {
+      const mod = modules[state.step];
+      const q = mod.questions[state.qIndex];
+      const correct = choice === q.answer;
 
-function next(step){
-  state.step = step;
-  render();
-}
+      if (correct) {
+        state.score += 1;
+        state.moduleCorrect[mod.key] += 1;
+      }
 
-async function submit(){
-  const payload = {
-    realName: state.name,
-    preferredName: state.name,
-    sbuEmail: state.email,
-    module1Completed: true,
-    module1Passed: true,
-    module2Completed: true,
-    module2Passed: true,
-    module3Completed: true,
-    module3Passed: true,
-    module4Completed: true,
-    module4Passed: true,
-    totalModulesCompleted: 4,
-    totalModulesPassed: 4,
-    cumulativeCheckPassed: true,
-    finalDragDropPassed: true,
-    totalScore: state.score,
-    passFail: "Pass",
-    attemptCount: 1
-  };
+      const feedback = document.getElementById("quizFeedback");
+      feedback.innerHTML = `
+        <div class="feedback ${correct ? "good" : "bad"}">
+          ${correct ? "Correct." : "Not quite."} ${q.explain}
+        </div>
+        <button onclick="nextQuestion()">Continue</button>
+      `;
 
-  document.getElementById("status").innerText = "Submitting...";
+      document.querySelectorAll(".choice").forEach(btn => btn.disabled = true);
+    }
 
-  await fetch(SCRIPT_URL,{
-    method:"POST",
-    mode:"no-cors",
-    body:JSON.stringify(payload)
-  });
+    function nextQuestion() {
+      state.qIndex += 1;
 
-  document.getElementById("status").innerText = "Submitted.";
-}
+      if (state.qIndex >= 10) {
+        state.step += 1;
+        state.phase = "teach";
+        state.qIndex = 0;
+      }
 
-</script>
+      render();
+    }
+
+    function makeDraggable(text, id) {
+      const div = document.createElement("div");
+      div.className = "draggable";
+      div.draggable = true;
+      div.id = id;
+      div.dataset.value = text;
+      div.textContent = text;
+      return div;
+    }
+
+    function makeSlot(n) {
+      const div = document.createElement("div");
+      div.className = "slot";
+      div.innerHTML = `<div class="slotlabel">Position ${n}</div>`;
+      return div;
+    }
+
+    function shuffle(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function compareCallNumbers(a, b) {
+      const extractWhole = (x) => {
+        const m = x.match(/\bM\s*(\d+(?:\.\d+)?)/i);
+        return m ? parseFloat(m[1]) : Infinity;
+      };
+      const extractCutter = (x) => {
+        const m = x.match(/\.([A-Z])(\d+(?:\.\d+)?)/i);
+        return m ? { letter: m[1].toUpperCase(), num: parseFloat(m[2]) } : null;
+      };
+      const extractYear = (x) => {
+        const m = x.match(/\b(1[6-9]\d{2}|20\d{2})\b/);
+        return m ? parseInt(m[1], 10) : null;
+      };
+
+      const wa = extractWhole(a);
+      const wb = extractWhole(b);
+      if (wa !== wb) return wa - wb;
+
+      const ca = extractCutter(a);
+      const cb = extractCutter(b);
+      if (ca && cb) {
+        if (ca.letter !== cb.letter) return ca.letter.localeCompare(cb.letter);
+        if (ca.num !== cb.num) return ca.num - cb.num;
+      }
+
+      const ya = extractYear(a);
+      const yb = extractYear(b);
+      if (ya !== yb) return (ya || -Infinity) - (yb || -Infinity);
+
+      return a.localeCompare(b);
+    }
+
+    function renderFinalDrag() {
+      const items = [
+        "M 3 .C4 1993 SER.VI V.69A",
+        "M 2.3 .U6 R4 V.66",
+        "M 3 .B103 2005 SER.8 V.2",
+        "M 2 .G39 1966 BD.23",
+        "M 452 .H42 H.III:E2"
+      ];
+
+      const shuffled = shuffle(items);
+
+      screen.innerHTML = `
+        <h2>Final Activity</h2>
+        <p>Drag each call number into the slots from first to last.</p>
+        <h3>Call Number Bank</h3>
+        <div class="sortbank" id="bank"></div>
+        <h3>Order Slots</h3>
+        <div class="sortslots" id="slots"></div>
+        <div id="dragFeedback"></div>
+        <button onclick="checkDrag()">Check Order</button>
+      `;
+
+      const bank = document.getElementById("bank");
+      const slots = document.getElementById("slots");
+
+      shuffled.forEach((item, i) => bank.appendChild(makeDraggable(item, "item-" + i)));
+      items.forEach((_, i) => slots.appendChild(makeSlot(i + 1)));
+
+      enableDnD();
+    }
+
+    function enableDnD() {
+      document.querySelectorAll(".draggable").forEach(el => {
+        el.addEventListener("dragstart", function(e) {
+          e.dataTransfer.setData("text/plain", this.id);
+        });
+      });
+
+      document.querySelectorAll(".slot").forEach(slot => {
+        slot.addEventListener("dragover", function(e) {
+          e.preventDefault();
+          this.classList.add("drag-over");
+        });
+
+        slot.addEventListener("dragleave", function() {
+          this.classList.remove("drag-over");
+        });
+
+        slot.addEventListener("drop", function(e) {
+          e.preventDefault();
+          this.classList.remove("drag-over");
+          const id = e.dataTransfer.getData("text/plain");
+          const el = document.getElementById(id);
+          const bank = document.getElementById("bank");
+
+          if (!el) return;
+
+          const existing = this.querySelector(".draggable");
+          if (existing && bank) bank.appendChild(existing);
+
+          this.appendChild(el);
+        });
+      });
+
+      const bank = document.getElementById("bank");
+      bank.addEventListener("dragover", e => e.preventDefault());
+      bank.addEventListener("drop", function(e) {
+        e.preventDefault();
+        const id = e.dataTransfer.getData("text/plain");
+        const el = document.getElementById(id);
+        if (el) bank.appendChild(el);
+      });
+    }
+
+    function checkDrag() {
+      const correctOrder = [
+        "M 2 .G39 1966 BD.23",
+        "M 2.3 .U6 R4 V.66",
+        "M 3 .B103 2005 SER.8 V.2",
+        "M 3 .C4 1993 SER.VI V.69A",
+        "M 452 .H42 H.III:E2"
+      ];
+
+      const chosen = [];
+      document.querySelectorAll(".slot").forEach(slot => {
+        const item = slot.querySelector(".draggable");
+        if (item) chosen.push(item.dataset.value);
+      });
+
+      const feedback = document.getElementById("dragFeedback");
+
+      if (chosen.length !== correctOrder.length) {
+        feedback.innerHTML = `<div class="feedback warn">Please place every call number into a slot before checking the order.</div>`;
+        return;
+      }
+
+      let ok = true;
+      for (let i = 0; i < correctOrder.length; i++) {
+        if (chosen[i] !== correctOrder[i]) {
+          ok = false;
+          break;
+        }
+      }
+
+      state.finalDragPassed = ok;
+
+      feedback.innerHTML = `
+        <div class="feedback ${ok ? "good" : "bad"}">
+          ${ok ? "Correct. You placed the call numbers in the right order." : "Not quite. The order is incorrect."}
+        </div>
+        <button onclick="finishTraining()">Continue</button>
+      `;
+    }
+
+    function finishTraining() {
+      state.step += 1;
+      render();
+    }
+
+    function buildPayload() {
+      const module1Passed = state.moduleCorrect.module1 >= 7;
+      const module2Passed = state.moduleCorrect.module2 >= 7;
+      const module3Passed = state.moduleCorrect.module3 >= 7;
+
+      const totalModulesPassed = [module1Passed, module2Passed, module3Passed, state.finalDragPassed].filter(Boolean).length;
+      const totalScore = state.score + (state.finalDragPassed ? 1 : 0);
+      const overallPass = module1Passed && module2Passed && module3Passed && state.finalDragPassed;
+
+      return {
+        timestamp: new Date().toISOString(),
+        realName: state.student.realName,
+        preferredName: state.student.preferredName,
+        sbuEmail: state.student.sbuEmail,
+        module1Completed: true,
+        module1Passed: module1Passed,
+        module2Completed: true,
+        module2Passed: module2Passed,
+        module3Completed: true,
+        module3Passed: module3Passed,
+        module4Completed: true,
+        module4Passed: state.finalDragPassed,
+        totalModulesCompleted: 4,
+        totalModulesPassed: totalModulesPassed,
+        cumulativeCheckPassed: totalScore >= 22,
+        finalDragDropPassed: state.finalDragPassed,
+        totalScore: totalScore,
+        passFail: overallPass ? "Pass" : "Fail",
+        attemptCount: 1
+      };
+    }
+
+    function renderDone() {
+      const payload = buildPayload();
+
+      screen.innerHTML = `
+        <h2>Training Complete</h2>
+        <div class="summary-grid">
+          <div class="summary-box"><div class="label">Student</div><div class="value">${payload.preferredName}</div></div>
+          <div class="summary-box"><div class="label">Real Name</div><div class="value">${payload.realName}</div></div>
+          <div class="summary-box"><div class="label">Email</div><div class="value">${payload.sbuEmail}</div></div>
+          <div class="summary-box"><div class="label">Total Score</div><div class="value">${payload.totalScore} / 31</div></div>
+          <div class="summary-box"><div class="label">Overall Result</div><div class="value">${payload.passFail}</div></div>
+        </div>
+        <button id="submitBtn" onclick="submitResults()">Submit Results</button>
+        <div id="submitStatus"></div>
+      `;
+    }
+
+    async function submitResults() {
+      const status = document.getElementById("submitStatus");
+      const payload = buildPayload();
+
+      if (state.submitted) {
+        status.innerHTML = `<div class="feedback good">Results already submitted for this run.</div>`;
+        return;
+      }
+
+      status.innerHTML = `<div class="feedback warn">Submitting results...</div>`;
+
+      try {
+        await fetch(APP_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        state.submitted = true;
+        status.innerHTML = `<div class="feedback good">Submission sent. Check the sheet in a few seconds.</div>`;
+      } catch (error) {
+        status.innerHTML = `<div class="feedback bad">Submission failed in the browser.</div>`;
+      }
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startTraining);
+  </script>
 </body>
 </html>
